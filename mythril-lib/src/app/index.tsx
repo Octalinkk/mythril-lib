@@ -1,12 +1,9 @@
-import { Text, View, StyleSheet, Platform } from "react-native";
-import * as Device from "expo-device"
+import { Text, View, StyleSheet } from "react-native";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Text>Saluuut</Text>
-      <Text>Running on : {Platform.OS} {Platform.Version}</Text>
-      <Text>Running on : {Device.brand}</Text>
+      <Text>Edit src/app/index.tsx to edit this screen.</Text>
     </View>
   );
 }
