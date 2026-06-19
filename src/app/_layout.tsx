@@ -1,19 +1,16 @@
-import { Stack } from 'expo-router';
-import { SQLiteProvider } from 'expo-sqlite';
 import { initDatabase } from '@/db/DBManager';
-import { Suspense } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 
 export default function RootLayout() {
-    return (
-        <SQLiteProvider
-            databaseName="data.db"
-            onInit={initDatabase}
-            useSuspense
-        >
-            <Suspense fallback={<ActivityIndicator />}>
-                <Stack screenOptions={{ headerShown: false }} />
-            </Suspense>
-        </SQLiteProvider>
-    );
+
+    console.log("App running...")
+
+    useEffect(() => {
+        initDatabase().then(() => {
+            console.log('✅ DB prête');
+        }).catch(console.error);
+    }, []);
+
+    return <Stack screenOptions={{ headerShown: false }} />;
 }
