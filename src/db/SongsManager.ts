@@ -1,13 +1,13 @@
 import { getDb } from "./DBManager"
 
 export interface Song {
-    id:Number
-    name: String
-    file_path:String
-    cover:String
-    last_time_played:String
-    time_listened: Number
-    time_started: Number
+    id:number
+    name: string
+    file_path:string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllSongs() {
@@ -25,7 +25,7 @@ export async function getAllSongs() {
     return songs;
 }
 
-export async function getSongById(id:Number) {
+export async function getSongById(id:number) {
     let song:Song
     const db = await getDb();
     const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE id = ${id}`);
@@ -43,8 +43,10 @@ export async function getSongById(id:Number) {
 export async function addSong(song:Song) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`INSERT INTO songs (name, file_path, cover, last_time_played, time_listened, time_started) 
-        VALUES (${song.name}, ${song.file_path}, ${song.cover}, ${song.last_time_played}, ${song.time_listened}, ${song.time_started})`)
+    await db.runAsync(
+    'INSERT INTO songs (name, file_path, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?, ?)',
+    [song.name, song.file_path, song.cover, song.last_time_played, song.time_listened, song.time_started]
+);
     }
     catch (err) {
         console.error(err)

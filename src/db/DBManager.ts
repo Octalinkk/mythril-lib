@@ -21,7 +21,7 @@ export async function initDatabase(): Promise<void> {
     await createAlbumsArtistsTable(db)
     await createSongsPlaylistsTable(db)
 
-    console.log('✅ DB initialised');
+    console.log('DB builded');
 }
 async function createSongsTable(db: SQLiteDatabase) {
     await db.execAsync(`
@@ -108,7 +108,7 @@ async function createAlbumsArtistsTable(db: SQLiteDatabase) {
 
 async function createSongsPlaylistsTable(db: SQLiteDatabase) {
     await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS albums_artists (
+        CREATE TABLE IF NOT EXISTS songs_playlists (
             song_id INTEGER NOT NULL,
             playlist_id INTEGER NOT NULL,
             PRIMARY KEY (song_id, playlist_id)

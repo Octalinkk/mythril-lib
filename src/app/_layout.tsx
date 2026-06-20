@@ -8,9 +8,12 @@ export default function RootLayout() {
 
     useEffect(() => {
         initDatabase().then(() => {
-            console.log('✅ DB prête');
+            console.log('DB is ready');
         }).catch(console.error);
     }, []);
 
-    return <Stack screenOptions={{ headerShown: false }} />;
+    return <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='index' />
+        <Stack.Screen name='playlist' />
+        </Stack>;
 }
