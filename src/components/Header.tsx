@@ -1,20 +1,31 @@
 import { colors } from "@/styles/global";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRef, useState } from "react";
+import { Animated, Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.7;
 
 export default function Header() {
 
     const [visible, setVisible] = useState(false);
+    const slideAnim = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
 
     function openSidebar(){
-        setVisible(true)
+      slideAnim.setValue(-SIDEBAR_WIDTH);
+      setVisible(true);
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
     }
 
     function closeSidebar(){
-        setVisible(false)
+        Animated.timing(slideAnim, {
+            toValue: -SIDEBAR_WIDTH,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setVisible(false));        
     }
 
     return (
@@ -29,9 +40,9 @@ export default function Header() {
                 onRequestClose={closeSidebar}  
             >
               <View style={styles.overlay}>
-                <View style={styles.sidebar}>
+                <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }]} ]}>
                   <Text>Contenu</Text>
-                </View>
+                </Animated.View>
                 <TouchableOpacity onPress={closeSidebar} style={styles.close}>
                 </TouchableOpacity>
               </View>
