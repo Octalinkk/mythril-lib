@@ -1,7 +1,7 @@
 import { colors } from "@/styles/global";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
-import { Animated, Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.7;
 
@@ -41,7 +41,10 @@ export default function Header() {
             >
               <View style={styles.overlay}>
                 <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }]} ]}>
-                  <Text>Contenu</Text>
+                  <View style={styles.title_container}>
+                    <Text style={styles.title_text}>Mythril Library</Text>
+                    <Image source={require("../res/Mithril.png")} style={styles.title_img}/>
+                  </View>                  
                 </Animated.View>
                 <TouchableOpacity onPress={closeSidebar} style={styles.close}>
                 </TouchableOpacity>
@@ -73,6 +76,26 @@ const styles = StyleSheet.create({
   close: {
     flex: 0.5,
     backgroundColor: 'transparent'
+  },
+
+  title_container: {
+    flex:1,
+    flexDirection: 'row',
+    backgroundColor: 'red',
+    maxHeight: 80,
+  },
+  title_text: {
+    flex:0.7,
+    color: colors.primary,
+    verticalAlign: 'middle',
+    alignItems: 'flex-start',
+    fontSize: 25
+  },
+  title_img: {
+    flex:0.3,
+    maxWidth: 80,
+    height: 80,
+    backgroundColor: 'green'
   }
   
 
