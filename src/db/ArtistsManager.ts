@@ -1,12 +1,12 @@
 import { getDb } from "./DBManager"
 
 export interface Artist {
-    id:Number
-    name: String
-    cover:String
-    last_time_played:String
-    time_listened: Number
-    time_started: Number
+    id:number
+    name: string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllArtists() {
@@ -23,10 +23,10 @@ export async function getAllArtists() {
     return artists;
 }
 
-export async function getArtistById(id:Number) {
+export async function getArtistById(id:number) {
     let artist:Artist
     const db = await getDb();
-    const row = await db.getFirstAsync<Artist>(`SELECT * FROM artists WHERE id = ${id}`);
+    const row = await db.getFirstAsync<Artist>(`SELECT * FROM artists WHERE id = ?`, [id]);
     if (!row) return null; else artist = {
         id: row.id,
         name: row.name,
@@ -40,8 +40,8 @@ export async function getArtistById(id:Number) {
 export async function addArtist(artist:Artist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`INSERT INTO artists (name, cover, last_time_played, time_listened, time_started) 
-        VALUES (${artist.name}, ${artist.cover}, ${artist.last_time_played}, ${artist.time_listened}, ${artist.time_started})`)
+    await db.runAsync(`INSERT INTO artists (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
+        [artist.name, artist.cover, artist.last_time_played, artist.time_listened, artist.time_started])
     }
     catch (err) {
         console.error(err)
@@ -52,13 +52,9 @@ export async function addArtist(artist:Artist) {
 export async function updateArtist(artist:Artist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`UPDATE artists SET 
-        name = ${artist.name}, 
-        cover = ${artist.cover}, 
-        last_time_played = ${artist.last_time_played}, 
-        time_listened = ${artist.time_listened}, 
-        time_started = ${artist.time_started}
-        WHERE id = ${artist.id}`)
+    const row = await db.runAsync(`UPDATE artists SET name = ?, cover = ?, last_time_played = ?, time_listened = ?, time_started = ? WHERE id = ?`,
+        [artist.name, artist.cover, artist.last_time_played, artist.time_listened, artist.time_started, artist.id]
+    )
     }
     catch (err) {
         console.error(err)
@@ -69,7 +65,7 @@ export async function updateArtist(artist:Artist) {
 export async function deleteArtist(artist:Artist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`DELETE FROM artists WHERE id = ${artist.id}`)
+    const row = await db.runAsync(`DELETE FROM artists WHERE id = ?`, [artist.id])
     }
     catch (err) {
         console.error(err)

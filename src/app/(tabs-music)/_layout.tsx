@@ -1,5 +1,6 @@
 import { colors } from '@/styles/global';
 import { Ionicons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
@@ -29,7 +30,7 @@ export default function TabLayout() {
         options={{
           title: 'Add Meal',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name='add-circle' size={size} color={color} />
+            <MaterialCommunityIcons name="playlist-music" size={24} color="black" />
           ),
         }}
       />

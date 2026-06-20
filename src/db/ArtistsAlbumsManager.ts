@@ -1,8 +1,8 @@
 import { getDb } from "./DBManager";
 
 export interface AlbumArtist {
-    album_id:Number
-    artist_id:Number
+    album_id:number
+    artist_id:number
 }
 
 export async function getAllSongsAlbums() {
@@ -15,23 +15,24 @@ export async function getAllSongsAlbums() {
     return albumsArtists;
 }
 
-export async function getArtistsByAlbumId(album_id:Number) {
+export async function getArtistsByAlbumId(album_id:number) {
     const db = await getDb();
-    const rows = await db.getAllAsync<{ artist_id: number }>(`SELECT artist_id FROM albums_artists WHERE album_id = ${album_id}`);
+    const rows = await db.getAllAsync<{ artist_id: number }>(`SELECT artist_id FROM albums_artists WHERE album_id = ?`, [album_id]);
     return rows.map(row => row.artist_id);
 }
 
-export async function getAlbumsByArtistId(artist_id:Number) {
+export async function getAlbumsByArtistId(artist_id:number) {
     const db = await getDb();
-    const rows = await db.getAllAsync<{ album_id: number }>(`SELECT album_id FROM albums_artists WHERE artist_id = ${artist_id}`);
+    const rows = await db.getAllAsync<{ album_id: number }>(`SELECT album_id FROM albums_artists WHERE artist_id = ?`, [artist_id]);
     return rows.map(row => row.album_id);
 }
 
 export async function addAlbumArtist(albums_artists:AlbumArtist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`INSERT INTO albums_artists (album_id, artist_id) 
-        VALUES (${albums_artists.album_id}, ${albums_artists.artist_id})`)
+        await db.runAsync(`INSERT INTO albums_artists (album_id, artist_id) VALUES (?, ?)`,
+        [albums_artists.album_id, albums_artists.artist_id]
+    )
     }
     catch (err) {
         console.error(err)
@@ -42,7 +43,7 @@ export async function addAlbumArtist(albums_artists:AlbumArtist) {
 export async function deleteSongsByAlbumId(albums_artists:AlbumArtist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`DELETE FROM albums_artists WHERE album_id = ${albums_artists.album_id}`)
+        await db.runAsync(`DELETE FROM albums_artists WHERE album_id = ?`, [albums_artists.album_id])
     }
     catch (err) {
         console.error(err)

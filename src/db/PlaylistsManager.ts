@@ -1,12 +1,12 @@
 import { getDb } from "./DBManager"
 
 export interface Playlist {
-    id:Number
-    name: String
-    cover:String
-    last_time_played:String
-    time_listened: Number
-    time_started: Number
+    id:number
+    name: string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllPlaylists() {
@@ -23,10 +23,10 @@ export async function getAllPlaylists() {
     return playlists;
 }
 
-export async function getPlaylistById(id:Number) {
+export async function getPlaylistById(id:number) {
     let playlist:Playlist
     const db = await getDb();
-    const row = await db.getFirstAsync<Playlist>(`SELECT * FROM playlists WHERE id = ${id}`);
+    const row = await db.getFirstAsync<Playlist>(`SELECT * FROM playlists WHERE id = ?`, [id]);
     if (!row) return null; else playlist = {
         id: row.id,
         name: row.name,
@@ -40,8 +40,8 @@ export async function getPlaylistById(id:Number) {
 export async function addPlaylist(playlist:Playlist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`INSERT INTO playlists (name, cover, last_time_played, time_listened, time_started) 
-        VALUES (${playlist.name}, ${playlist.cover}, ${playlist.last_time_played}, ${playlist.time_listened}, ${playlist.time_started})`)
+        await db.runAsync(`INSERT INTO playlists (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
+        [playlist.name, playlist.cover, playlist.last_time_played, playlist.time_listened, playlist.time_started])
     }
     catch (err) {
         console.error(err)
@@ -52,13 +52,9 @@ export async function addPlaylist(playlist:Playlist) {
 export async function updatePlaylist(playlist:Playlist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`UPDATE playlists SET 
-        name = ${playlist.name}, 
-        cover = ${playlist.cover}, 
-        last_time_played = ${playlist.last_time_played}, 
-        time_listened = ${playlist.time_listened}, 
-        time_started = ${playlist.time_started}
-        WHERE id = ${playlist.id}`)
+    const row = await db.runAsync(`UPDATE playlists SET name = ?, cover = ?, last_time_played = ?, time_listened = ?, time_started = ? WHERE id = ?`,
+        [playlist.name, playlist.cover, playlist.last_time_played, playlist.time_listened, playlist.time_started, playlist.id]
+    )
     }
     catch (err) {
         console.error(err)
@@ -69,7 +65,7 @@ export async function updatePlaylist(playlist:Playlist) {
 export async function deletePlaylist(playlist:Playlist) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`DELETE FROM playlists WHERE id = ${playlist.id}`)
+    const row = await db.runAsync(`DELETE FROM playlists WHERE id = ?`, [playlist.id])
     }
     catch (err) {
         console.error(err)

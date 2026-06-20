@@ -28,7 +28,7 @@ export async function getAllSongs() {
 export async function getSongById(id:number) {
     let song:Song
     const db = await getDb();
-    const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE id = ${id}`);
+    const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE id = ?`, [id]);
     if (!row) return null; else song = {
         id: row.id,
         name: row.name,
@@ -57,14 +57,9 @@ export async function addSong(song:Song) {
 export async function updateSong(song:Song) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`UPDATE songs SET 
-        name = ${song.name}, 
-        file_path = ${song.file_path}, 
-        cover = ${song.cover}, 
-        last_time_played = ${song.last_time_played}, 
-        time_listened = ${song.time_listened}, 
-        time_started = ${song.time_started}
-        WHERE id = ${song.id}`)
+    await db.runAsync(`UPDATE songs SET name = ?, file_path = ?, cover = ?, last_time_played = ?, time_listened = ?, time_started = ? WHERE id = ?`,
+        [song.name, song.file_path, song.cover, song.last_time_played, song.time_listened, song.time_started, song.id]
+    )
     }
     catch (err) {
         console.error(err)
@@ -75,7 +70,7 @@ export async function updateSong(song:Song) {
 export async function deleteSong(song:Song) {
     const db = await getDb();
     try {
-    const row = await db.runAsync(`DELETE FROM songs WHERE id = ${song.id}`)
+        await db.runAsync(`DELETE FROM songs WHERE id = ?`, [song.id])
     }
     catch (err) {
         console.error(err)
