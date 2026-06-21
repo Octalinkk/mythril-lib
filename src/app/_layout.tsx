@@ -1,5 +1,5 @@
 import { askAudioFilesPerms, askImagesFilesPerms } from '@/Managers/PermsManager';
-import getMp3Files from '@/Managers/StorageManager';
+import { updateSongs } from '@/Managers/StorageManager';
 import { initDatabase } from '@/db/DBManager';
 
 import { SpaceGrotesk_400Regular, SpaceGrotesk_700Bold, useFonts } from '@expo-google-fonts/space-grotesk';
@@ -25,9 +25,7 @@ export default function RootLayout() {
         askAudioFilesPerms().then(granted => {
             console.log('Audio files permission :', granted);
             if (granted) {
-            getMp3Files().then(files => {
-                console.log(`${files.length} fichiers MP3 trouvés`);
-            });
+            updateSongs()
         }
         })
         .catch(err => console.error('Perms error:', err));;

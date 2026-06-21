@@ -41,5 +41,9 @@ example
 # generated native folders
 /ios
 /android
+modules/*/android/build/
+modules/*/android/.cxx/
+modules/*/ios/build/
+modules/*/.gradle/
 
 .vscode

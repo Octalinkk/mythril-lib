@@ -1,13 +1,13 @@
 import { getDb } from "./DBManager"
 
 export interface Song {
-    id:number
-    name: string
-    file_path:string
-    cover:string
-    last_time_played:string
-    time_listened: number
-    time_started: number
+    id:number | null
+    name: string | null
+    file_path:string | null
+    cover:string | null
+    last_time_played:string | null
+    time_listened: number | null
+    time_started: number | null
 }
 
 export async function getAllSongs() {
@@ -29,6 +29,21 @@ export async function getSongById(id:number) {
     let song:Song
     const db = await getDb();
     const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE id = ?`, [id]);
+    if (!row) return null; else song = {
+        id: row.id,
+        name: row.name,
+        file_path:row.file_path,
+        cover: row.cover,
+        last_time_played:row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }
+}
+
+export async function getSongByFilePath(file_path:string) {
+    let song:Song
+    const db = await getDb();
+    const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE file_path = ?`, [file_path]);
     if (!row) return null; else song = {
         id: row.id,
         name: row.name,
