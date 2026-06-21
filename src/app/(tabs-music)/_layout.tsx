@@ -11,10 +11,16 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.primary,
+          height: 70,
+          paddingBottom: 8,
+          paddingTop: 4,
+          marginBottom: 50
         },
         tabBarLabelStyle: {
+            flex: 1,
             fontFamily: 'SpaceGrotesk_400Regular',
             fontSize: 12,
+            width: 100
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.secondary,

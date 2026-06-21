@@ -2,6 +2,7 @@ import { colors } from "@/styles/global";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import { Animated, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Separator from "./Separator";
 
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.7;
 
@@ -31,11 +32,11 @@ export default function Header() {
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={openSidebar}>
-                <Ionicons name="menu" size={50} color={colors.primary} />
+                <Ionicons name="menu" size={40} color={colors.primary} />
             </TouchableOpacity>
             <View style={{ flex: 1 }}/>
             <TouchableOpacity onPress={openSidebar}>
-                <Ionicons name="search" size={40} color={colors.primary} />
+                <Ionicons name="search" size={30} color={colors.primary} />
             </TouchableOpacity>
 
             <Modal 
@@ -49,7 +50,8 @@ export default function Header() {
                   <View style={styles.title_container}>
                     <Text style={styles.title_text}>Mythril Library</Text>
                     <Image source={require("../res/Mithril.png")} style={styles.title_img}/>
-                  </View>                  
+                  </View>    
+                  <Separator />              
                 </Animated.View>
                 <TouchableOpacity onPress={closeSidebar} style={styles.close}>
                 </TouchableOpacity>
@@ -90,19 +92,21 @@ const styles = StyleSheet.create({
     flex:1,
     flexDirection: 'row',
     maxHeight: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title_text: {
     flex:0.7,
     color: colors.primary,
     verticalAlign: 'middle',
     alignItems: 'flex-start',
-    fontSize: 25,
+    fontSize: 23,
     fontFamily: 'SpaceGrotesk_700Bold'
   },
   title_img: {
     flex:0.3,
-    maxWidth: 80,
-    height: 80,
+    maxWidth: 70,
+    height: 70,
   }
   
 
