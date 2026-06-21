@@ -1,43 +1,36 @@
 package expo.modules.audiometadata
 
-import android.media.MediaMetadataRetriever
-import android.util.Base64
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import android.media.MediaMetadataRetriever
+
 
 class AudioMetadataModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("AudioMetadata")
 
-        AsyncFunction("getMetadata") { uri: String ->
-            val retriever = MediaMetadataRetriever()
+        AsyncFunction("getAudioMetaData") { uri: String ->
+            //logique pour read
             
-            try {
-                // Convertit content:// et file:// correctement
-                if (uri.startsWith("content://")) {
-                    retriever.setDataSource(appContext.reactContext, android.net.Uri.parse(uri))
-                } else {
-                    retriever.setDataSource(uri)
-                }
+            val retriver = MediaMetadataRetriever()
 
+            try {
+                retriver.setDataSource(uri)
+                //return existe pas mdr alors laisse comme ça
                 mapOf(
-                    "title"    to retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
-                    "artist"   to retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
-                    "album"    to retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
-                    "duration" to retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION),
-                    "genre"    to retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                    "title" to retriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE), 
+                    "artist" to retriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST), 
+                    "album" to retriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM), 
+                    "duration" to retriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 )
-            } catch (e: Exception) {
-                // Retourne null pour tous les champs au lieu de crasher
-                mapOf(
-                    "title"    to null,
-                    "artist"   to null,
-                    "album"    to null,
-                    "duration" to null,
-                    "genre"    to null
-                )
-            } finally {
-                retriever.release()
+                
+            }
+            catch(e: Exception){
+                //Peut pas console.log fiat chier
+                null
+            }
+            finally{
+                retriver.release()
             }
         }
     }

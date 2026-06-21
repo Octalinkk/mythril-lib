@@ -1,6 +1,6 @@
 import { Song } from '@/db/SongsManager';
 import { Directory, File } from 'expo-file-system';
-import { getMetadata } from '../../modules/audio-metadata';
+import { getAudioMetaData } from '../../modules/audio-metadata';
 
 export default async function getMp3Files(path = "file:///storage/emulated/0/Music/"): Promise<File[]> {
     const dir = new Directory(path);
@@ -21,7 +21,7 @@ export async function updateSongs() {
     localSongs.forEach(async (song) => {
         if (song.exists && song.extension == ".mp3"){
             //TODO Je dois finir le module de lecture des meta avant
-            const metadata = await getMetadata(song.uri);
+            const metadata = await getAudioMetaData(song.uri);
             if (metadata){
                 const newSong:Song = {
                     id: 0,
@@ -44,7 +44,7 @@ export async function updateSongs() {
                     time_started: 0
                 }
             }
-            
+            console.log(metadata)
         }
     });
 }

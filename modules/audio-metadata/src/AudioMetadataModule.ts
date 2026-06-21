@@ -1,12 +1,9 @@
 import { NativeModule, requireNativeModule } from 'expo';
+import { AudioMetadataModuleEvents, SongMetadata } from './AudioMetadata.types';
 
-import { AudioMetadataModuleEvents } from './AudioMetadata.types';
 
 declare class AudioMetadataModule extends NativeModule<AudioMetadataModuleEvents> {
-  PI: number;
-  hello(): string;
-  setValueAsync(value: string): Promise<void>;
-  AudioMetadataModuleSharedObject: typeof AudioMetadataModuleSharedObject;
+  getAudioMetaData: (uri: string) => SongMetadata //change le type pour mon custom
 }
 
 export default requireNativeModule<AudioMetadataModule>('AudioMetadata');

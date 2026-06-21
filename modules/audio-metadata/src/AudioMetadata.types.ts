@@ -1,16 +1,10 @@
-import type { StyleProp, ViewStyle } from 'react-native';
 
-export type AudioMetadataModuleEvents = {
-  onChange: (params: ChangeEventPayload) => void;
-};
+export type AudioMetadataModuleEvents = {};
 
-export type ChangeEventPayload = {
-  value: string;
-};
+export interface SongMetadata {
+    title: string | null;
+    artist: string | null;
+    album: string | null;
+    duration: string | null;
+}
 
-export type OnTapEventPayload = Record<string, never>;
-
-export type AudioMetadataViewProps = {
-  onTap: (event: { nativeEvent: OnTapEventPayload }) => void;
-  style?: StyleProp<ViewStyle>;
-};
