@@ -33,6 +33,11 @@ export default function Header() {
             <TouchableOpacity onPress={openSidebar}>
                 <Ionicons name="menu" size={50} color={colors.primary} />
             </TouchableOpacity>
+            <View style={{ flex: 1 }}/>
+            <TouchableOpacity onPress={openSidebar}>
+                <Ionicons name="search" size={40} color={colors.primary} />
+            </TouchableOpacity>
+
             <Modal 
                 visible={visible}
                 transparent={true}
@@ -57,18 +62,21 @@ export default function Header() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#782121",
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    maxHeight: 60
+    alignItems: 'center',
+    maxHeight: 60,
+    paddingLeft: 10,
+    paddingRight: 20
   },
+
   overlay:{
     flex: 1,
     flexDirection: 'row'
   },
   sidebar: {
     flex: 1,
-    backgroundColor: "#ffffffd6",
+    backgroundColor: "#3a0f86d6",
     maxWidth: SIDEBAR_WIDTH,
     paddingHorizontal: 20,
     paddingVertical: 60
@@ -81,12 +89,11 @@ const styles = StyleSheet.create({
   title_container: {
     flex:1,
     flexDirection: 'row',
-    backgroundColor: 'red',
     maxHeight: 80,
   },
   title_text: {
     flex:0.7,
-    color: colors.primary,
+    color: colors.secondary,
     verticalAlign: 'middle',
     alignItems: 'flex-start',
     fontSize: 25
@@ -95,7 +102,6 @@ const styles = StyleSheet.create({
     flex:0.3,
     maxWidth: 80,
     height: 80,
-    backgroundColor: 'green'
   }
   
 

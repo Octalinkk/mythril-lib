@@ -10,10 +10,10 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.background,
-          borderTopColor: "#0f0f0f",
+          borderTopColor: colors.primary,
         },
-        tabBarActiveTintColor: "#0f0f0f",
-        tabBarInactiveTintColor: "#525252",
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.secondary,
       }}
     >
       <Tabs.Screen
@@ -28,9 +28,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name='playlist'
         options={{
-          title: 'Add Meal',
+          title: 'Playlists',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="playlist-music" size={24} color="black" />
+            <MaterialCommunityIcons name="playlist-music" size={size} color={color} />
           ),
         }}
       />
