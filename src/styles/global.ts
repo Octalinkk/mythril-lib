@@ -6,7 +6,7 @@ export const colors = {
     background: "#2c0ba4",
     grad_prim: "#1b2da5",
     grad_sec: "#270b62",
-    grad_tri: "#410b62",
+    grad_tri: "#32084d",
     title: ""
 }
 

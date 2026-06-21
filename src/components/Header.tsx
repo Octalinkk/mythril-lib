@@ -93,10 +93,11 @@ const styles = StyleSheet.create({
   },
   title_text: {
     flex:0.7,
-    color: colors.secondary,
+    color: colors.primary,
     verticalAlign: 'middle',
     alignItems: 'flex-start',
-    fontSize: 25
+    fontSize: 25,
+    fontFamily: 'SpaceGrotesk_700Bold'
   },
   title_img: {
     flex:0.3,

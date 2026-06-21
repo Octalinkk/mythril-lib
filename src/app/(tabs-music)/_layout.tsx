@@ -12,6 +12,10 @@ export default function TabLayout() {
           backgroundColor: colors.background,
           borderTopColor: colors.primary,
         },
+        tabBarLabelStyle: {
+            fontFamily: 'SpaceGrotesk_400Regular',
+            fontSize: 12,
+        },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.secondary,
       }}
@@ -26,11 +30,29 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='playlist'
+        name='playlists'
         options={{
           title: 'Playlists',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="playlist-music" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='artists'
+        options={{
+          title: 'Artists',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="microphone-variant" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='albums'
+        options={{
+          title: 'Albums',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="album" size={size} color={color} />
           ),
         }}
       />
