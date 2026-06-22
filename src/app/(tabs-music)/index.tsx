@@ -1,8 +1,10 @@
 
 import Header from '@/components/Header';
+import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
 
-import { getMostRecent, Song } from '@/db/SongsManager';
+import { Playlist } from '@/db/PlaylistsManager';
+import { getMostRecentSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
@@ -11,10 +13,17 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 export default function HomeScreen() {
 
   const [recSongs, setSong] = useState<Song[]>([]);
+  const [recPlaylists, setPlaylist] = useState<Playlist[]>([]);
     
   useEffect(() => {
-      getMostRecent().then(result => {
+      getMostRecentSongs().then(result => {
           if (result) setSong(result);
+      });
+  }, []);
+
+  useEffect(() => {
+      getMostRecentSongs().then(result => {
+          if (result) setPlaylist(result);
       });
   }, []);
 
@@ -22,6 +31,13 @@ export default function HomeScreen() {
   if (recSongs.length > 0){
     for (const item of recSongs) {
         recentSong.push(<SongItem song_id={item.id} key={item.id}/>)
+    }
+  }
+
+  let recentPlst = []
+  if (recPlaylists.length > 0){
+    for (const item of recPlaylists) {
+        recentPlst.push(<PlaylistItem playlist_id={item.id} key={item.id}/>)
     }
   }
   
@@ -36,15 +52,24 @@ export default function HomeScreen() {
       end={{x:1, y:1}}
     >
       <Header />
+
       <ScrollView style={styles.main_scroll}>
-        <Text style={styles.title}>Recent Song</Text>
+        <Text style={styles.title}>Recent Songs</Text>
         <ScrollView horizontal={true}>
           <View  style={styles.items_container_sm}>
-            <Suspense fallback={<Text>Chargement...</Text>}>
+            <Suspense fallback={<Text>Loading...</Text>}>
               {recentSong}
             </Suspense>
           </View>
         </ScrollView>
+        
+        
+        <Text style={styles.title}>Recent Playlists</Text>
+        <View  style={styles.items_container_md}>
+          <Suspense fallback={<Text>Loading...</Text>}>
+            {recentPlst}
+          </Suspense>
+        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -54,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 30,
     fontFamily: 'SpaceGrotesk_700Bold',
-    color: colors.primary,
+    color: colors.primary
   },
   main_scroll: {
     paddingVertical: 10,
@@ -66,5 +91,13 @@ const styles = StyleSheet.create({
     marginVertical: 20, 
     justifyContent: 'space-between', 
     gap: 10
+  },
+  items_container_md: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 20, 
+    justifyContent: 'space-between', 
+    gap: 20
   }
 });

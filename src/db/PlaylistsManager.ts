@@ -1,17 +1,31 @@
 import { getDb } from "./DBManager"
 
 export interface Playlist {
-    id:number | null
-    name: string | null
-    cover:string | null
-    last_time_played:string | null
-    time_listened: number | null
-    time_started: number | null
+    id:number
+    name: string
+    cover:string
+    last_time_played:string 
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllPlaylists() {
     const db = await getDb();
     const rows = await db.getAllAsync<Playlist>('SELECT * FROM playlists');
+    const playlists: Playlist[] = rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played: row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }));
+    return playlists;
+}
+
+export async function getMostRecentPlst() {
+    const db = await getDb();
+    const rows = await db.getAllAsync<Playlist>('SELECT * FROM playlists ORDER BY last_time_played DESC LIMIT 6');
     const playlists: Playlist[] = rows.map(row => ({
         id: row.id,
         name: row.name,

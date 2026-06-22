@@ -25,9 +25,9 @@ export async function getAllSongs() {
     return songs;
 }
 
-export async function getMostRecent() {
+export async function getMostRecentSongs() {
     const db = await getDb();
-    const rows = await db.getAllAsync<Song>('SELECT * FROM songs ORDER BY last_time_played DESC LIMIT 10');
+    const rows = await db.getAllAsync<Song>('SELECT * FROM songs ORDER BY last_time_played DESC LIMIT 6');
     const songs: Song[] = rows.map(row => ({
         id: row.id,
         name: row.name,

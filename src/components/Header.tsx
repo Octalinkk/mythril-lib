@@ -63,13 +63,15 @@ export default function Header() {
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    maxHeight: 60,
+    maxHeight: 70,
     paddingLeft: 10,
-    paddingRight: 20
+    paddingBottom: 10,
+    paddingRight: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
   },
 
   overlay:{
