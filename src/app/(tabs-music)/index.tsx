@@ -2,10 +2,10 @@
 import Header from '@/components/Header';
 import SongItem from '@/components/SongItem';
 
-import { Song, getSongById, updateSong } from '@/db/SongsManager';
+import { Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function HomeScreen() {
@@ -22,16 +22,6 @@ export default function HomeScreen() {
           time_listened: 0,
           time_started: 0
       });
-  
-      useEffect(() => {
-          getSongById(1).then(result => {
-              if (result) {
-                console.log("trouvé")
-                result.cover = "file:///storage/emulated/0/DCIM/Octa/new__profile_picture_by_octalink_private_dm6ojbm-pre.jpg"
-                updateSong(result)
-              }
-          });
-      }, []);
 
   let recentSong = 
   <Suspense fallback={<Text>Chargement...</Text>}>
@@ -53,7 +43,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.main_scroll}>
         <Text style={styles.title}>Recent Song</Text>
         <ScrollView horizontal={true}>
-          <View  style={styles.items_container}>
+          <View  style={styles.items_container_sm}>
             {recentSong}
           </View>
         </ScrollView>
@@ -72,11 +62,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20
   },
-  items_container: {
+  items_container_sm: {
     flex: 1,
     flexDirection: 'row',
     marginVertical: 20, 
     justifyContent: 'space-between', 
-    gap: 20
+    gap: 10
   }
 });

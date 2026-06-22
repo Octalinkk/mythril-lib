@@ -1,7 +1,8 @@
 import { getSongById, Song } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
   song_id: number;
@@ -33,13 +34,15 @@ export default function SongItem (id: Id) {
     }, []);
 
 
-
-    console.log(song.cover)
-
     return (
         <View style={styles.container}>
             <Image source={getCoverSource(song.cover)} style={styles.image}/>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
+            <View style={styles.title_container}>
+                <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
+                <TouchableOpacity style={styles.icon}>
+                    <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -47,24 +50,37 @@ export default function SongItem (id: Id) {
 const styles = StyleSheet.create({
     container: {
         flex:1,
-        width: 150,
-        height: 200,
+        width: 100,
+        height: 140,
         backgroundColor: '#b8b8b81b',
         borderRadius: 20,
         padding: 10,
-        gap: 10
+        paddingBottom: 5
     },
     image:{
-        width: 130,
-        height: 130,
+        width: 80,
+        height: 80,
         borderRadius: 20,
     },
+    title_container: {
+        flex:1,
+        flexDirection: 'row'
+    },
     title:{
-        flex: 1,
+        flex: 0.95,
         flexDirection: 'row',
-        fontSize: 15,
+        fontSize: 11,
         color: colors.primary,
         fontFamily: 'SpaceGrotesk_700Bold',
-        flexWrap: 'wrap'  
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 5,
+        paddingRight: 5
+    },
+    icon:{
+        flex: 0.05,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });
