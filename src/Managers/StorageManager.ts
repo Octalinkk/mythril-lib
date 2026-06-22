@@ -17,19 +17,18 @@ export default async function getMp3Files(path = "file:///storage/emulated/0/Mus
 }
 
 export async function updateSongs() {
-    console.log("updating db..")
+    console.log("Checking for missing songs..")
     const localSongs: File[] = await getMp3Files() 
     //Check if a song isn't saved in the DB
     for (const song of localSongs) {
         if (song.exists && song.extension == ".mp3"){
             if(!await getSongByFilePath(song.uri)) {
-                console.log("Song not in DB")
                 const metadata = await getAudioMetaData(song.uri);
                 let newSong: Song = {
                     id: 0,
                     name: "",
                     file_path: song.uri,
-                    cover: "@/res/def_cover.png",
+                    cover: "",
                     last_time_played: "",
                     time_listened: 0,
                     time_started: 0
@@ -38,10 +37,12 @@ export async function updateSongs() {
                 if (metadata && metadata.title) {
                     newSong.name = metadata.title;
                 }
+                console.log(`Adding song : ${newSong}`)
                 await addSong(newSong);
             }
         }
     };
-
+    
+    console.log("Done checking songs")
     //TODO check deletedSongs from folder still in DB?
 }

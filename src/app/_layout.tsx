@@ -1,4 +1,4 @@
-import { askAudioFilesPerms, askImagesFilesPerms } from '@/Managers/PermsManager';
+import { askAudioFilesPerms } from '@/Managers/PermsManager';
 import { updateSongs } from '@/Managers/StorageManager';
 import { initDatabase } from '@/db/DBManager';
 
@@ -15,28 +15,21 @@ export default function RootLayout() {
     });
 
     useEffect(() => {
+        //1. Init DB
         initDatabase().then(() => {
             console.log('Database initiated');
+            //2. Ask perms to read files
+            askAudioFilesPerms().then(granted => {
+                console.log('Audio files permission :', granted);
+                if (granted) {
+                    // 3.update DB
+                    updateSongs()
+                }
+            })
+        .catch(err => console.error('Perms error:', err));
         }).catch(console.error);
     }, []);
 
-    
-    useEffect(() => {
-        askAudioFilesPerms().then(granted => {
-            console.log('Audio files permission :', granted);
-            if (granted) {
-            updateSongs()
-        }
-        })
-        .catch(err => console.error('Perms error:', err));;
-    }, []);
-
-    useEffect(() => {
-        askImagesFilesPerms().then(granted => {
-            console.log('Images files permission :', granted);
-        })
-        .catch(err => console.error('Perms error:', err));;
-    }, []);
     
 
     return <Stack screenOptions={{ headerShown: false }}>

@@ -1,13 +1,13 @@
 import { getDb } from "./DBManager"
 
 export interface Song {
-    id:number | null
-    name: string | null
-    file_path:string | null
-    cover:string | null
-    last_time_played:string | null
-    time_listened: number | null
-    time_started: number | null
+    id:number
+    name: string
+    file_path:string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllSongs() {
