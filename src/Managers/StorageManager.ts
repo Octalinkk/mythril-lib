@@ -1,4 +1,4 @@
-import { Song } from '@/db/SongsManager';
+import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { Directory, File } from 'expo-file-system';
 import { getAudioMetaData } from '../../modules/audio-metadata';
 
@@ -17,34 +17,31 @@ export default async function getMp3Files(path = "file:///storage/emulated/0/Mus
 }
 
 export async function updateSongs() {
+    console.log("updating db..")
     const localSongs: File[] = await getMp3Files() 
-    localSongs.forEach(async (song) => {
+    //Check if a song isn't saved in the DB
+    for (const song of localSongs) {
         if (song.exists && song.extension == ".mp3"){
-            //TODO Je dois finir le module de lecture des meta avant
-            const metadata = await getAudioMetaData(song.uri);
-            if (metadata){
-                const newSong:Song = {
-                    id: 0,
-                    name: metadata.title,
-                    file_path: song.uri,
-                    cover: "",
-                    last_time_played: "",
-                    time_listened: 0,
-                    time_started: 0
-                }
-            }
-            else {
-                const newSong:Song = {
+            if(!await getSongByFilePath(song.uri)) {
+                console.log("Song not in DB")
+                const metadata = await getAudioMetaData(song.uri);
+                let newSong: Song = {
                     id: 0,
                     name: "",
                     file_path: song.uri,
-                    cover: "",
+                    cover: "@/res/def_cover.png",
                     last_time_played: "",
                     time_listened: 0,
                     time_started: 0
+                };
+
+                if (metadata && metadata.title) {
+                    newSong.name = metadata.title;
                 }
+                await addSong(newSong);
             }
-            console.log(metadata)
         }
-    });
+    };
+
+    //TODO check deletedSongs from folder still in DB?
 }

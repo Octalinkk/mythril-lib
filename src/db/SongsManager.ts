@@ -29,7 +29,7 @@ export async function getSongById(id:number) {
     let song:Song
     const db = await getDb();
     const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE id = ?`, [id]);
-    if (!row) return null; else song = {
+    if (!row) return null; else return song = {
         id: row.id,
         name: row.name,
         file_path:row.file_path,
@@ -44,7 +44,7 @@ export async function getSongByFilePath(file_path:string) {
     let song:Song
     const db = await getDb();
     const row = await db.getFirstAsync<Song>(`SELECT * FROM songs WHERE file_path = ?`, [file_path]);
-    if (!row) return null; else song = {
+    if (!row) return null; else return song = {
         id: row.id,
         name: row.name,
         file_path:row.file_path,

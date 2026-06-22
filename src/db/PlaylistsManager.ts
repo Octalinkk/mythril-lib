@@ -27,7 +27,7 @@ export async function getPlaylistById(id:number) {
     let playlist:Playlist
     const db = await getDb();
     const row = await db.getFirstAsync<Playlist>(`SELECT * FROM playlists WHERE id = ?`, [id]);
-    if (!row) return null; else playlist = {
+    if (!row) return null; else return playlist = {
         id: row.id,
         name: row.name,
         cover: row.cover,

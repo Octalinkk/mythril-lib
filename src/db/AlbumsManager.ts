@@ -27,7 +27,7 @@ export async function getAlbumById(id:number) {
     let album:Album
     const db = await getDb();
     const row = await db.getFirstAsync<Album>(`SELECT * FROM albums WHERE id = ?`, [id]);
-    if (!row) return null; else album = {
+    if (!row) return null; else return album = {
         id: row.id,
         name: row.name,
         cover: row.cover,
