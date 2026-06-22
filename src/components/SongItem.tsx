@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     title:{
-        flex: 0.95,
+        flex: 0.85,
         flexDirection: 'row',
         fontSize: 11,
         color: colors.primary,
@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
         paddingRight: 5
     },
     icon:{
-        flex: 0.05,
+        flex: 0.15,
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     }
 });

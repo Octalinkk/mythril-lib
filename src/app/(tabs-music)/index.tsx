@@ -2,35 +2,31 @@
 import Header from '@/components/Header';
 import SongItem from '@/components/SongItem';
 
-import { Song } from '@/db/SongsManager';
+import { getMostRecent, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function HomeScreen() {
 
-
-  "file:///storage/emulated/0/DCIM/Octa/new__profile_picture_by_octalink_private_dm6ojbm-pre.jpg"
-
-  const [song, setSong] = useState<Song>({
-          id: 0,
-          name: "",
-          file_path: "",
-          cover: "",
-          last_time_played: "",
-          time_listened: 0,
-          time_started: 0
+  const [recSongs, setSong] = useState<Song[]>([]);
+    
+  useEffect(() => {
+      getMostRecent().then(result => {
+          if (result) setSong(result);
       });
+  }, []);
 
-  let recentSong = 
-  <Suspense fallback={<Text>Chargement...</Text>}>
-      <SongItem song_id={1} />
-      <SongItem song_id={2} />
-      <SongItem song_id={3} />
-      <SongItem song_id={4} />
-      <SongItem song_id={5} />
-  </Suspense>
+  let recentSong = []
+  if (recSongs.length > 0){
+    for (const item of recSongs) {
+        recentSong.push(<SongItem song_id={item.id} key={item.id}/>)
+    }
+  }
+  
+  
+  
 
   return (
     <LinearGradient 
@@ -44,7 +40,9 @@ export default function HomeScreen() {
         <Text style={styles.title}>Recent Song</Text>
         <ScrollView horizontal={true}>
           <View  style={styles.items_container_sm}>
-            {recentSong}
+            <Suspense fallback={<Text>Chargement...</Text>}>
+              {recentSong}
+            </Suspense>
           </View>
         </ScrollView>
       </ScrollView>
