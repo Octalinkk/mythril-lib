@@ -1,5 +1,5 @@
-import { Playlist } from "@/db/PlaylistsManager";
-import { getSongById } from "@/db/SongsManager";
+import { getPlaylistById, Playlist } from "@/db/PlaylistsManager";
+import { getPlaylistCountById } from "@/db/SongsPlaylistsManager";
 import { colors } from "@/styles/global";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -25,19 +25,22 @@ export default function PlaylistItem (id: Id) {
         time_listened: 0,
         time_started: 0
     });
+    const [count, setCount] = useState<number>(0)
 
     useEffect(() => {
-        getSongById(id.playlist_id).then(result => {
+        getPlaylistById(id.playlist_id).then(result => {
             if (result) setPlaylist(result);
+            getPlaylistCountById(id.playlist_id).then(result => {
+                if (result) setCount(result.count);
+
+            });
         });
     }, []);
-
-
     return (
         <View style={styles.container}>
             <Image source={getCoverSource(playlist.cover)} style={styles.image}/>
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{playlist.name}</Text>
-            <Text style={styles.context}>2999 songs</Text>
+            <Text style={styles.context}>{count} songs</Text>
         </View>
     );
 };

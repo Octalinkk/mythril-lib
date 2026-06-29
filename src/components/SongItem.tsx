@@ -1,6 +1,7 @@
 import { getSongById, Song } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -35,15 +36,20 @@ export default function SongItem (id: Id) {
 
 
     return (
-        <View style={styles.container}>
-            <Image source={getCoverSource(song.cover)} style={styles.image}/>
-            <View style={styles.title_container}>
-                <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
-                <TouchableOpacity style={styles.icon}>
-                    <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                </TouchableOpacity>
-            </View>
-        </View>
+        <Link href={{
+            pathname: "/musicPlayer",
+            params: {ids:[ song.id.toString(), (song.id + 1).toString()]},
+            }} push asChild>
+            <TouchableOpacity style={styles.container}>
+                <Image source={getCoverSource(song.cover)} style={styles.image}/>
+                <View style={styles.title_container}>
+                    <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
+                    <TouchableOpacity style={styles.icon}>
+                        <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        </Link>
     );
 };
 

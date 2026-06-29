@@ -40,7 +40,7 @@ async function createArtistsTable(db: SQLiteDatabase) {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS artists (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            name TEXT NOT NULL UNIQUE,
             cover TEXT,
             last_time_played TEXT,
             time_listened INTEGER DEFAULT 0,
@@ -53,7 +53,7 @@ async function createAlbumsTable(db: SQLiteDatabase) {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS albums (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            name TEXT NOT NULL UNIQUE,
             cover TEXT,
             last_time_played TEXT,
             time_listened INTEGER DEFAULT 0,
@@ -66,7 +66,7 @@ async function createPlaylistsTable(db: SQLiteDatabase) {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS playlists (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            name TEXT NOT NULL UNIQUE,
             cover TEXT,
             last_time_played TEXT,
             time_listened INTEGER DEFAULT 0,

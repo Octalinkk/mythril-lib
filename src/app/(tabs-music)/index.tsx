@@ -3,9 +3,11 @@ import Header from '@/components/Header';
 import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
 
-import { Playlist } from '@/db/PlaylistsManager';
+import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
+import { SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
+import TrackPlayer, { PlayerCommand } from "@rntp/player";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -14,6 +16,20 @@ export default function HomeScreen() {
 
   const [recSongs, setSong] = useState<Song[]>([]);
   const [recPlaylists, setPlaylist] = useState<Playlist[]>([]);
+
+  let wasd: Playlist = {
+    id: 0,
+    name: "Test",
+    cover:"",
+    last_time_played:"" ,
+    time_listened: 0,
+    time_started: 0
+}
+
+let daa: SongPlaylist = {
+    song_id:1,
+    playlist_id:1
+}
     
   useEffect(() => {
       getMostRecentSongs().then(result => {
@@ -22,10 +38,26 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-      getMostRecentSongs().then(result => {
+      getMostRecentPlst().then(result => {
           if (result) setPlaylist(result);
       });
   }, []);
+
+  useEffect(() => {
+      TrackPlayer.setupPlayer({
+          contentType: 'music',
+      });
+      TrackPlayer.setCommands({
+        capabilities: [
+            PlayerCommand.PlayPause,
+            PlayerCommand.Next,
+            PlayerCommand.Previous,
+        ],
+      });
+  }, []);
+
+  
+      
 
   let recentSong = []
   if (recSongs.length > 0){
