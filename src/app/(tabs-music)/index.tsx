@@ -20,7 +20,7 @@ function getRecentSong(songs:Song[]){
     }
   }
   else {
-    recentSong.push(<Text style={styles.filler_text}>No Songs found</Text>)
+    recentSong.push(<Text style={styles.filler_text} key={"song:None"}>No Songs found</Text>)
   }
   return recentSong
 }
@@ -33,20 +33,21 @@ function getRecentPlaylists(playlists:Playlist[]){
     }
   }
   else {
-    recentPlst.push(<Text style={styles.filler_text}>No Playlists found</Text>)
+    recentPlst.push(<Text style={styles.filler_text}  key={"playlist:None"}>No Playlists found</Text>)
   }
   return recentPlst
 }
 
 function getRecentArtists(artists:Artist[]){
   let recentArtist = []
+
   if (artists.length > 0){
     for (const item of artists) {
         recentArtist.push(<PlaylistItem playlist_id={item.id} key={"artist:"+item.id}/>)
     }
   }
   else {
-    recentArtist.push(<Text style={styles.filler_text}>No Artists found</Text>)
+    recentArtist.push(<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>)
   }
   return recentArtist
 }
@@ -58,6 +59,7 @@ export default function HomeScreen() {
   const [recArtists, setArtist] = useState<Artist[]>([]);
 
     
+
   useEffect(() => {
       getMostRecentSongs().then(result => {
           if (result) setSong(result);

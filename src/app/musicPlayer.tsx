@@ -11,7 +11,7 @@ import TextTicker from 'react-native-text-ticker';
 
 import { Artist, getArtistById } from '@/db/ArtistsManager';
 import { getArtistsBySongId } from '@/db/SongsArtistsManager';
-import { Song, getSongById } from '@/db/SongsManager';
+import { Song, getSongById, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 
 type MediaItem = {
@@ -58,14 +58,6 @@ function getSongDuration(dur:number): string{
     const minutes = Math.floor(dur / 60);
     const seconds = Math.floor(dur % 60);
     return minutes + ':' + seconds;
-}
-
-async function updateSongStats(id:number, last_time_played: string, time_listened: number, time_started: number){
-    let song = await Promise.resolve(getSongById(id))
-    if (song){
-        song.last_time_played = last_time_played
-    }
-    
 }
 
 export default function MusicPlayer() {
@@ -139,7 +131,7 @@ export default function MusicPlayer() {
         
     }, []);
    
-    TrackPlayer.addEventListener(Event.MediaItemTransition, ({ item, index }) => {
+    TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
     
         //console.log('Played:', curr_song.name);
         //console.log('Now playing:', item?.title, 'at index', index);
@@ -150,6 +142,7 @@ export default function MusicPlayer() {
             curr_song.last_time_played = new Date().toLocaleString()
             curr_song.time_listened += Math.round(position)
         }
+        await updateSong(curr_song)
     });
     
 
