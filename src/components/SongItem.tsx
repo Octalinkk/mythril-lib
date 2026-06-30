@@ -1,4 +1,4 @@
-import { getSongById, Song } from "@/db/SongsManager";
+import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { Link } from "expo-router";
@@ -39,6 +39,11 @@ export default function SongItem (id: Id) {
         <Link href={{
             pathname: "/musicPlayer",
             params: {ids:[song.id.toString()]},
+            }}
+            onPress={async () => {
+                song.time_started += 1
+                song.last_time_played = new Date().toLocaleString()
+                await updateSong(song)
             }} push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>

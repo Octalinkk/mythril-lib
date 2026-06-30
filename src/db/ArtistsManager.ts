@@ -1,12 +1,12 @@
 import { getDb } from "./DBManager"
 
 export interface Artist {
-    id:number | null
-    name: string | null
-    cover:string | null
-    last_time_played:string | null
-    time_listened: number | null
-    time_started: number | null
+    id:number
+    name: string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllArtists() {
