@@ -62,14 +62,14 @@ let daa: SongPlaylist = {
   let recentSong = []
   if (recSongs.length > 0){
     for (const item of recSongs) {
-        recentSong.push(<SongItem song_id={item.id} key={item.id}/>)
+        recentSong.push(<SongItem song_id={item.id} key={"song:"+item.id}/>)
     }
   }
 
   let recentPlst = []
   if (recPlaylists.length > 0){
     for (const item of recPlaylists) {
-        recentPlst.push(<PlaylistItem playlist_id={item.id} key={item.id}/>)
+        recentPlst.push(<PlaylistItem playlist_id={item.id} key={"playlist:"+item.id}/>)
     }
   }
   

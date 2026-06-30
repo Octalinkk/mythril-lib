@@ -38,7 +38,7 @@ export default function SongItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[ song.id.toString(), (song.id + 1).toString()]},
+            params: {ids:[song.id.toString()]},
             }} push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>
