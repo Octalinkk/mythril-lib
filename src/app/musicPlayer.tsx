@@ -134,7 +134,7 @@ export default function MusicPlayer() {
     
 
     if (!playing) {
-        //TrackPlayer.play()
+        TrackPlayer.play()
     }
         
     }, []);

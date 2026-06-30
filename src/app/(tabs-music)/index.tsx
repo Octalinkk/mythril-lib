@@ -2,34 +2,61 @@
 import Header from '@/components/Header';
 import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
+import { Artist } from '@/db/ArtistsManager';
 
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
-import { SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import TrackPlayer, { PlayerCommand } from "@rntp/player";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+function getRecentSong(songs:Song[]){
+  let recentSong = []
+  if (songs.length > 0){
+    for (const item of songs) {
+        recentSong.push(<SongItem song_id={item.id} key={"song:"+item.id}/>)
+    }
+  }
+  else {
+    recentSong.push(<Text style={styles.filler_text}>No Songs found</Text>)
+  }
+  return recentSong
+}
+
+function getRecentPlaylists(playlists:Playlist[]){
+  let recentPlst = []
+  if (playlists.length > 0){
+    for (const item of playlists) {
+        recentPlst.push(<PlaylistItem playlist_id={item.id} key={"playlist:"+item.id}/>)
+    }
+  }
+  else {
+    recentPlst.push(<Text style={styles.filler_text}>No Playlists found</Text>)
+  }
+  return recentPlst
+}
+
+function getRecentArtists(artists:Artist[]){
+  let recentArtist = []
+  if (artists.length > 0){
+    for (const item of artists) {
+        recentArtist.push(<PlaylistItem playlist_id={item.id} key={"artist:"+item.id}/>)
+    }
+  }
+  else {
+    recentArtist.push(<Text style={styles.filler_text}>No Artists found</Text>)
+  }
+  return recentArtist
+}
+
 export default function HomeScreen() {
 
   const [recSongs, setSong] = useState<Song[]>([]);
   const [recPlaylists, setPlaylist] = useState<Playlist[]>([]);
+  const [recArtists, setArtist] = useState<Artist[]>([]);
 
-  let wasd: Playlist = {
-    id: 0,
-    name: "Test",
-    cover:"",
-    last_time_played:"" ,
-    time_listened: 0,
-    time_started: 0
-}
-
-let daa: SongPlaylist = {
-    song_id:1,
-    playlist_id:1
-}
     
   useEffect(() => {
       getMostRecentSongs().then(result => {
@@ -44,36 +71,30 @@ let daa: SongPlaylist = {
   }, []);
 
   useEffect(() => {
+    try{
       TrackPlayer.setupPlayer({
           contentType: 'music',
+          android: {
+            wakeMode: 'local',
+            skipSilenceEnabled: true,
+            taskRemovedBehavior : 'continue',
+            notification: {
+              channelId: 'com.solizardstudio.mythrillib',
+              channelName: 'Mythril Library',
+              smallIcon: 'ic_notification',
+            },
+          },
       });
       TrackPlayer.setCommands({
         capabilities: [
             PlayerCommand.PlayPause,
             PlayerCommand.Next,
-            PlayerCommand.Previous,
+            PlayerCommand.SkipForward
         ],
       });
+    }
+    catch {}
   }, []);
-
-  
-      
-
-  let recentSong = []
-  if (recSongs.length > 0){
-    for (const item of recSongs) {
-        recentSong.push(<SongItem song_id={item.id} key={"song:"+item.id}/>)
-    }
-  }
-
-  let recentPlst = []
-  if (recPlaylists.length > 0){
-    for (const item of recPlaylists) {
-        recentPlst.push(<PlaylistItem playlist_id={item.id} key={"playlist:"+item.id}/>)
-    }
-  }
-  
-  
   
 
   return (
@@ -90,7 +111,7 @@ let daa: SongPlaylist = {
         <ScrollView horizontal={true}>
           <View  style={styles.items_container_sm}>
             <Suspense fallback={<Text>Loading...</Text>}>
-              {recentSong}
+              {getRecentSong(recSongs)}
             </Suspense>
           </View>
         </ScrollView>
@@ -99,7 +120,14 @@ let daa: SongPlaylist = {
         <Text style={styles.title}>Recent Playlists</Text>
         <View  style={styles.items_container_md}>
           <Suspense fallback={<Text>Loading...</Text>}>
-            {recentPlst}
+            {getRecentPlaylists(recPlaylists)}
+          </Suspense>
+        </View>
+
+        <Text style={styles.title}>Recent Artists</Text>
+        <View  style={styles.items_container_md}>
+          <Suspense fallback={<Text>Loading...</Text>}>
+            {getRecentArtists(recArtists)}
           </Suspense>
         </View>
       </ScrollView>
@@ -128,8 +156,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 20, 
+    marginVertical: 30, 
     justifyContent: 'space-between', 
-    gap: 20
+    gap: 20,
+  },
+  filler_text: {
+    flex: 1,
+    color: colors.secondary,
+    fontFamily: 'SpaceGrotesk_400Regular',
   }
 });
