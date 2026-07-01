@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import RandomIcon from '@/components/RandomIcon';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
@@ -45,20 +46,15 @@ function getRandomIcon(){
     }
 }
 
-function getPlayIcon(){
-    if (TrackPlayer.isPlaying()) {
-        return <FontAwesome name="pause" size={30} color={"#000000"} />
-    }
-    else{
-        return <FontAwesome name="play" style={{marginLeft:5}} size={30} color={"#000000"} />
-    }
-}
 
 function getSongDuration(dur:number): string{
-    const minutes = Math.floor(dur / 60);
-    const seconds = Math.floor(dur % 60);
-    return minutes + ':' + seconds;
+    const minutes = Math.floor(dur / 60).toString()
+    const seconds = Math.floor(dur % 60)
+    const dispSec = seconds<10 ? "0"+seconds.toString() : seconds.toString();
+    return minutes + ':' + dispSec;
 }
+
+
 
 export default function MusicPlayer() {
     const params = useLocalSearchParams<{
@@ -66,6 +62,7 @@ export default function MusicPlayer() {
     }>();
     const playing = useIsPlaying();
     const { position, duration } = useProgress();
+    const [shuffle, setShuffle] = useState<boolean>(false)
 
     const [curr_song, setCurrSong] = useState<Song>({
         id: 0,
@@ -80,6 +77,25 @@ export default function MusicPlayer() {
     const [curr_artists, setCurrArtists] = useState<Artist[]>([]);
     
     useEffect(() => {
+
+        async function getArtistDisplay(songId:number){
+            const artistsIds = await Promise.resolve(
+                getArtistsBySongId(songId)
+            );
+            console.log(artistsIds)
+
+            const artists = await Promise.all(
+                artistsIds.map(id => getArtistById(+id))
+            );
+
+            //TODO update les data sur les artists
+
+            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
+            setCurrArtists(validArtists)
+        }
+
+
+
         async function loadSongs() {
         let ids:number[] = params.ids.split(",").map((i) => Number(i))
         
@@ -105,29 +121,11 @@ export default function MusicPlayer() {
             setCurrSong(results[0]);  
         }
 
-        if( curr_song.id != 0 ) {
-            const artistsIds = await Promise.resolve(
-                getArtistsBySongId(curr_song.id)
-            );
-            console.log(artistsIds)
-
-            const artists = await Promise.all(
-                artistsIds.map(id => getArtistById(+id))
-            );
-            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
-            setCurrArtists(validArtists)
+        if( curr_song.id != 0 ) {            
+            getArtistDisplay(curr_song.id)
         }
         else{
-            const artistsIds = await Promise.resolve(
-                getArtistsBySongId(results[0]?.id ?? curr_song.id)
-            );
-            console.log(artistsIds)
-
-            const artists = await Promise.all(
-                artistsIds.map(id => getArtistById(+id))
-            );
-            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
-            setCurrArtists(validArtists)
+            getArtistDisplay(results[0]?.id ?? curr_song.id)            
         }
 
         if(Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)){
@@ -144,15 +142,15 @@ export default function MusicPlayer() {
         
     
 
-    if (!playing) {
-        TrackPlayer.play()
-    }
-        
-    }, []);
-   
+    
+
     TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
+        console.log("EVENT")
+        if (!playing) {
+            TrackPlayer.play()
+        }
         if(item?.mediaId != undefined){
-            
+
             if(+item?.mediaId == curr_song.id) {
                 curr_song.time_started += 1
                 console.log(curr_song.name, curr_song.id)
@@ -160,10 +158,20 @@ export default function MusicPlayer() {
             else if (+item?.mediaId != curr_song.id) {
                 curr_song.last_time_played = new Date().toISOString()
                 curr_song.time_listened += Math.round(position)
+                const newSong = await getSongById(+item?.mediaId)
+                if(newSong){
+                    setCurrSong(newSong)
+                }
+                
             }
             await updateSong(curr_song)
+            await getArtistDisplay(+item?.mediaId)
         }
     });
+        
+    }, []);
+   
+    
     
 
     return (
@@ -183,8 +191,11 @@ export default function MusicPlayer() {
                         <Text style={styles.artists}>{getArtistName(curr_artists)}</Text>
                     </View>
                     <View style={styles.random_container}>
-                        <TouchableOpacity  onPress={() => { TrackPlayer.setShuffleEnabled(!TrackPlayer.isShuffleEnabled())}}>
-                            {getRandomIcon()}
+                        <TouchableOpacity onPress={() => {
+                            TrackPlayer.setShuffleEnabled(!shuffle);
+                            setShuffle(!shuffle);
+                        }}>
+                            <RandomIcon isShuffled={shuffle} />
                         </TouchableOpacity>   
                         <Text style={styles.dur}>{getSongDuration(duration)}</Text>
                     </View>                 
@@ -198,12 +209,12 @@ export default function MusicPlayer() {
                     TrackPlayer.seekTo(value)
                 }}/>
                 <View style={styles.controls}>
-                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>
+                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToPrevious()}}>
                         <MaterialIcons name="skip-previous" size={30} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.play_btn} onPress={() => {playing ? TrackPlayer.pause() : TrackPlayer.play()}}>
-                        {getPlayIcon()}
+                    <TouchableOpacity style={styles.play_btn} onPress={() => { playing ? TrackPlayer.pause() : TrackPlayer.play() }}>
+                        {playing ? <FontAwesome name="pause" size={30} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>

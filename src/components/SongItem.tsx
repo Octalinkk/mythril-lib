@@ -38,7 +38,7 @@ export default function SongItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString(), (song.id+1).toString()]},
+            params: {ids:[song.id.toString()]},
             }}
             onPress={async () => {
                 song.time_started += 1
