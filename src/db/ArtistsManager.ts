@@ -37,11 +37,33 @@ export async function getArtistById(id:number) {
     }
 }
 
+export async function getArtistByName(name:string) {
+    let artist:Artist
+    const db = await getDb();
+    const row = await db.getFirstAsync<Artist>(`SELECT * FROM artists WHERE name = ?`, [name]);
+    if (!row) return null; else return artist = {
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played:row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }
+}
+
+export async function isArtistinDB(name:string) {
+    let artist:Artist
+    const db = await getDb();
+    const row = await db.getFirstAsync<Artist>(`SELECT * FROM artists WHERE name = ?`, [name]);
+    if (!row) return false; else return true
+}
+
 export async function addArtist(artist:Artist) {
     const db = await getDb();
     try {
-    await db.runAsync(`INSERT INTO artists (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
-        [artist.name, artist.cover, artist.last_time_played, artist.time_listened, artist.time_started])
+        const result = await db.runAsync(`INSERT INTO artists (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
+            [artist.name, artist.cover, artist.last_time_played, artist.time_listened, artist.time_started])
+        return result.lastInsertRowId 
     }
     catch (err) {
         console.error(err)

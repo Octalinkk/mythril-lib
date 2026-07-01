@@ -78,7 +78,6 @@ export default function HomeScreen() {
           contentType: 'music',
           android: {
             wakeMode: 'local',
-            skipSilenceEnabled: true,
             taskRemovedBehavior : 'continue',
             notification: {
               channelId: 'com.solizardstudio.mythrillib',

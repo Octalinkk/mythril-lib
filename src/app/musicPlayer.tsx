@@ -102,23 +102,42 @@ export default function MusicPlayer() {
 
 
         if (results[0]) {
-            setCurrSong(results[0]);           
+            setCurrSong(results[0]);  
         }
 
+        if( curr_song.id != 0 ) {
+            const artistsIds = await Promise.resolve(
+                getArtistsBySongId(curr_song.id)
+            );
+            console.log(artistsIds)
+
+            const artists = await Promise.all(
+                artistsIds.map(id => getArtistById(+id))
+            );
+            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
+            setCurrArtists(validArtists)
+        }
+        else{
+            const artistsIds = await Promise.resolve(
+                getArtistsBySongId(results[0]?.id ?? curr_song.id)
+            );
+            console.log(artistsIds)
+
+            const artists = await Promise.all(
+                artistsIds.map(id => getArtistById(+id))
+            );
+            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
+            setCurrArtists(validArtists)
+        }
+
+        if(Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)){
+            TrackPlayer.addMediaItems(all_songs.slice(1))
+        }
+        else {
+            console.log(TrackPlayer.getActiveMediaItemIndex(), Number(all_songs[0].mediaId))
+            TrackPlayer.setMediaItems(all_songs);
+        }
         
-        const artistsIds = await Promise.resolve(
-            getArtistsBySongId(curr_song.id)
-        );
-
-        const artists = await Promise.all(
-            artistsIds.map(id => getArtistById(+id))
-        );
-        const validArtists = artists.filter((artist): artist is Artist => artist !== null);
-        setCurrArtists(validArtists)
-
-
-
-        TrackPlayer.setMediaItems(all_songs, 0);
     }
 
     loadSongs().catch(console.error);
@@ -132,17 +151,18 @@ export default function MusicPlayer() {
     }, []);
    
     TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-    
-        //console.log('Played:', curr_song.name);
-        //console.log('Now playing:', item?.title, 'at index', index);
-        if(item?.mediaId != undefined && +item?.mediaId == curr_song.id) {
-            curr_song.time_started += 1
+        if(item?.mediaId != undefined){
+            
+            if(+item?.mediaId == curr_song.id) {
+                curr_song.time_started += 1
+                console.log(curr_song.name, curr_song.id)
+            }
+            else if (+item?.mediaId != curr_song.id) {
+                curr_song.last_time_played = new Date().toISOString()
+                curr_song.time_listened += Math.round(position)
+            }
+            await updateSong(curr_song)
         }
-        else if (item?.mediaId != undefined && +item?.mediaId != curr_song.id) {
-            curr_song.last_time_played = new Date().toLocaleString()
-            curr_song.time_listened += Math.round(position)
-        }
-        await updateSong(curr_song)
     });
     
 

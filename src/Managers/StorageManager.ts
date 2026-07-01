@@ -29,7 +29,7 @@ export async function updateSongs() {
                     name: "",
                     file_path: song.uri,
                     cover: "",
-                    last_time_played: new Date().toLocaleString(),
+                    last_time_played: new Date().toISOString(),
                     time_listened: 0,
                     time_started: 0
                 };

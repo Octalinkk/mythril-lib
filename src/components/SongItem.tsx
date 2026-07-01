@@ -38,20 +38,25 @@ export default function SongItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString()]},
+            params: {ids:[song.id.toString(), (song.id+1).toString()]},
             }}
             onPress={async () => {
                 song.time_started += 1
-                song.last_time_played = new Date().toLocaleString()
+                song.last_time_played = new Date().toISOString()
                 await updateSong(song)
             }} push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>
                 <View style={styles.title_container}>
                     <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
-                    <TouchableOpacity style={styles.icon}>
-                        <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                    </TouchableOpacity>
+                    <Link href={{
+                        pathname: "/songSettings",
+                        params: {id:[song.id.toString()]},
+                        }} push asChild>
+                        <TouchableOpacity style={styles.icon}>
+                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                        </TouchableOpacity>
+                    </Link>
                 </View>
             </TouchableOpacity>
         </Link>
