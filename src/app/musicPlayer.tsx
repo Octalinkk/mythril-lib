@@ -10,10 +10,11 @@ import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextTicker from 'react-native-text-ticker';
 
-import { Artist, getArtistById } from '@/db/ArtistsManager';
+import { Artist, getArtistById, updateArtist } from '@/db/ArtistsManager';
 import { getArtistsBySongId } from '@/db/SongsArtistsManager';
 import { Song, getSongById, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 type MediaItem = {
     mediaId: string;
@@ -82,15 +83,14 @@ export default function MusicPlayer() {
             const artistsIds = await Promise.resolve(
                 getArtistsBySongId(songId)
             );
-            console.log(artistsIds)
 
             const artists = await Promise.all(
                 artistsIds.map(id => getArtistById(+id))
             );
 
-            //TODO update les data sur les artists
 
             const validArtists = artists.filter((artist): artist is Artist => artist !== null);
+
             setCurrArtists(validArtists)
         }
 
@@ -98,8 +98,6 @@ export default function MusicPlayer() {
 
         async function loadSongs() {
         let ids:number[] = params.ids.split(",").map((i) => Number(i))
-        
-        console.log(ids)
         
         let results = await Promise.all(
             ids.map(id => getSongById(+id))
@@ -132,20 +130,16 @@ export default function MusicPlayer() {
             TrackPlayer.addMediaItems(all_songs.slice(1))
         }
         else {
-            console.log(TrackPlayer.getActiveMediaItemIndex(), Number(all_songs[0].mediaId))
             TrackPlayer.setMediaItems(all_songs);
         }
         
     }
 
     loadSongs().catch(console.error);
-        
     
-
     
 
     TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-        console.log("EVENT")
         if (!playing) {
             TrackPlayer.play()
         }
@@ -153,11 +147,21 @@ export default function MusicPlayer() {
 
             if(+item?.mediaId == curr_song.id) {
                 curr_song.time_started += 1
-                console.log(curr_song.name, curr_song.id)
+                curr_artists.forEach((art) => {art.time_started += 1})
             }
             else if (+item?.mediaId != curr_song.id) {
                 curr_song.last_time_played = new Date().toISOString()
                 curr_song.time_listened += Math.round(position)
+
+                if(curr_artists){
+                    curr_artists.forEach((art) => {art.last_time_played = new Date().toISOString()})
+                    curr_artists.forEach((art) => {art.time_listened += Math.round(position)})
+
+                    for (const [index, artist] of curr_artists.entries()){
+                        await updateArtist(artist)
+                    }
+                }
+
                 const newSong = await getSongById(+item?.mediaId)
                 if(newSong){
                     setCurrSong(newSong)
@@ -214,7 +218,7 @@ export default function MusicPlayer() {
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.play_btn} onPress={() => { playing ? TrackPlayer.pause() : TrackPlayer.play() }}>
-                        {playing ? <FontAwesome name="pause" size={30} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
+                        {playing ? <FontAwesome6 name="pause" size={30} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>
