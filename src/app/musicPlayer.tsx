@@ -218,7 +218,7 @@ export default function MusicPlayer() {
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.play_btn} onPress={() => { playing ? TrackPlayer.pause() : TrackPlayer.play() }}>
-                        {playing ? <FontAwesome6 name="pause" size={30} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
+                        {playing ? <FontAwesome6 name="pause" size={35} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>

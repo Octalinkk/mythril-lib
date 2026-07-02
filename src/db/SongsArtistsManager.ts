@@ -27,6 +27,12 @@ export async function getArtistsBySongId(song_id:number) {
     return rows.map(row => row.artist_id);
 }
 
+export async function getSongCountById(artist_id:number) {
+    const db = await getDb();
+    const row = await db.getFirstAsync< {count: number} >(`SELECT COUNT(DISTINCT song_id) AS count FROM songs_artists WHERE artist_id = ?`, [artist_id]);
+    if (!row) return 0; else return row 
+}
+
 export async function addSongArtist(song_artist:SongArtist) {
     const db = await getDb();
     try {

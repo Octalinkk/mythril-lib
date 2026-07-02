@@ -5,7 +5,7 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 
 import { addArtist, getArtistById, getArtistByName } from '@/db/ArtistsManager';
 import { addSongArtist, deleteArtistsBySongId, getArtistsBySongId } from '@/db/SongsArtistsManager';
-import { getSongById, Song } from '@/db/SongsManager';
+import { getSongById, Song, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 
 function getCoverSource(cover: string) {
@@ -19,7 +19,8 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
 
     //update title
     song.name = title
-
+    console.log(song)
+    await updateSong(song)
 
     //update artist(s)
     //Delete tout les registre de la relationel Song-Artist by Song id
@@ -32,9 +33,7 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     const artistLst = artist.split(",").map(art => art.trimStart());
     console.log(artistLst)
     for (const [index, artName] of artistLst.entries()){
-        console.log(artName)
         const artist = await getArtistByName(artName)
-        console.log(artist)
         let id = 0
         if (!artist){
             const newArtist = {
@@ -45,8 +44,7 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
                 time_listened: 0,
                 time_started: 0
             }
-            id = await addArtist(newArtist)            
-            console.log("newID", id)
+            id = await addArtist(newArtist)    
         }
         else {console.log("existingId", artist.id) 
             id = artist.id}        

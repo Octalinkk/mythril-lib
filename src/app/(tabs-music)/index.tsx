@@ -1,8 +1,9 @@
 
+import ArtistItem from '@/components/ArtistItem';
 import Header from '@/components/Header';
 import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
-import { Artist } from '@/db/ArtistsManager';
+import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
 
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
@@ -43,7 +44,7 @@ function getRecentArtists(artists:Artist[]){
 
   if (artists.length > 0){
     for (const item of artists) {
-        recentArtist.push(<PlaylistItem playlist_id={item.id} key={"artist:"+item.id}/>)
+        recentArtist.push(<ArtistItem artist_id={item.id} key={"artist:"+item.id}/>)
     }
   }
   else {
@@ -69,6 +70,12 @@ export default function HomeScreen() {
   useEffect(() => {
       getMostRecentPlst().then(result => {
           if (result) setPlaylist(result);
+      });
+  }, []);
+
+  useEffect(() => {
+      getMostRecentArtists().then(result => {
+          if (result) setArtist(result);
       });
   }, []);
 

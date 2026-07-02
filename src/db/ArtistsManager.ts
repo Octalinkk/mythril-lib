@@ -51,6 +51,20 @@ export async function getArtistByName(name:string) {
     }
 }
 
+export async function getMostRecentArtists() {
+    const db = await getDb();
+    const rows = await db.getAllAsync<Artist>('SELECT * FROM artists ORDER BY last_time_played DESC LIMIT 6');
+    const artists: Artist[] = rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played: row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }));
+    return artists;
+}
+
 export async function isArtistinDB(name:string) {
     let artist:Artist
     const db = await getDb();
