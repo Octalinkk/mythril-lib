@@ -4,12 +4,14 @@ import Header from '@/components/Header';
 import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
 import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
+import { useCallback } from 'react';
 
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 import TrackPlayer, { PlayerCommand } from "@rntp/player";
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from 'expo-router';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -78,6 +80,30 @@ export default function HomeScreen() {
           if (result) setArtist(result);
       });
   }, []);
+
+  useFocusEffect(
+    useCallback(() =>{
+      getMostRecentSongs().then(result => {
+          if (result) setSong(result);
+      });
+    }, [recSongs]) 
+  )
+
+  useFocusEffect(
+    useCallback(() =>{
+      getMostRecentPlst().then(result => {
+          if (result) setPlaylist(result);
+      });
+    }, [recPlaylists]) 
+  )
+
+  useFocusEffect(
+    useCallback(() =>{
+      getMostRecentArtists().then(result => {
+          if (result) setArtist(result);
+      });
+    }, [recArtists]) 
+  )
 
   useEffect(() => {
     try{
