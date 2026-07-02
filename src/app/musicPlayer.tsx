@@ -88,10 +88,9 @@ export default function MusicPlayer() {
                 artistsIds.map(id => getArtistById(+id))
             );
 
-
             const validArtists = artists.filter((artist): artist is Artist => artist !== null);
-
-            setCurrArtists(validArtists)
+            console.log(validArtists)
+            await setCurrArtists(validArtists)
         }
 
 
@@ -144,15 +143,19 @@ export default function MusicPlayer() {
             TrackPlayer.play()
         }
         if(item?.mediaId != undefined){
+            
+            await getArtistDisplay(+item?.mediaId)
 
             if(+item?.mediaId == curr_song.id) {
                 curr_song.time_started += 1
                 curr_artists.forEach((art) => {art.time_started += 1})
+                console.log("cur song", curr_song)
+                console.log("artist: ", curr_artists)
             }
             else if (+item?.mediaId != curr_song.id) {
                 curr_song.last_time_played = new Date().toISOString()
                 curr_song.time_listened += Math.round(position)
-
+                console.log("cur artists", curr_artists)
                 if(curr_artists){
                     curr_artists.forEach((art) => {art.last_time_played = new Date().toISOString()})
                     curr_artists.forEach((art) => {art.time_listened += Math.round(position)})
@@ -164,12 +167,12 @@ export default function MusicPlayer() {
 
                 const newSong = await getSongById(+item?.mediaId)
                 if(newSong){
-                    setCurrSong(newSong)
+                    await setCurrSong(newSong)
                 }
                 
             }
+
             await updateSong(curr_song)
-            await getArtistDisplay(+item?.mediaId)
         }
     });
         

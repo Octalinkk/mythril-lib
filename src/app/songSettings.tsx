@@ -46,8 +46,7 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
             }
             id = await addArtist(newArtist)    
         }
-        else {console.log("existingId", artist.id) 
-            id = artist.id}        
+        else {id = artist.id}        
             
         
         await addSongArtist({

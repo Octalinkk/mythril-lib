@@ -17,7 +17,6 @@ function getRandomColor(seed:string){
         const r = codeA*10 > 255 ? 255 : Math.round(codeA*10)
         const g = codeB*10 > 255 ? 255 : Math.round(codeB*10)
         const b = diff*10 > 255 ? 255 : Math.round(diff*10)
-        console.log(r, g, b)
         return `rgba(${r}, ${g}, ${b},1)`
     }
     return "#000000"
@@ -69,7 +68,6 @@ export default function ArtistItem (id: Id) {
         });
     }, [id]);
 
-        console.log(artist)
         return (
             <View style={styles.container}>
                 {getCoverSource(artist.cover, artist.name)}
@@ -77,7 +75,7 @@ export default function ArtistItem (id: Id) {
                 <Text style={styles.context}>{countSong} songs | {countAlbum} albums</Text>
             </View>
         );
-        
+
 };
 
 const styles = StyleSheet.create({
