@@ -6,7 +6,7 @@ import Slider from '@react-native-community/slider';
 import TrackPlayer, { Event, useIsPlaying, useProgress } from "@rntp/player";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextTicker from 'react-native-text-ticker';
 
@@ -65,7 +65,7 @@ export default function MusicPlayer() {
     const { position, duration } = useProgress();
     const [shuffle, setShuffle] = useState<boolean>(false)
 
-    const [curr_song, setCurrSong] = useState<Song>({
+    const [curr_display_song, setCurrDisplaySong] = useState<Song>({
         id: 0,
         name: "",
         file_path: "",
@@ -74,12 +74,16 @@ export default function MusicPlayer() {
         time_listened: 0,
         time_started: 0
     });
-    
-    const [curr_artists, setCurrArtists] = useState<Artist[]>([]);
+    const [curr_display_artists, setCurrDisplayArtists] = useState<Artist[]>([]);
+
+    const used_event = useRef<boolean>(false);
+    const last_position = useRef<number>(0);
+    const curr_song = useRef<Song>(null);
+    const curr_artists = useRef<Artist[]>(null);
     
     useEffect(() => {
 
-        async function getArtistDisplay(songId:number){
+        async function getArtistsforSongId(songId:number){
             const artistsIds = await Promise.resolve(
                 getArtistsBySongId(songId)
             );
@@ -88,97 +92,131 @@ export default function MusicPlayer() {
                 artistsIds.map(id => getArtistById(+id))
             );
 
-            const validArtists = artists.filter((artist): artist is Artist => artist !== null);
-            console.log(validArtists)
-            await setCurrArtists(validArtists)
+            return artists.filter((artist): artist is Artist => artist !== null);
+        }
+
+        async function getArtistDisplay(songId:number){
+            const artists = await getArtistsforSongId(songId)
+            setCurrDisplayArtists(artists)
         }
 
 
 
         async function loadSongs() {
-        let ids:number[] = params.ids.split(",").map((i) => Number(i))
-        
-        let results = await Promise.all(
-            ids.map(id => getSongById(+id))
-        );
 
-        results = results.filter(result => result != null)
+            if(TrackPlayer.getActiveMediaItem()){
+                last_position.current = position
+                const id = Number(TrackPlayer.getActiveMediaItem()?.mediaId)
+                if (id){
+                    curr_song.current = await getSongById(id)
 
-        const all_songs: MediaItem[] = results
-            .map(result => ({
-                mediaId: result!.id.toString(),
-                url: result!.file_path,
-                title: result!.name,
-                artist: '',
-                artworkUrl: result!.cover,
-            }));
-
-
-        if (results[0]) {
-            setCurrSong(results[0]);  
-        }
-
-        if( curr_song.id != 0 ) {            
-            getArtistDisplay(curr_song.id)
-        }
-        else{
-            getArtistDisplay(results[0]?.id ?? curr_song.id)            
-        }
-
-        if(Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)){
-            TrackPlayer.addMediaItems(all_songs.slice(1))
-        }
-        else {
-            TrackPlayer.setMediaItems(all_songs);
-        }
-        
-    }
-
-    loadSongs().catch(console.error);
-    
-    
-
-    TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-        if (!playing) {
-            TrackPlayer.play()
-        }
-        if(item?.mediaId != undefined){
-            
-            await getArtistDisplay(+item?.mediaId)
-
-            if(+item?.mediaId == curr_song.id) {
-                curr_song.time_started += 1
-                curr_artists.forEach((art) => {art.time_started += 1})
-                console.log("cur song", curr_song)
-                console.log("artist: ", curr_artists)
-            }
-            else if (+item?.mediaId != curr_song.id) {
-                curr_song.last_time_played = new Date().toISOString()
-                curr_song.time_listened += Math.round(position)
-                console.log("cur artists", curr_artists)
-                if(curr_artists){
-                    curr_artists.forEach((art) => {art.last_time_played = new Date().toISOString()})
-                    curr_artists.forEach((art) => {art.time_listened += Math.round(position)})
-
-                    for (const [index, artist] of curr_artists.entries()){
-                        await updateArtist(artist)
+                    if (curr_song.current){
+                        curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
                     }
                 }
-
-                const newSong = await getSongById(+item?.mediaId)
-                if(newSong){
-                    await setCurrSong(newSong)
+                else{
+                    curr_song.current = null
                 }
                 
             }
 
-            await updateSong(curr_song)
+            let ids:number[] = params.ids.split(",").map((i) => Number(i))
+            
+            let results = await Promise.all(
+                ids.map(id => getSongById(+id))
+            );
+
+            results = results.filter(result => result != null)
+
+            const all_songs: MediaItem[] = results
+                .map(result => ({
+                    mediaId: result!.id.toString(),
+                    url: result!.file_path,
+                    title: result!.name,
+                    artist: '',
+                    artworkUrl: result!.cover,
+                }));
+
+
+            if (results[0]) {
+                setCurrDisplaySong(results[0]);  
+            }
+
+            if( curr_display_song.id != 0 ) {            
+                getArtistDisplay(curr_display_song.id)
+            }
+            else{
+                getArtistDisplay(results[0]?.id ?? curr_display_song.id)            
+            }
+
+            if(Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)){
+                TrackPlayer.addMediaItems(all_songs.slice(1))
+            }
+            else {
+                TrackPlayer.setMediaItems(all_songs);
+            }
+            
         }
-    });
-        
+
+        loadSongs().catch(console.error);
     }, []);
+
    
-    
+    useEffect(() => {
+
+        async function getArtistsforSongId(songId:number){
+            const artistsIds = await Promise.resolve(
+                getArtistsBySongId(songId)
+            );
+
+            const artists = await Promise.all(
+                artistsIds.map(id => getArtistById(+id))
+            );
+
+            return artists.filter((artist): artist is Artist => artist !== null);
+        }
+
+        TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
+            if(!used_event.current){
+                used_event.current = true
+                if (!playing) {
+                    TrackPlayer.play()
+                }
+                if(item?.mediaId != undefined){
+                    //null à chaque réouverture du player car remit le useRef par défaut (null) 
+                    if (curr_song.current != null && curr_artists.current != null){
+                        
+                        console.log(curr_song.current)
+                        //for previous song
+                        curr_song.current.time_listened += last_position.current
+                        curr_song.current.last_time_played += new Date().toISOString()
+                        curr_artists.current.map(artist => artist.time_listened += last_position.current)
+                        curr_artists.current.map(artist => artist.last_time_played += new Date().toISOString())
+                        updateSong(curr_song.current)
+                        await Promise.all(
+                            curr_artists.current.map(artist => updateArtist(artist))
+                        );
+                    }
+                    curr_song.current = await getSongById(Number(item?.mediaId))
+                    if (curr_song.current != null){
+                        curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
+                        curr_song.current.time_started += 1
+                        curr_artists.current.map(artist => artist.time_started += 1)
+                        setCurrDisplaySong(curr_song.current)
+                        setCurrDisplayArtists(curr_artists.current)
+                        updateSong(curr_song.current)
+                        await Promise.all(
+                            curr_artists.current.map(artist => updateArtist(artist))
+                        );
+                    }
+                    else {curr_artists.current = []}
+                    
+                    
+                    console.log(curr_song.current)
+                }
+            }
+        });
+    }, []);
     
 
     return (
@@ -190,12 +228,12 @@ export default function MusicPlayer() {
             >
             <Header />
             <View style={styles.container}>
-                <Image source={getCoverSource(curr_song.cover)} style={styles.cover}/>
+                <Image source={getCoverSource(curr_display_song.cover)} style={styles.cover}/>
 
                 <View style={styles.title_container}>
                     <View style={styles.info_container}>
-                        <TextTicker scrollSpeed={50} loop bounce numberOfLines={1} style={styles.title}>{curr_song.name}</TextTicker>
-                        <Text style={styles.artists}>{getArtistName(curr_artists)}</Text>
+                        <TextTicker scrollSpeed={50} loop bounce numberOfLines={1} style={styles.title}>{curr_display_song.name}</TextTicker>
+                        <Text style={styles.artists}>{getArtistName(curr_display_artists)}</Text>
                     </View>
                     <View style={styles.random_container}>
                         <TouchableOpacity onPress={() => {
@@ -216,7 +254,7 @@ export default function MusicPlayer() {
                     TrackPlayer.seekTo(value)
                 }}/>
                 <View style={styles.controls}>
-                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToPrevious()}}>
+                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToPrevious(); used_event.current = false}}>
                         <MaterialIcons name="skip-previous" size={30} color="black" />
                     </TouchableOpacity>
 
@@ -224,7 +262,7 @@ export default function MusicPlayer() {
                         {playing ? <FontAwesome6 name="pause" size={35} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>
+                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext() ; used_event.current = false}}>
                         <MaterialIcons name="skip-next" size={30} color="black" />
                     </TouchableOpacity>
                 </View>
