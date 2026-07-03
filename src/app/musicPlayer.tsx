@@ -186,12 +186,10 @@ export default function MusicPlayer() {
                     //null à chaque réouverture du player car remit le useRef par défaut (null) 
                     if (curr_song.current != null && curr_artists.current != null){
                         
-                        console.log(curr_song.current)
+                        console.log(curr_artists.current)
                         //for previous song
                         curr_song.current.time_listened += last_position.current
-                        curr_song.current.last_time_played += new Date().toISOString()
                         curr_artists.current.map(artist => artist.time_listened += last_position.current)
-                        curr_artists.current.map(artist => artist.last_time_played += new Date().toISOString())
                         updateSong(curr_song.current)
                         await Promise.all(
                             curr_artists.current.map(artist => updateArtist(artist))
@@ -201,7 +199,9 @@ export default function MusicPlayer() {
                     if (curr_song.current != null){
                         curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
                         curr_song.current.time_started += 1
+                        curr_song.current.last_time_played += new Date().toISOString()
                         curr_artists.current.map(artist => artist.time_started += 1)
+                        curr_artists.current.map(artist => artist.last_time_played = new Date().toISOString())
                         setCurrDisplaySong(curr_song.current)
                         setCurrDisplayArtists(curr_artists.current)
                         updateSong(curr_song.current)
@@ -212,7 +212,7 @@ export default function MusicPlayer() {
                     else {curr_artists.current = []}
                     
                     
-                    console.log(curr_song.current)
+                    console.log(curr_artists.current)
                 }
             }
         });
