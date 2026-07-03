@@ -170,7 +170,6 @@ export default function MusicPlayer() {
                 
                 
             </ScrollView>
-            <Text>{song.name}</Text>
         </LinearGradient>
     )
 }

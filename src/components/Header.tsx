@@ -1,5 +1,6 @@
 import { colors } from "@/styles/global";
 import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Animated, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Separator from "./Separator";
@@ -35,10 +36,13 @@ export default function Header() {
                 <Ionicons name="menu" size={40} color={colors.primary} />
             </TouchableOpacity>
             <View style={{ flex: 1 }}/>
-            <TouchableOpacity onPress={openSidebar}>
-                <Ionicons name="search" size={30} color={colors.primary} />
-            </TouchableOpacity>
-
+            <Link href={{
+              pathname: "/searchSongs",
+            }} push asChild>
+              <TouchableOpacity>
+                  <Ionicons name="search" size={30} color={colors.primary} />
+              </TouchableOpacity>
+            </Link>
             <Modal 
                 visible={visible}
                 transparent={true}

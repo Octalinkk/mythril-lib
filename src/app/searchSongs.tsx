@@ -1,11 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { Suspense, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import SongListItem from '@/components/SongListItem';
 import { getAllSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 
-
+function getFilteredSongList(songs: Song[], filter:string){
+    const filteredSongs = songs.filter((song) => song.name.toLowerCase().includes(filter.toLowerCase()))
+    console.log(filteredSongs.length)
+    return filteredSongs.map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)
+}
 
 export default function SearchSongsScreen() {
 
@@ -34,14 +39,17 @@ export default function SearchSongsScreen() {
             <View style={styles.header}>
                 <TextInput
                     style={styles.search_input}
-                    onChangeText={(text) => setName(name)}
+                    onChangeText={(text) => setName(text)}
                     inputMode='text'
-                    placeholder="Song title"
+                    placeholder="Search Songs, Artists or Albums"
                     placeholderTextColor ={colors.secondary}
                 />
             </View>
             <ScrollView >
                 <View style={styles.main_scroll}>
+                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                        {getFilteredSongList(songs, name)}
+                    </Suspense>
                     
                 </View>
             </ScrollView>
@@ -52,12 +60,21 @@ export default function SearchSongsScreen() {
 const styles = StyleSheet.create({  
     header: {
         flex: 1,
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
         maxHeight: 40,
         alignItems: 'center',
+        marginVertical: 20
     },
     search_input: {
-        backgroundColor: 'red'
+        flex:1,
+        backgroundColor: '#4646467c',
+        color: colors.primary,
+        height: 40,
+        marginHorizontal: 20,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+        borderColor: colors.primary,
+        borderWidth: 1
     },
     btn_sm: {
         width: 70,
@@ -84,7 +101,7 @@ const styles = StyleSheet.create({
     },
     main_scroll: {
         paddingVertical: 30,
-        gap: 20,
+        gap: 10,
         paddingHorizontal: 20,
         alignItems: 'center', 
     },
