@@ -73,10 +73,11 @@ export async function getSongByFilePath(file_path:string) {
 export async function addSong(song:Song) {
     const db = await getDb();
     try {
-    await db.runAsync(
-    'INSERT INTO songs (name, file_path, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?, ?)',
-    [song.name, song.file_path, song.cover, song.last_time_played, song.time_listened, song.time_started]
-);
+        const result = await db.runAsync(
+            'INSERT INTO songs (name, file_path, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?, ?)',
+            [song.name, song.file_path, song.cover, song.last_time_played, song.time_listened, song.time_started]
+        );
+        return result.lastInsertRowId 
     }
     catch (err) {
         console.error(err)

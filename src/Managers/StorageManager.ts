@@ -1,3 +1,5 @@
+import { addArtist, Artist, getArtistByName } from '@/db/ArtistsManager';
+import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { Directory, File } from 'expo-file-system';
 import { getAudioMetaData } from '../../modules/audio-metadata';
@@ -32,13 +34,47 @@ export async function updateSongs() {
                     last_time_played: new Date().toISOString(),
                     time_listened: 0,
                     time_started: 0
-                };
+                }
+                let newArtist: Artist = {
+                    id: 0,
+                    name: "",
+                    cover: "",
+                    last_time_played: new Date().toISOString(),
+                    time_listened: 0,
+                    time_started: 0
+                }
 
-                if (metadata && metadata.title) {
-                    newSong.name = metadata.title;
+                if (metadata) {
+                    if(metadata.title) {newSong.name = metadata.title}
+                    if(metadata.artist) {newArtist.name = metadata.artist}
+                    
+                    
                 }
                 console.log(`Adding song : ${newSong}`)
-                await addSong(newSong);
+                const lastSongId = await addSong(newSong);
+                let lastArtistId = 0
+
+                const artist = await getArtistByName(newArtist.name)
+                if (!artist){
+                    newArtist = {
+                        id: 0,
+                        name: newArtist.name,
+                        cover: "",
+                        last_time_played: "",
+                        time_listened: 0,
+                        time_started: 0
+                    }
+                    lastArtistId = await addArtist(newArtist)    
+                }
+                else {lastArtistId = artist.id} 
+
+
+                await addSongArtist({
+                    song_id:lastSongId,
+                    artist_id:lastArtistId
+                })
+
+                
             }
         }
     };
