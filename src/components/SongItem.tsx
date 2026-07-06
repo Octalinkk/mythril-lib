@@ -1,9 +1,10 @@
 import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import SettingBtn from "./SettingsButtons";
 
 type Id = {
   song_id: number;
@@ -53,9 +54,9 @@ export default function SongItem (id: Id) {
                         pathname: "/songSettings",
                         params: {id:[song.id.toString()]},
                         }} push asChild>
-                        <TouchableOpacity style={styles.icon}>
-                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                        </TouchableOpacity>
+                            <View style={styles.icon}>
+                                <SettingBtn song_id={song.id} key={"song_setting:"+song.id}/>
+                            </View>
                     </Link>
                 </View>
             </TouchableOpacity>
