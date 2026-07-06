@@ -1,6 +1,7 @@
 import { getPlaylistById, Playlist } from "@/db/PlaylistsManager";
 import { getPlaylistCountById } from "@/db/SongsPlaylistsManager";
 import { colors } from "@/styles/global";
+import { File } from "expo-file-system";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -9,7 +10,8 @@ type Id = {
 };
 
 function getCoverSource(cover: string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
     return { uri: cover };

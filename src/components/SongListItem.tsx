@@ -3,6 +3,7 @@ import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import { File } from "expo-file-system";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -12,7 +13,8 @@ type Id = {
 };
 
 function getCoverSource(cover: string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
     return { uri: cover };

@@ -2,6 +2,7 @@ import { getAlbumCountById } from "@/db/ArtistsAlbumsManager";
 import { Artist, getArtistById } from "@/db/ArtistsManager";
 import { getSongCountById } from "@/db/SongsArtistsManager";
 import { colors } from "@/styles/global";
+import { File } from "expo-file-system";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -24,7 +25,8 @@ function getRandomColor(seed:string){
 }
 
 function getCoverSource(cover: string, name:string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         const split = name.split(" ")
         let text = ""
         if(split.length > 1){

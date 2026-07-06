@@ -4,6 +4,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 import TrackPlayer, { Event, useIsPlaying, useProgress } from "@rntp/player";
+import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from 'react';
@@ -25,7 +26,8 @@ type MediaItem = {
 }
 
 function getCoverSource(cover: string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
     return { uri: cover };

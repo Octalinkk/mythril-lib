@@ -1,17 +1,19 @@
 import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
+import { SimpleLineIcons } from "@expo/vector-icons";
+import { File } from "expo-file-system";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import SettingBtn from "./SettingsButtons";
 
 type Id = {
   song_id: number;
 };
 
 function getCoverSource(cover: string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
     return { uri: cover };
@@ -28,6 +30,7 @@ export default function SongItem (id: Id) {
         time_listened: 0,
         time_started: 0
     });
+    
 
     useEffect(() => {
         getSongById(id.song_id).then(result => {
@@ -39,7 +42,7 @@ export default function SongItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString(), (song.id+1).toString()]},
+            params: {ids:[song.id.toString()]},
             }}
             onPress={async () => {
                 song.time_started += 1
@@ -54,9 +57,9 @@ export default function SongItem (id: Id) {
                         pathname: "/songSettings",
                         params: {id:[song.id.toString()]},
                         }} push asChild>
-                            <View style={styles.icon}>
-                                <SettingBtn song_id={song.id} key={"song_setting:"+song.id}/>
-                            </View>
+                            <TouchableOpacity style={styles.icon}>
+                                <SimpleLineIcons name="options-vertical" size={12} color={colors.primary} />
+                            </TouchableOpacity>
                     </Link>
                 </View>
             </TouchableOpacity>
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
         paddingRight: 5
     },
     icon:{
-        flex: 0.15,
+        flex: 0.3,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'

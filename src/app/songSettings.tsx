@@ -1,3 +1,5 @@
+import SearchCoverModal from '@/components/SearchCoverModal';
+import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
@@ -9,7 +11,8 @@ import { getSongById, Song, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 
 function getCoverSource(cover: string) {
-    if (!cover || cover =="") {
+    const file = new File(cover)
+    if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
     return { uri: cover };
@@ -78,7 +81,15 @@ export default function MusicPlayer() {
     const [name, setName] = useState<string>("");
     const [artist, setArtist] = useState<string>("");
     const [album, setAlbum] = useState<string>("");
-    
+    const [visibleModal, setVisibleModal] = useState<boolean>(false)
+
+    function openModal(){
+        setVisibleModal(true)
+    }
+
+    function closeModal(){
+        setVisibleModal(false)
+    }
     
     
     useEffect(() => {
@@ -127,10 +138,12 @@ export default function MusicPlayer() {
                     <Image source={getCoverSource(song.cover)} style={styles.cover}/>
                     <TouchableOpacity 
                         onPress={async () => {
-                            //Change cover popup (modal je crois)
+                            openModal()
                         }} style={styles.btn_md}>
                         <Text style={styles.btn_text}>Change cover</Text>
                     </TouchableOpacity>
+                    
+                    <SearchCoverModal visible={visibleModal} onClose={closeModal} id={song.id} key={"song_setting:"+song.id}/>
                     <View style={styles.field_container}>
                         <Text style={styles.field_title}>Title</Text>
                         <TextInput
