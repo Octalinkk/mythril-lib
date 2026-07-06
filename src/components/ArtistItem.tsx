@@ -30,7 +30,7 @@ function getCoverSource(cover: string, name:string) {
         const split = name.split(" ")
         let text = ""
         if(split.length > 1){
-            text = split.map(name => name.charAt(0).toUpperCase()).join("")
+            text = split.map(name => name.charAt(0).toUpperCase()).join("").substring(0, 2)
         }
         else{
             text = split[0].substring(0, 2).toUpperCase()

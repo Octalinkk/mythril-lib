@@ -4,8 +4,8 @@ import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { File } from "expo-file-system";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
@@ -27,46 +27,35 @@ function getArtistName(artists: Artist[]):string {
     else return "unknown"
 }
 
+async function getArtistsforSongId(songId:number){
+        const artistsIds = await Promise.resolve(
+            getArtistsBySongId(songId)
+        );
+                const artists = await Promise.all(
+            artistsIds.map(id => getArtistById(+id))
+        );
+        return artists.filter((artist): artist is Artist => artist !== null);
+    }
+
 export default function SongListItem (id: Id) {
 
-    const [song, setSong] = useState<Song>({
-        id: 0,
-        name: "",
-        file_path: "",
-        cover: "",
-        last_time_played: "",
-        time_listened: 0,
-        time_started: 0
-    });
-
+    const [song, setSong] = useState<Song | null>(null);
     const [artists, setArtists] = useState<Artist[]>([])
-
-    useEffect(() => {
-
-        async function getArtistsforSongId(songId:number){
-            const artistsIds = await Promise.resolve(
-                getArtistsBySongId(songId)
-            );
-                    const artists = await Promise.all(
-                artistsIds.map(id => getArtistById(+id))
-            );
-            return artists.filter((artist): artist is Artist => artist !== null);
-        }
-
-        
-
-        async function setArtistsDisplay(songId:number){
-            const artists = await getArtistsforSongId(songId)
-            setArtists(artists)
-        }
-
-        getSongById(id.song_id).then(result => {
-            if (result) {
-                setSong(result);
-                setArtistsDisplay(result.id)
+    
+    useFocusEffect(
+        useCallback(() => {
+            async function loadInfo(){
+                const result = await getSongById(id.song_id)
+                if (result) {
+                    setSong(result)
+                    const artists = await getArtistsforSongId(result.id)
+                    setArtists(artists)
+                };
             }
-        });
-    }, []);
+            loadInfo()
+        }, [id.song_id])
+    );
+    if (!song) return null;
 
 
     return (

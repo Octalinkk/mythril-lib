@@ -82,12 +82,16 @@ export default function SearchCoverModal ({ visible, onClose, id }: SongOptionsM
                     console.log(output.exists)
                     if (output.exists && output.uri != "" && output.uri){
                         song.cover = output.uri
+                        console.log(song)
+                        //TODO Need to add a prop to define if it's song/album/artist
                         await updateSong(song)
                     }
                 } catch (error) {
-                    console.error(error)
+                    
                 }
             }
+            closeSearch()
+            onClose()
         }
     }
 

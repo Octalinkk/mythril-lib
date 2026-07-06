@@ -110,8 +110,7 @@ export default function MusicPlayer() {
                 });
             }
         });
-
-        //Load current artist if any
+        //TODO update pour que l'image soit mise à jour
         //Load current album if any
     }, []);
     

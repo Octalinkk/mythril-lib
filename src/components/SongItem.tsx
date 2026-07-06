@@ -2,8 +2,8 @@ import { getSongById, Song, updateSong } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { File } from "expo-file-system";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 
@@ -13,7 +13,7 @@ type Id = {
 
 function getCoverSource(cover: string) {
     const file = new File(cover)
-    if (!cover || cover =="" || !file.exists) {
+    if (!cover || cover =="") {
         return require('../res/def_cover.png');
     }
     return { uri: cover };
@@ -21,23 +21,17 @@ function getCoverSource(cover: string) {
 
 export default function SongItem (id: Id) {
 
-    const [song, setSong] = useState<Song>({
-        id: 0,
-        name: "",
-        file_path: "",
-        cover: "",
-        last_time_played: "",
-        time_listened: 0,
-        time_started: 0
-    });
-    
+    const [song, setSong] = useState<Song | null>(null);
 
-    useEffect(() => {
-        getSongById(id.song_id).then(result => {
-            if (result) setSong(result);
-        });
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            getSongById(id.song_id).then(result => {
+                if (result) setSong(result);
+            });
+        }, [id.song_id])
+    );
 
+    if (!song) return null;
 
     return (
         <Link href={{
