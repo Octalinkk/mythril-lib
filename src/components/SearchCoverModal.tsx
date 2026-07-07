@@ -1,4 +1,4 @@
-import { getSongById, Song, updateSong } from "@/db/SongsManager";
+import { getSongById, Song } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from "expo-linear-gradient";
@@ -13,12 +13,12 @@ type Id = {
 type SongOptionsModalProps = {
     visible: boolean;
     onClose: () => void;
-    actionOnClose: () => void;
+    returnFileResult: (file:File) => void;
     id: number;
 };
 
 
-export default function SearchCoverModal ({ visible, onClose, id, actionOnClose }: SongOptionsModalProps) {
+export default function SearchCoverModal ({ visible, onClose, id, returnFileResult }: SongOptionsModalProps) {
 
     const [song, setSong] = useState<Song>({
         id: 0,
@@ -69,7 +69,7 @@ export default function SearchCoverModal ({ visible, onClose, id, actionOnClose 
             const imageUrl = event.nativeEvent.data
             if (imageUrl && imageUrl != ""){
                 const dir = new Directory(Paths.document, 'songCover')
-                const destination = new File (dir.uri + `/${song.id}.jpg`)
+                const destination = new File (dir.uri + `/${song.id}-temp.jpg`)
                 if (!dir.exists){
                     dir.create()                    
                 }
@@ -81,8 +81,7 @@ export default function SearchCoverModal ({ visible, onClose, id, actionOnClose 
                     if (output.exists && output.uri != "" && output.uri){
                         song.cover = output.uri
                         //TODO Need to add a prop to define if it's song/album/artist
-                        await updateSong(song)
-                        await actionOnClose()
+                        await returnFileResult(output)
                     }
                 } catch (error) {
                     

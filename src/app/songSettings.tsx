@@ -18,11 +18,30 @@ function getCoverSource(cover: string, key:number) {
     return { uri: `${cover}?cache=${key}` };
 }
 
-async function saveChanges(song:Song, title: string, artist: string, album: string){
+async function saveChanges(song:Song, title: string, artist: string, album: string, old_cover:File | null, new_cover:File | null){
 
     //update title
     song.name = title
-    console.log(song.cover)
+    if(old_cover && new_cover){
+        let uri = ""
+        try{
+            const oldCovValue = old_cover.bytesSync()
+            if (oldCovValue != new_cover.bytesSync()){
+                //nouvelle image
+                uri = old_cover.uri
+                new_cover.moveSync(old_cover, { overwrite: true })
+            }
+            else{
+                new_cover.delete()
+            }
+        }
+        catch{
+            new_cover.moveSync(new File(new_cover.uri.replace("-temp", "")), { overwrite: true })
+            uri = new_cover.uri
+        }
+        
+        song.cover = uri
+    }
     await updateSong(song)
 
     //update artist(s)
@@ -82,6 +101,9 @@ export default function MusicPlayer() {
     const [album, setAlbum] = useState<string>("");
     const [visibleModal, setVisibleModal] = useState<boolean>(false)
     const [coverKey, setCoverKey] = useState<number>(Date.now());
+    
+    const [old_cover, setOldCover] = useState<File | null>(null);
+    const [new_cover, setNewCover] = useState<File | null>(null);
 
     function openModal(){
         setVisibleModal(true)
@@ -91,11 +113,13 @@ export default function MusicPlayer() {
         setVisibleModal(false)
     }
     
-    async function updateCover() {
-        const upSong = await getSongById(song.id);
+    async function updateCover(newImage:File) {
+        let upSong = await getSongById(song.id);
         if (upSong) {
+            upSong.cover = newImage.uri
             setSong(upSong);
-            setCoverKey(Date.now()); // ← force un nouvel URI → React Native recharge l'image
+            setNewCover(newImage)
+            setCoverKey(Date.now());
         }
     }
     
@@ -103,6 +127,7 @@ export default function MusicPlayer() {
         getSongById(Number(params.id)).then(result => {
             if (result) {
                 setSong(result);
+                setOldCover(new File(result.cover))
                 setName(result.name)
                 getArtistsBySongId(Number(result.id)).then(artIds => {
                     if (artIds) {
@@ -133,7 +158,7 @@ export default function MusicPlayer() {
                 <TouchableOpacity 
                     onPress={async () => {
                         //Save change
-                        saveChanges(song, name, artist, album)
+                        saveChanges(song, name, artist, album, old_cover, new_cover)
                         router.back()
                     }} style={styles.btn_sm}>
                     <Text style={styles.btn_text}>Save</Text>
@@ -149,7 +174,7 @@ export default function MusicPlayer() {
                         <Text style={styles.btn_text}>Change cover</Text>
                     </TouchableOpacity>
                     
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} actionOnClose={updateCover} id={song.id} key={"song_setting:"+song.id}/>
+                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} id={song.id} key={"song_setting:"+song.id}/>
                     <View style={styles.field_container}>
                         <Text style={styles.field_title}>Title</Text>
                         <TextInput
