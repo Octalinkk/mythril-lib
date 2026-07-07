@@ -30,7 +30,7 @@ function getCoverSource(cover: string) {
     if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
-    return { uri: cover };
+    return { uri: `${cover}?cache=${Date.now()}` };
 }
 
 function getArtistName(artists: Artist[]):string {
@@ -187,8 +187,6 @@ export default function MusicPlayer() {
                 if(item?.mediaId != undefined){
                     //null à chaque réouverture du player car remit le useRef par défaut (null) 
                     if (curr_song.current != null && curr_artists.current != null){
-                        
-                        console.log(curr_artists.current)
                         //for previous song
                         curr_song.current.time_listened += last_position.current
                         curr_artists.current.map(artist => artist.time_listened += last_position.current)
@@ -212,9 +210,6 @@ export default function MusicPlayer() {
                         );
                     }
                     else {curr_artists.current = []}
-                    
-                    
-                    console.log(curr_artists.current)
                 }
             }
         });

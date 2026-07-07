@@ -42,7 +42,7 @@ function getCoverSource(cover: string, name:string) {
                     <Text style={styles.profile_title}>{text}</Text>
                 </View>)
     }
-    return <Image source={{uri: cover}} style={styles.image}/>
+    return <Image source={{uri: `${cover}?cache=${Date.now()}`}} style={styles.image}/>
 }
 
 export default function ArtistListItem (id: Id) {

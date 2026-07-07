@@ -13,11 +13,12 @@ type Id = {
 type SongOptionsModalProps = {
     visible: boolean;
     onClose: () => void;
+    actionOnClose: () => void;
     id: number;
 };
 
 
-export default function SearchCoverModal ({ visible, onClose, id }: SongOptionsModalProps) {
+export default function SearchCoverModal ({ visible, onClose, id, actionOnClose }: SongOptionsModalProps) {
 
     const [song, setSong] = useState<Song>({
         id: 0,
@@ -65,7 +66,6 @@ export default function SearchCoverModal ({ visible, onClose, id }: SongOptionsM
     async function onMessage(event: WebViewMessageEvent) {
         if(!used_event.current){
             used_event.current = true
-            console.log("EVENT")
             const imageUrl = event.nativeEvent.data
             if (imageUrl && imageUrl != ""){
                 const dir = new Directory(Paths.document, 'songCover')
@@ -74,17 +74,15 @@ export default function SearchCoverModal ({ visible, onClose, id }: SongOptionsM
                     dir.create()                    
                 }
                 if(destination.exists){
-                    console.log(destination.exists)
                     await destination.delete()
                 }
                 try {                
                     const output = await File.downloadFileAsync(imageUrl, destination)
-                    console.log(output.exists)
                     if (output.exists && output.uri != "" && output.uri){
                         song.cover = output.uri
-                        console.log(song)
                         //TODO Need to add a prop to define if it's song/album/artist
                         await updateSong(song)
+                        await actionOnClose()
                     }
                 } catch (error) {
                     

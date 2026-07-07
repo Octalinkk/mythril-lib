@@ -16,7 +16,7 @@ function getCoverSource(cover: string) {
     if (!cover || cover =="") {
         return require('../res/def_cover.png');
     }
-    return { uri: cover };
+    return { uri: `${cover}?cache=${Date.now()}` };
 }
 
 export default function SongItem (id: Id) {

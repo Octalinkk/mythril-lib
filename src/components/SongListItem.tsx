@@ -17,7 +17,7 @@ function getCoverSource(cover: string) {
     if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
-    return { uri: cover };
+    return { uri: `${cover}?cache=${Date.now()}` };
 }
 
 function getArtistName(artists: Artist[]):string {

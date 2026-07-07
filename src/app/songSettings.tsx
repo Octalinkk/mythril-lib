@@ -10,19 +10,19 @@ import { addSongArtist, deleteArtistsBySongId, getArtistsBySongId } from '@/db/S
 import { getSongById, Song, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 
-function getCoverSource(cover: string) {
+function getCoverSource(cover: string, key:number) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
         return require('../res/def_cover.png');
     }
-    return { uri: cover };
+    return { uri: `${cover}?cache=${key}` };
 }
 
 async function saveChanges(song:Song, title: string, artist: string, album: string){
 
     //update title
     song.name = title
-    console.log(song)
+    console.log(song.cover)
     await updateSong(song)
 
     //update artist(s)
@@ -34,7 +34,6 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
         console.log("Couldn't delete link for song")
     }
     const artistLst = artist.split(",").map(art => art.trimStart());
-    console.log(artistLst)
     for (const [index, artName] of artistLst.entries()){
         const artist = await getArtistByName(artName)
         let id = 0
@@ -82,6 +81,7 @@ export default function MusicPlayer() {
     const [artist, setArtist] = useState<string>("");
     const [album, setAlbum] = useState<string>("");
     const [visibleModal, setVisibleModal] = useState<boolean>(false)
+    const [coverKey, setCoverKey] = useState<number>(Date.now());
 
     function openModal(){
         setVisibleModal(true)
@@ -91,6 +91,13 @@ export default function MusicPlayer() {
         setVisibleModal(false)
     }
     
+    async function updateCover() {
+        const upSong = await getSongById(song.id);
+        if (upSong) {
+            setSong(upSong);
+            setCoverKey(Date.now()); // ← force un nouvel URI → React Native recharge l'image
+        }
+    }
     
     useEffect(() => {
         getSongById(Number(params.id)).then(result => {
@@ -134,7 +141,7 @@ export default function MusicPlayer() {
             </View>
             <ScrollView >
                 <View style={styles.main_scroll}>
-                    <Image source={getCoverSource(song.cover)} style={styles.cover}/>
+                    <Image source={getCoverSource(song.cover, coverKey)} style={styles.cover}/>
                     <TouchableOpacity 
                         onPress={async () => {
                             openModal()
@@ -142,7 +149,7 @@ export default function MusicPlayer() {
                         <Text style={styles.btn_text}>Change cover</Text>
                     </TouchableOpacity>
                     
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} id={song.id} key={"song_setting:"+song.id}/>
+                    <SearchCoverModal visible={visibleModal} onClose={closeModal} actionOnClose={updateCover} id={song.id} key={"song_setting:"+song.id}/>
                     <View style={styles.field_container}>
                         <Text style={styles.field_title}>Title</Text>
                         <TextInput
