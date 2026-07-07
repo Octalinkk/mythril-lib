@@ -31,7 +31,7 @@ async function getArtistsforSongId(songId:number){
         const artistsIds = await Promise.resolve(
             getArtistsBySongId(songId)
         );
-                const artists = await Promise.all(
+        const artists = await Promise.all(
             artistsIds.map(id => getArtistById(+id))
         );
         return artists.filter((artist): artist is Artist => artist !== null);

@@ -1,3 +1,4 @@
+import { Artist, getArtistById } from "@/db/ArtistsManager";
 import { getSongById, Song } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -5,6 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { Directory, File, Paths } from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
@@ -30,16 +32,34 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         time_started: 0
     });
 
+    const [artists, setArtists] = useState<Artist[]>([]);
+
     const [visibleSearch, setVisibleSearch] = useState<boolean>(false)
 
     useEffect(() => {
         getSongById(id).then(result => {
-            if (result) setSong(result);
+            if (result) {
+                setSong(result)
+                getArtistsforSongId(result.id).then(res => {
+                    setArtists(res)
+                })
+            }
         });
     }, []);
 
     
     const used_event = useRef<boolean>(false);
+
+
+    async function getArtistsforSongId(songId:number){
+        const artistsIds = await Promise.resolve(
+            getArtistsBySongId(songId)
+        );
+        const artists = await Promise.all(
+            artistsIds.map(id => getArtistById(+id))
+        );
+        return artists.filter((artist): artist is Artist => artist !== null);
+    }
 
 
     function openSearch(){
@@ -92,6 +112,17 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         }
     }
 
+    function getQuery(){
+        if (artists.length < 1){
+            return song.name
+        }
+        else{            
+            const names = artists.filter((artist): artist is Artist => artist !== null).map(artist => artist.name);
+            return String(song.name + "+" + names.join("+"))
+        }
+        
+    }
+
 
     return (       
         
@@ -127,7 +158,7 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
             >
                 <View style={styles.main_container}>
                     <WebView
-                        source={{ uri: `https://www.google.com/search?sxsrf=APpeQnvKONL8cw888eX7mI--vukP_XJQqw:1783339800397&udm=2&q=${song.name}+album+cover` }}
+                        source={{ uri: `https://www.google.com/search?sxsrf=APpeQnvKONL8cw888eX7mI--vukP_XJQqw:1783339800397&udm=2&q=${getQuery()}+album+cover` }}
                         onMessage={onMessage}
                         injectedJavaScript={injectedJS}
                     />
