@@ -37,7 +37,7 @@ export default function Header() {
             </TouchableOpacity>
             <View style={{ flex: 1 }}/>
             <Link href={{
-              pathname: "/searchSongs",
+              pathname: "/searchPage",
             }} push asChild>
               <TouchableOpacity>
                   <Ionicons name="search" size={30} color={colors.primary} />

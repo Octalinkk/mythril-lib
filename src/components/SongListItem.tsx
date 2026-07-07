@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     title:{
         flex: 0.6,
         flexDirection: 'row',
-        fontSize: 20,
+        fontSize: 16,
         color: colors.primary,
         fontFamily: 'SpaceGrotesk_700Bold',
         alignItems: 'center'

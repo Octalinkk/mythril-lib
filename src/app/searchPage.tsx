@@ -2,21 +2,34 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import ArtistListItem from '@/components/ArtistListItem';
 import SongListItem from '@/components/SongListItem';
+import { Artist, getAllArtists } from '@/db/ArtistsManager';
 import { getAllSongs, Song } from '@/db/SongsManager';
-import { colors, globalStyles } from '@/styles/global';
+import { colors } from '@/styles/global';
 
 function getFilteredSongList(songs: Song[], filter:string){
     const filteredSongs = songs.filter((song) => song.name.toLowerCase().includes(filter.toLowerCase()))
-    console.log(filteredSongs.length)
-    return filteredSongs.map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)
+    if (filteredSongs.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
+    if (filteredSongs.length > 100){return filteredSongs.slice(0, 100).map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)}
+    else{return filteredSongs.map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)}
+    
 }
 
-export default function SearchSongsScreen() {
+function getFilteredArtistList(artists: Artist[], filter:string){
+    const filteredArtists = artists.filter((artist) => artist.name.toLowerCase().includes(filter.toLowerCase()))
+    if (filteredArtists.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
+    if (filteredArtists.length > 100){return filteredArtists.slice(0, 100).map(artist => <ArtistListItem artist_id={artist.id} key={"searched_artist:"+artist.id}/>)}
+    else{return filteredArtists.map(artist => <ArtistListItem artist_id={artist.id} key={"searched_artist:"+artist.id}/>)}
+    
+}
+
+export default function SearchScreen() {
 
 
     const [name, setName] = useState<string>("");
     const [songs, setAllSongs] = useState<Song[]>([]);
+    const [artists, setAllArtists] = useState<Artist[]>([]);
     
     
     
@@ -26,12 +39,18 @@ export default function SearchSongsScreen() {
                 setAllSongs(result);
             }
         });
+
+        getAllArtists().then(result => {
+            if (result) {
+                setAllArtists(result);
+            }
+        });
     }, []);
     
 
     return (
         <LinearGradient 
-              style={globalStyles.main_container}
+              style={styles.main_container}
               colors={[colors.grad_prim, colors.grad_sec, colors.grad_tri]}
               start={{x:0, y:0}}
               end={{x:1, y:1}}
@@ -41,14 +60,19 @@ export default function SearchSongsScreen() {
                     style={styles.search_input}
                     onChangeText={(text) => setName(text)}
                     inputMode='text'
-                    placeholder="Search Songs, Artists or Albums"
+                    placeholder="Search: Songs, Artists or Albums"
                     placeholderTextColor ={colors.secondary}
                 />
             </View>
             <ScrollView >
                 <View style={styles.main_scroll}>
+                    <Text style={styles.title}>Songs</Text>
                     <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
                         {getFilteredSongList(songs, name)}
+                    </Suspense>
+                    <Text style={styles.title}>Artists</Text>
+                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                        {getFilteredArtistList(artists, name)}
                     </Suspense>
                     
                 </View>
@@ -58,6 +82,11 @@ export default function SearchSongsScreen() {
 }
 
 const styles = StyleSheet.create({  
+    main_container: {
+        flex: 1,
+        paddingTop: 50,
+        marginBottom:50
+    },
     header: {
         flex: 1,
         flexDirection: 'row',
@@ -75,6 +104,13 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderColor: colors.primary,
         borderWidth: 1
+    },
+    title: {
+        flex: 1,
+        fontSize: 30,
+        fontFamily: 'SpaceGrotesk_700Bold',
+        textAlign: 'left',
+        color: colors.primary
     },
     btn_sm: {
         width: 70,
@@ -110,6 +146,11 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 30
+    },
+    filler_text: {
+        flex: 1,
+        color: colors.secondary,
+        fontFamily: 'SpaceGrotesk_400Regular',
     },
     field_container:{
         flex: 1,
