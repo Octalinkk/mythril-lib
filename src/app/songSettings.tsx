@@ -174,7 +174,7 @@ export default function MusicPlayer() {
                         <Text style={styles.btn_text}>Change cover</Text>
                     </TouchableOpacity>
                     
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} id={song.id} key={"song_setting:"+song.id}/>
+                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='song' id={song.id} key={"song_setting:"+song.id}/>
                     <View style={styles.field_container}>
                         <Text style={styles.field_title}>Title</Text>
                         <TextInput

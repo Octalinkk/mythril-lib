@@ -10,17 +10,16 @@ import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { Directory, File, Paths } from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
-type Id = {
-};
 type SongOptionsModalProps = {
     visible: boolean;
     onClose: () => void;
     returnFileResult: (file:File) => void;
     id: number;
+    target: "song" | "artist" | "album" | "playlist"
 };
 
 
-export default function SearchCoverModal ({ visible, onClose, id, returnFileResult }: SongOptionsModalProps) {
+export default function SearchCoverModal ({ visible, onClose, id, returnFileResult, target }: SongOptionsModalProps) {
 
     const [song, setSong] = useState<Song>({
         id: 0,
@@ -32,19 +31,39 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         time_started: 0
     });
 
+    const [artist, setArtist] = useState<Artist>({
+        id: 0,
+        name: "",
+        cover: "",
+        last_time_played: "",
+        time_listened: 0,
+        time_started: 0
+    });
+
     const [artists, setArtists] = useState<Artist[]>([]);
 
     const [visibleSearch, setVisibleSearch] = useState<boolean>(false)
 
     useEffect(() => {
-        getSongById(id).then(result => {
-            if (result) {
-                setSong(result)
-                getArtistsforSongId(result.id).then(res => {
-                    setArtists(res)
-                })
-            }
-        });
+        if (target == "song"){
+            getSongById(id).then(result => {
+                if (result) {
+                    setSong(result)
+                    getArtistsforSongId(result.id).then(res => {
+                        setArtists(res)
+                    })
+                }
+            });
+        }
+        if (target == "artist"){
+            getArtistById(id).then(result => {
+                if (result) {
+                    setArtist(result)
+                    
+                }
+            });
+        }
+
     }, []);
 
     
@@ -88,8 +107,30 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
             used_event.current = true
             const imageUrl = event.nativeEvent.data
             if (imageUrl && imageUrl != ""){
-                const dir = new Directory(Paths.document, 'songCover')
-                const destination = new File (dir.uri + `/${song.id}-temp.jpg`)
+                let dir
+                let destination
+                if (target == "song"){
+                    dir = new Directory(Paths.document, 'songCover')
+                    destination = new File (dir.uri + `/${song.id}-temp.jpg`)
+                }
+                if (target == "artist"){
+                    dir = new Directory(Paths.document, 'artistProfil')
+                    destination = new File (dir.uri + `/${artist.id}-temp.jpg`)
+                }
+                if (target == "album"){
+                    dir = new Directory(Paths.document, 'albumCover')
+                    destination = new File (dir.uri + `/${song.id}-temp.jpg`) //a changer 
+                }
+                if (target == "playlist"){
+                    dir = new Directory(Paths.document, 'playlistCover')
+                    destination = new File (dir.uri + `/${song.id}-temp.jpg`) //a changer
+                }
+                else{
+                    //Le else est à garder sinon y'a des erreur jpp
+                    dir = new Directory(Paths.document, 'songCover')
+                    destination = new File (dir.uri + `/${song.id}-temp.jpg`)
+                }
+                
                 if (!dir.exists){
                     dir.create()                    
                 }
@@ -99,6 +140,16 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                 try {                
                     const output = await File.downloadFileAsync(imageUrl, destination)
                     if (output.exists && output.uri != "" && output.uri){
+                        if (target == "song"){
+                            song.cover = output.uri
+                        }
+                        if (target == "artist"){
+                            artist.cover = output.uri
+                        }
+                        if (target == "album"){
+                        }
+                        if (target == "playlist"){
+                        }
                         song.cover = output.uri
                         //TODO Need to add a prop to define if it's song/album/artist
                         await returnFileResult(output)
@@ -113,14 +164,18 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
     }
 
     function getQuery(){
-        if (artists.length < 1){
-            return song.name
+        if(target == "song"){
+            if (artists.length < 1){
+                return String(song.name+"+album+cover")
+            }
+            else{            
+                const names = artists.filter((artist): artist is Artist => artist !== null).map(artist => artist.name);
+                return String(song.name + "+" + names.join("+") + "+album+cover")
+            }
         }
-        else{            
-            const names = artists.filter((artist): artist is Artist => artist !== null).map(artist => artist.name);
-            return String(song.name + "+" + names.join("+"))
+        if (target == "artist"){
+            return String(artist.name+"+profile+cover")
         }
-        
     }
 
 
@@ -158,7 +213,7 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
             >
                 <View style={styles.main_container}>
                     <WebView
-                        source={{ uri: `https://www.google.com/search?sxsrf=APpeQnvKONL8cw888eX7mI--vukP_XJQqw:1783339800397&udm=2&q=${getQuery()}+album+cover` }}
+                        source={{ uri: `https://www.google.com/search?sxsrf=APpeQnvKONL8cw888eX7mI--vukP_XJQqw:1783339800397&udm=2&q=${getQuery()}` }}
                         onMessage={onMessage}
                         injectedJavaScript={injectedJS}
                     />
