@@ -70,21 +70,27 @@ export default function ArtistListItem (id: Id) {
     if (!artist) return null;
 
     return (
-        <TouchableOpacity style={styles.container}>
-            {getCoverSource(artist.cover, artist.name)}
-            <View style={styles.title_container}>
-                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
-                <Text style={styles.subtitle}>{countSong} songs | {countAlbum} albums</Text>
-            </View>
-                <Link href={{
-                    pathname: "/songSettings",
-                    params: {id:[artist.id.toString()]},
-                    }} push asChild>
-                    <TouchableOpacity style={styles.icon}>
-                        <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                    </TouchableOpacity>
-                </Link>
-        </TouchableOpacity>
+        <Link href={{
+            pathname: "/artistProfile",
+            params: {id:[artist.id.toString()]},
+            }}
+            push asChild>
+            <TouchableOpacity style={styles.container}>
+                {getCoverSource(artist.cover, artist.name)}
+                <View style={styles.title_container}>
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
+                    <Text style={styles.subtitle}>{countSong} songs | {countAlbum} albums</Text>
+                </View>
+                    <Link href={{
+                        pathname: "/songSettings",
+                        params: {id:[artist.id.toString()]},
+                        }} push asChild>
+                        <TouchableOpacity style={styles.icon}>
+                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                        </TouchableOpacity>
+                    </Link>
+            </TouchableOpacity>
+        </Link>
     );
 
 };

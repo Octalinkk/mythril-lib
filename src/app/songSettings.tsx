@@ -81,7 +81,7 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     //Sinon -> Add et
 }
 
-export default function MusicPlayer() {
+export default function songSettings() {
     const params = useLocalSearchParams<{
         id: string;
     }>();

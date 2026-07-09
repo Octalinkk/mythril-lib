@@ -3,8 +3,9 @@ import { Artist, getArtistById } from "@/db/ArtistsManager";
 import { getSongCountById } from "@/db/SongsArtistsManager";
 import { colors } from "@/styles/global";
 import { File } from "expo-file-system";
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
   artist_id: number;
@@ -72,11 +73,17 @@ export default function ArtistItem (id: Id) {
     }, [id]);
 
         return (
-            <View style={styles.container}>
-                {getCoverSource(artist.cover, artist.name)}
-                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
-                <Text style={styles.context}>{countSong} songs | {countAlbum} albums</Text>
-            </View>
+            <Link href={{
+                pathname: "/artistProfile",
+                params: {id:[artist.id.toString()]},
+                }}
+                push asChild>
+                <TouchableOpacity style={styles.container}>
+                    {getCoverSource(artist.cover, artist.name)}
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
+                    <Text style={styles.context}>{countSong} songs | {countAlbum} albums</Text>
+                </TouchableOpacity>
+            </Link>
         );
 
 };
@@ -105,6 +112,7 @@ const styles = StyleSheet.create({
     profile_title:{
         fontSize: 50,
         color: colors.primary,
+        marginBottom:5,
         fontFamily: 'SpaceGrotesk_700Bold',
     },
     title_container: {
