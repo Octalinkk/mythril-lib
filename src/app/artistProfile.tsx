@@ -1,9 +1,9 @@
 import Header from '@/components/Header';
 import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import SongListItem from '@/components/SongListItem';
 import { Album, getAlbumById } from '@/db/AlbumsManager';
@@ -12,6 +12,7 @@ import { Artist, getArtistById } from '@/db/ArtistsManager';
 import { getSongCountById, getSongsByArtistId } from '@/db/SongsArtistsManager';
 import { getSongById, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
+import { SimpleLineIcons } from '@expo/vector-icons';
 
 
 function getCoverSource(cover: string, name:string) {
@@ -135,6 +136,16 @@ export default function ArtistProfil() {
             >
             <Header />
             <ScrollView style={{marginBottom: 50}}>
+                <View style={styles.header}>
+                    <Link href={{
+                        pathname: "/artistSettings",
+                        params: {id:[artist.id.toString()]},
+                        }} push asChild>
+                        <TouchableOpacity>
+                            <SimpleLineIcons name="options-vertical" size={20} color={colors.primary} />
+                        </TouchableOpacity>
+                    </Link>
+                </View>
                 <View style={styles.main_scroll}>
                     <View style={styles.pfp_container}>
                         {getCoverSource(artist.cover, artist.name)}
@@ -160,6 +171,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignItems: 'center', 
     },
+    header:{
+        flex: 1,
+        flexDirection: 'row-reverse',
+        paddingHorizontal: 20,
+        marginTop: 20
+    },
     pfp_container:{
         flex: 1,
         justifyContent: 'center',
@@ -169,7 +186,8 @@ const styles = StyleSheet.create({
     image:{
         width: 200,
         height: 200,
-        borderRadius: '50%',
+        borderRadius: 200 / 2,
+        overflow: "hidden",
     },
     profile_container:{
         width: 200,

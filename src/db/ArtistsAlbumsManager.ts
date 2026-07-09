@@ -46,7 +46,7 @@ export async function addAlbumArtist(albums_artists:AlbumArtist) {
     }
 }
 
-export async function deleteSongsByAlbumId(albums_artists:AlbumArtist) {
+export async function deleteArtistsByAlbumId(albums_artists:AlbumArtist) {
     const db = await getDb();
     try {
         await db.runAsync(`DELETE FROM albums_artists WHERE album_id = ?`, [albums_artists.album_id])
@@ -57,7 +57,7 @@ export async function deleteSongsByAlbumId(albums_artists:AlbumArtist) {
     }
 }
 
-export async function deleteAlbumsBySongId(albums_artists:AlbumArtist) {
+export async function deleteAlbumsByArtistId(albums_artists:AlbumArtist) {
     const db = await getDb();
     try {
     const row = await db.runAsync(`DELETE FROM albums_artists WHERE artist_id = ${albums_artists.artist_id}`)

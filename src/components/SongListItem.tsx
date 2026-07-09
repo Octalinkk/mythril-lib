@@ -79,7 +79,7 @@ export default function SongListItem (id: Id) {
                         params: {id:[song.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity style={styles.icon}>
-                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                            <SimpleLineIcons name="options-vertical" size={15} color={colors.primary} />
                         </TouchableOpacity>
                     </Link>
             </TouchableOpacity>

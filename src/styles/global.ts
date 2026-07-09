@@ -7,7 +7,7 @@ export const colors = {
     grad_prim: "#1b2da5",
     grad_sec: "#270b62",
     grad_tri: "#32084d",
-    title: ""
+    danger: "#6e0e0e"
 }
 
 export const globalStyles = StyleSheet.create({

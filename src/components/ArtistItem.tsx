@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
     image:{
         width: 130,
         height: 130,
-        borderRadius: '50%',
+        borderRadius: 130 / 2,
+        overflow: "hidden",
     },
     profile_container:{
         width: 130,
