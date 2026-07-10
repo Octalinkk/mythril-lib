@@ -1,4 +1,7 @@
+import { addAlbum, Album, getAlbumByName } from '@/db/AlbumsManager';
+import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
 import { addArtist, Artist, getArtistByName } from '@/db/ArtistsManager';
+import { addSongAlbum } from '@/db/SongsAlbumsManager';
 import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { Directory, File } from 'expo-file-system';
@@ -43,19 +46,27 @@ export async function updateSongs() {
                     time_listened: 0,
                     time_started: 0
                 }
+                let newAlbum: Album = {
+                    id: 0,
+                    name: "",
+                    cover: "",
+                    last_time_played: new Date().toISOString(),
+                    time_listened: 0,
+                    time_started: 0
+                }
 
                 if (metadata) {
                     if(metadata.title) {newSong.name = metadata.title}
                     if(metadata.artist) {newArtist.name = metadata.artist}
-                    
-                    
+                    if(metadata.album) {newAlbum.name = metadata.album}
                 }
-                console.log(`Adding song : ${newSong}`)
+                console.log(`Adding song : ${newSong.name}`)
                 const lastSongId = await addSong(newSong);
                 let lastArtistId = 0
+                let lastAlbumId = 0
 
                 const artist = await getArtistByName(newArtist.name)
-                if (!artist){
+                if (artist == null){
                     newArtist = {
                         id: 0,
                         name: newArtist.name,
@@ -64,16 +75,48 @@ export async function updateSongs() {
                         time_listened: 0,
                         time_started: 0
                     }
+                    
+                    console.log(`Adding artist : ${newArtist.name}`)
                     lastArtistId = await addArtist(newArtist)    
                 }
                 else {lastArtistId = artist.id} 
+
+                const album = await getAlbumByName(newAlbum.name)
+                if (album == null){
+                    newArtist = {
+                        id: 0,
+                        name: newAlbum.name,
+                        cover: "",
+                        last_time_played: "",
+                        time_listened: 0,
+                        time_started: 0
+                    }
+                    
+                    console.log(`Adding album : ${newAlbum.name}`)
+                    lastAlbumId = await addAlbum(newAlbum)    
+                }
+                else {lastAlbumId = album.id} 
 
 
                 await addSongArtist({
                     song_id:lastSongId,
                     artist_id:lastArtistId
                 })
-
+                await addSongAlbum({
+                    song_id:lastSongId,
+                    album_id:lastAlbumId
+                })    
+                if (artist && album) {
+                    const newAlbArt = {
+                        album_id:lastAlbumId,
+                        artist_id:lastArtistId
+                    }
+                    const has_already = await getAlbumArtistById(newAlbArt)
+                    console.warn(has_already)
+                    if(has_already == null){
+                        await addAlbumArtist(newAlbArt)
+                    }       
+                }
                 
             }
         }

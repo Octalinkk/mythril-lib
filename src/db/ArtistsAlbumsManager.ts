@@ -5,7 +5,7 @@ export interface AlbumArtist {
     artist_id:number
 }
 
-export async function getAllSongsAlbums() {
+export async function getAllArtistsAlbums() {
     const db = await getDb();
     const rows = await db.getAllAsync<AlbumArtist>('SELECT * FROM albums_artists');
     const albumsArtists: AlbumArtist[] = rows.map(row => ({
@@ -13,6 +13,12 @@ export async function getAllSongsAlbums() {
         artist_id:row.artist_id
     }));
     return albumsArtists;
+}
+
+export async function getAlbumArtistById(album_artist:AlbumArtist) {
+    const db = await getDb();
+    const rows = await db.getAllAsync<{album_artist:AlbumArtist}>(`SELECT * FROM albums_artists WHERE album_id = ? AND artist_id = ?`, [album_artist.album_id, album_artist.artist_id]);
+    if (rows.length > 0) return rows; else return null 
 }
 
 export async function getArtistsByAlbumId(album_id:number) {

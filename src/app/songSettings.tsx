@@ -5,7 +5,10 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
+import { addAlbum, getAlbumById, getAlbumByName } from '@/db/AlbumsManager';
+import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
 import { addArtist, getArtistById, getArtistByName } from '@/db/ArtistsManager';
+import { addSongAlbum, deleteAlbumsBySongId } from '@/db/SongsAlbumsManager';
 import { addSongArtist, deleteArtistsBySongId, getArtistsBySongId } from '@/db/SongsArtistsManager';
 import { getSongById, Song, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
@@ -44,6 +47,9 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     }
     await updateSong(song)
 
+    let allArt = []
+    let allAlb = []
+
     //update artist(s)
     //Delete tout les registre de la relationel Song-Artist by Song id
     try{
@@ -55,7 +61,7 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     const artistLst = artist.split(",").map(art => art.trimStart());
     for (const [index, artName] of artistLst.entries()){
         const artist = await getArtistByName(artName)
-        let id = 0
+        let artId = 0
         if (!artist){
             const newArtist = {
                 id: 0,
@@ -65,20 +71,70 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
                 time_listened: 0,
                 time_started: 0
             }
-            id = await addArtist(newArtist)    
+            artId = await addArtist(newArtist)    
         }
-        else {id = artist.id}        
-            
+        else {artId = artist.id}        
+
+        allArt.push(await getArtistById(artId))
         
         await addSongArtist({
             song_id:song.id,
-            artist_id:id
+            artist_id:artId
         })
     }
+
+    try{
+        await deleteAlbumsBySongId(song.id)
+    }
+    catch{
+        console.log("Couldn't delete link for song")
+    }
+    const albumLst = album.split(",").map(alb => alb.trimStart());
+    for (const [index, albName] of albumLst.entries()){
+        const album = await getAlbumByName(albName)
+        let id = 0
+        if (!album){
+            const newAlbum = {
+                id: 0,
+                name: albName,
+                cover: "",
+                last_time_played: "",
+                time_listened: 0,
+                time_started: 0
+            }
+            id = await addAlbum(newAlbum)    
+        }
+        else {id = album.id}        
+        
+        allAlb.push(await getAlbumById(id))
+        
+        await addSongAlbum({
+            song_id:song.id,
+            album_id:id
+        }) 
+    }
+
+    for (const [index, artist] of allArt.entries()){
+        for (const [index, album] of allAlb.entries()){
+            
+            if (artist && album) {
+                const entry = {
+                    album_id:album.id,
+                    artist_id:artist.id
+                }
+                const has_already = await getAlbumArtistById(entry)
+                if(has_already != null){
+                    await addAlbumArtist({
+                        album_id:album.id,
+                        artist_id:artist.id
+                    })
+                }
+                
+            }
+            
+        }
+    }
     
-    //Check si l'artist existe
-    //Si oui -> get by ID et ajouté sur la table S-Art
-    //Sinon -> Add et
 }
 
 export default function songSettings() {

@@ -45,6 +45,7 @@ function getSongsList(songs:Song[]){
 
 function getAlbumsList(albums:Album[]){
     if (albums.length > 0){
+        //Faire les display pour les albums
         return albums.map(album => <SongListItem song_id={1} key={"listed_song:"+album.id}/>)
     }
     else{
@@ -82,7 +83,7 @@ async function getAlbumsforArtistId(id:number){
     const albums = await Promise.all(
         albumsIds.map(id => getAlbumById(+id))
     );
-    return albums.filter((song): song is Song => song !== null);
+    return albums.filter((album): album is Album => album !== null);
 }
 
 export default function ArtistProfil() {
@@ -108,7 +109,6 @@ export default function ArtistProfil() {
             getArtistById(Number(params.id)).then(result => {
                 if (result) {
                     setArtist(result)
-                    console.log(artist)
                     getSongCountById(result.id).then(cntSong => {
                         if (cntSong) setCountSong(cntSong.count);
                     });

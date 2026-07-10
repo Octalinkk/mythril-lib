@@ -1,12 +1,12 @@
 import { getDb } from "./DBManager"
 
 export interface Album {
-    id:number | null
-    name: string | null
-    cover:string | null
-    last_time_played:string | null
-    time_listened: number | null
-    time_started: number | null
+    id:number
+    name: string
+    cover:string
+    last_time_played:string
+    time_listened: number
+    time_started: number
 }
 
 export async function getAllAlbums() {
@@ -37,11 +37,26 @@ export async function getAlbumById(id:number) {
     }
 }
 
+export async function getAlbumByName(name:string) {
+    let album:Album
+    const db = await getDb();
+    const row = await db.getFirstAsync<Album>(`SELECT * FROM albums WHERE name = ?`, [name]);
+    if (!row) return null; else return album = {
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played:row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }
+}
+
 export async function addAlbum(album:Album) {
     const db = await getDb();
     try {
-        await db.runAsync(`INSERT INTO albums (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
+        const result = await db.runAsync(`INSERT INTO albums (name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?)`, 
         [album.name, album.cover, album.last_time_played, album.time_listened, album.time_started])
+        return result.lastInsertRowId
     }
     catch (err) {
         console.error(err)

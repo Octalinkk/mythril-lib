@@ -40,10 +40,10 @@ export async function addSongAlbum(songs_albums:SongAlbum) {
     }
 }
 
-export async function deleteSongsByAlbumId(songs_albums:SongAlbum) {
+export async function deleteSongsByAlbumId(id:number) {
     const db = await getDb();
     try {
-        await db.runAsync(`DELETE FROM songs_albums WHERE album_id =?`, [songs_albums.album_id])
+        await db.runAsync(`DELETE FROM songs_albums WHERE album_id =?`, [id])
     }
     catch (err) {
         console.error(err)
@@ -51,10 +51,10 @@ export async function deleteSongsByAlbumId(songs_albums:SongAlbum) {
     }
 }
 
-export async function deleteAlbumsBySongId(songs_albums:SongAlbum) {
+export async function deleteAlbumsBySongId(id:number) {
     const db = await getDb();
     try {
-        await db.runAsync(`DELETE FROM songs_albums WHERE song_id = ?`, [songs_albums.song_id])
+        await db.runAsync(`DELETE FROM songs_albums WHERE song_id = ?`, [id])
     }
     catch (err) {
         console.error(err)
