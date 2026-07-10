@@ -27,6 +27,12 @@ export async function getAlbumsBySongId(song_id:number) {
     return rows.map(row => row.album_id);
 }
 
+export async function getSongCountByAlbumId(album_id:number) {
+    const db = await getDb();
+    const row = await db.getFirstAsync< {count: number} >(`SELECT COUNT(DISTINCT song_id) AS count FROM songs_albums WHERE album_id = ?`, [album_id]);
+    if (!row) return 0; else return row 
+}
+
 export async function addSongAlbum(songs_albums:SongAlbum) {
     const db = await getDb();
     try {

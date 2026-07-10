@@ -2,8 +2,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import AlbumListItem from '@/components/AlbumListItem';
 import ArtistListItem from '@/components/ArtistListItem';
 import SongListItem from '@/components/SongListItem';
+import { Album, getAllAlbums } from '@/db/AlbumsManager';
 import { Artist, getAllArtists } from '@/db/ArtistsManager';
 import { getAllSongs, Song } from '@/db/SongsManager';
 import { colors } from '@/styles/global';
@@ -24,12 +26,21 @@ function getFilteredArtistList(artists: Artist[], filter:string){
     
 }
 
+function getFilteredAlbumList(albums: Album[], filter:string){
+    const filteredAlbums = albums.filter((album) => album.name.toLowerCase().includes(filter.toLowerCase()))
+    if (filteredAlbums.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
+    if (filteredAlbums.length > 100){return filteredAlbums.slice(0, 100).map(album => <AlbumListItem id={album.id} key={"searched_album:"+album.id}/>)}
+    else{return filteredAlbums.map(album => <AlbumListItem id={album.id} key={"searched_album:"+album.id}/>)}
+    
+}
+
 export default function SearchScreen() {
 
 
     const [name, setName] = useState<string>("");
     const [songs, setAllSongs] = useState<Song[]>([]);
     const [artists, setAllArtists] = useState<Artist[]>([]);
+    const [albums, setAllAlbums] = useState<Artist[]>([]);
     
     
     
@@ -43,6 +54,12 @@ export default function SearchScreen() {
         getAllArtists().then(result => {
             if (result) {
                 setAllArtists(result);
+            }
+        });
+
+        getAllAlbums().then(result => {
+            if (result) {
+                setAllAlbums(result);
             }
         });
     }, []);
@@ -74,7 +91,10 @@ export default function SearchScreen() {
                     <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
                         {getFilteredArtistList(artists, name)}
                     </Suspense>
-                    
+                    <Text style={styles.title}>Albums</Text>
+                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                        {getFilteredAlbumList(albums, name)}
+                    </Suspense>
                 </View>
             </ScrollView>
         </LinearGradient>

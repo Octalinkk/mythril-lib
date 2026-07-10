@@ -1,6 +1,5 @@
-import { getAlbumCountById } from "@/db/ArtistsAlbumsManager";
-import { Artist, getArtistById } from "@/db/ArtistsManager";
-import { getSongCountByArtistId } from "@/db/SongsArtistsManager";
+import { Album, getAlbumById } from "@/db/AlbumsManager";
+import { getSongCountByAlbumId } from "@/db/SongsAlbumsManager";
 import { colors } from "@/styles/global";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { File } from "expo-file-system";
@@ -9,81 +8,55 @@ import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
-  artist_id: number;
+  id: number;
 };
 
-function getRandomColor(seed:string){
-    if(seed){
-        const codeA = (seed[0].toUpperCase().charCodeAt(0) - 64)
-        const codeB = (seed[1].toUpperCase().charCodeAt(0) - 64)
-        const diff = Math.abs(codeA - codeB)
-        const r = codeA*10 > 255 ? 255 : Math.round(codeA*10)
-        const g = codeB*10 > 255 ? 255 : Math.round(codeB*10)
-        const b = diff*10 > 255 ? 255 : Math.round(diff*10)
-        return `rgba(${r}, ${g}, ${b},1)`
-    }
-    return "#000000"
-    
-}
 
-function getCoverSource(cover: string, name:string) {
+function getCoverSource(cover: string) {
     const file = new File(cover)
-    if (!cover || cover =="" || !file.exists) {
-        const split = name.split(" ")
-        let text = ""
-        if(split.length > 1){
-            text = split.map(name => name.charAt(0).toUpperCase()).join("").substring(0, 2)
-        }
-        else{
-            text = split[0].substring(0, 2).toUpperCase()
-        }
-
-        return (<View style={[{backgroundColor: getRandomColor(text)}, styles.profile_container]}>
-                    <Text style={styles.profile_title}>{text}</Text>
-                </View>)
+    if (!cover || cover =="") {
+        return require('../res/def_cover.png');
     }
-    return <Image source={{uri: `${cover}?cache=${Date.now()}`}} style={styles.image}/>
+    return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-export default function ArtistListItem (id: Id) {
 
-    const [artist, setArtist] = useState<Artist | null>(null);
+export default function AlbumListItem (id: Id) {
+
+    const [album, setAlbum] = useState<Album | null>(null);
     const [countSong, setCountSong] = useState<number>(0)
-    const [countAlbum, setCountAlbum] = useState<number>(0)
 
 
     useFocusEffect(
         useCallback(() => {
             async function loadInfo(){
-                const result = await getArtistById(id.artist_id)
+                const result = await getAlbumById(id.id)
                 if (result) {
-                    setArtist(result)
-                    const cntSongs = await getSongCountByArtistId(result.id)
-                    const cntAlbms = await getAlbumCountById(result.id)
+                    setAlbum(result)
+                    const cntSongs = await getSongCountByAlbumId(result.id)
                     if(cntSongs) {setCountSong(cntSongs.count)}
-                    if(cntAlbms) {setCountAlbum(cntAlbms.count)}
                 };
             }
             loadInfo()
-        }, [id.artist_id])
+        }, [id.id])
     );
-    if (!artist) return null;
+    if (!album) return null;
 
     return (
         <Link href={{
             pathname: "/artistProfile",
-            params: {id:[artist.id.toString()]},
+            params: {id:[album.id.toString()]},
             }}
             push asChild>
             <TouchableOpacity style={styles.container}>
-                {getCoverSource(artist.cover, artist.name)}
+                <Image source={getCoverSource(album.cover)} style={styles.image}/>
                 <View style={styles.title_container}>
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
-                    <Text style={styles.subtitle}>{countSong} songs | {countAlbum} albums</Text>
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{album.name}</Text>
+                    <Text style={styles.subtitle}>{countSong} songs</Text>
                 </View>
                     <Link href={{
-                        pathname: "/artistSettings",
-                        params: {id:[artist.id.toString()]},
+                        pathname: "/songSettings",
+                        params: {id:[album.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity style={styles.icon}>
                             <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
@@ -109,8 +82,7 @@ const styles = StyleSheet.create({
     image:{
         width: 50,
         height: 50,
-        borderRadius: 50 / 2,
-        overflow: "hidden",
+        borderRadius: 10,
     },
     title_container: {
         flex:1,

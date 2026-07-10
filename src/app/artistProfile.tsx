@@ -5,11 +5,12 @@ import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import AlbumListItem from '@/components/AlbumListItem';
 import SongListItem from '@/components/SongListItem';
 import { Album, getAlbumById } from '@/db/AlbumsManager';
 import { getAlbumCountById, getAlbumsByArtistId } from '@/db/ArtistsAlbumsManager';
 import { Artist, getArtistById } from '@/db/ArtistsManager';
-import { getSongCountById, getSongsByArtistId } from '@/db/SongsArtistsManager';
+import { getSongCountByArtistId, getSongsByArtistId } from '@/db/SongsArtistsManager';
 import { getSongById, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { SimpleLineIcons } from '@expo/vector-icons';
@@ -46,7 +47,7 @@ function getSongsList(songs:Song[]){
 function getAlbumsList(albums:Album[]){
     if (albums.length > 0){
         //Faire les display pour les albums
-        return albums.map(album => <SongListItem song_id={1} key={"listed_song:"+album.id}/>)
+        return albums.map(album => <AlbumListItem id={album.id} key={"listed_album:"+album.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>None located for this artist</Text>
@@ -109,7 +110,7 @@ export default function ArtistProfil() {
             getArtistById(Number(params.id)).then(result => {
                 if (result) {
                     setArtist(result)
-                    getSongCountById(result.id).then(cntSong => {
+                    getSongCountByArtistId(result.id).then(cntSong => {
                         if (cntSong) setCountSong(cntSong.count);
                     });
                     getAlbumCountById(result.id).then(cntAlb => {

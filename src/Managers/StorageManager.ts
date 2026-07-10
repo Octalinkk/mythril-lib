@@ -57,56 +57,65 @@ export async function updateSongs() {
 
                 if (metadata) {
                     if(metadata.title) {newSong.name = metadata.title}
-                    if(metadata.artist) {newArtist.name = metadata.artist}
+                    if(metadata.artist && metadata.artist.replaceAll(" ", "") != "") {newArtist.name = metadata.artist}
                     if(metadata.album) {newAlbum.name = metadata.album}
                 }
                 console.log(`Adding song : ${newSong.name}`)
                 const lastSongId = await addSong(newSong);
                 let lastArtistId = 0
                 let lastAlbumId = 0
+                let artist = null 
+                let album = null
 
-                const artist = await getArtistByName(newArtist.name)
-                if (artist == null){
-                    newArtist = {
-                        id: 0,
-                        name: newArtist.name,
-                        cover: "",
-                        last_time_played: "",
-                        time_listened: 0,
-                        time_started: 0
+                if (newArtist.name != ""){
+                    artist = await getArtistByName(newArtist.name)
+                    if (artist == null){
+                        newArtist = {
+                            id: 0,
+                            name: newArtist.name,
+                            cover: "",
+                            last_time_played: "",
+                            time_listened: 0,
+                            time_started: 0
+                        }
+                        
+                        console.log(`Adding artist : ${newArtist.name}`)
+                        lastArtistId = await addArtist(newArtist)    
                     }
-                    
-                    console.log(`Adding artist : ${newArtist.name}`)
-                    lastArtistId = await addArtist(newArtist)    
+                    else {lastArtistId = artist.id} 
                 }
-                else {lastArtistId = artist.id} 
 
-                const album = await getAlbumByName(newAlbum.name)
-                if (album == null){
-                    newArtist = {
-                        id: 0,
-                        name: newAlbum.name,
-                        cover: "",
-                        last_time_played: "",
-                        time_listened: 0,
-                        time_started: 0
+                if (newAlbum.name != ""){
+                    album = await getAlbumByName(newAlbum.name)
+                    if (album == null){
+                        newArtist = {
+                            id: 0,
+                            name: newAlbum.name,
+                            cover: "",
+                            last_time_played: "",
+                            time_listened: 0,
+                            time_started: 0
+                        }
+                        
+                        console.log(`Adding album : ${newAlbum.name}`)
+                        lastAlbumId = await addAlbum(newAlbum)    
                     }
-                    
-                    console.log(`Adding album : ${newAlbum.name}`)
-                    lastAlbumId = await addAlbum(newAlbum)    
+                    else {lastAlbumId = album.id} 
                 }
-                else {lastAlbumId = album.id} 
 
-
-                await addSongArtist({
-                    song_id:lastSongId,
-                    artist_id:lastArtistId
-                })
-                await addSongAlbum({
-                    song_id:lastSongId,
-                    album_id:lastAlbumId
-                })    
-                if (artist && album) {
+                if (lastArtistId != 0){
+                    await addSongArtist({
+                        song_id:lastSongId,
+                        artist_id:lastArtistId
+                    })
+                }
+                if (lastAlbumId != 0){
+                    await addSongAlbum({
+                        song_id:lastSongId,
+                        album_id:lastAlbumId
+                    })    
+                }
+                if (artist != null && album != null) {
                     const newAlbArt = {
                         album_id:lastAlbumId,
                         artist_id:lastArtistId

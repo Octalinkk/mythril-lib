@@ -1,6 +1,6 @@
 import { getAlbumCountById } from "@/db/ArtistsAlbumsManager";
 import { Artist, getArtistById } from "@/db/ArtistsManager";
-import { getSongCountById } from "@/db/SongsArtistsManager";
+import { getSongCountByArtistId } from "@/db/SongsArtistsManager";
 import { colors } from "@/styles/global";
 import { File } from "expo-file-system";
 import { Link } from "expo-router";
@@ -61,7 +61,7 @@ export default function ArtistItem (id: Id) {
     useEffect(() => {
         getArtistById(id.artist_id).then(result => {
             if (result) setArtist(result);
-            getSongCountById(id.artist_id).then(cntSong => {
+            getSongCountByArtistId(id.artist_id).then(cntSong => {
                 if (cntSong) setCountSong(cntSong.count);
 
             });
