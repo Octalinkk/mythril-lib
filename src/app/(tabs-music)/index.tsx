@@ -6,6 +6,7 @@ import SongItem from '@/components/SongItem';
 import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
 import { useCallback } from 'react';
 
+import FloatingPlayer from '@/components/floatingPlayer';
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
@@ -169,10 +170,12 @@ export default function HomeScreen() {
           </Suspense>
         </View>
       </ScrollView>
+      <FloatingPlayer />
     </LinearGradient>
   );
 }
 const styles = StyleSheet.create({
+  
   title: {
     flex: 1,
     fontSize: 30,
