@@ -67,7 +67,7 @@ export async function addAlbum(album:Album) {
 export async function updateAlbum(album:Album) {
     const db = await getDb();
     try {
-    await db.runAsync(`UPDATE albums SET name = ?, cover = ?, last_time_played = ?, time_listened = ?, time_started = ? WHERE id = ?}`,
+    await db.runAsync(`UPDATE albums SET name = ?, cover = ?, last_time_played = ?, time_listened = ?, time_started = ? WHERE id = ?`,
         [album.name, album.cover, album.last_time_played, album.time_listened, album.time_started, album.id]
     )
     }

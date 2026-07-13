@@ -44,7 +44,7 @@ export default function AlbumListItem (id: Id) {
 
     return (
         <Link href={{
-            pathname: "/artistProfile",
+            pathname: "/albumProfile",
             params: {id:[album.id.toString()]},
             }}
             push asChild>

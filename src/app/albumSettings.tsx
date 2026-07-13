@@ -5,46 +5,24 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { Artist, deleteArtist, getArtistById, updateArtist } from '@/db/ArtistsManager';
-import { deleteSongsByArtistId } from '@/db/SongsArtistsManager';
+import { Album, deleteAlbum, getAlbumById, updateAlbum } from '@/db/AlbumsManager';
+import { deleteArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
+import { deleteSongsByAlbumId } from '@/db/SongsAlbumsManager';
 import { colors, globalStyles } from '@/styles/global';
 
-function getCoverSource(cover: string, name:string) {
+function getCoverSource(cover: string) {
     const file = new File(cover)
-    if (!cover || cover =="" || !file.exists) {
-        const split = name.split(" ")
-        let text = ""
-        if(split.length > 1){
-            text = split.map(name => name.charAt(0).toUpperCase()).join("").substring(0, 2)
-        }
-        else{
-            text = split[0].substring(0, 2).toUpperCase()
-        }
-
-        return (<View style={[{backgroundColor: getRandomColor(text)}, styles.profile_container]}>
-                    <Text style={styles.profile_title}>{text}</Text>
-                </View>)
+    if (!cover || cover =="") {
+        return require('../res/def_cover.png');
     }
-    return <Image source={{uri: `${cover}?cache=${Date.now()}`}} style={styles.image}/>
+    return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-function getRandomColor(seed:string){
-    if(seed){
-        const codeA = (seed[0].toUpperCase().charCodeAt(0) - 64)
-        const codeB = (seed[1].toUpperCase().charCodeAt(0) - 64)
-        const diff = Math.abs(codeA - codeB)
-        const r = codeA*10 > 255 ? 255 : Math.round(codeA*10)
-        const g = codeB*10 > 255 ? 255 : Math.round(codeB*10)
-        const b = diff*10 > 255 ? 255 : Math.round(diff*10)
-        return `rgba(${r}, ${g}, ${b},1)`
-    }
-    return "#000000"    
-}
 
-async function saveChanges(artist:Artist, title: string, old_cover:File | null, new_cover:File | null){
+async function saveChanges(album:Album, title: string, old_cover:File | null, new_cover:File | null){
 
     //update title
-    artist.name = title
+    album.name = title
     if(old_cover && new_cover){
         let uri = ""
         try{
@@ -63,29 +41,25 @@ async function saveChanges(artist:Artist, title: string, old_cover:File | null, 
             uri = new_cover.uri
         }
         
-        artist.cover = uri
+        album.cover = uri
     }
-    await updateArtist(artist)
+    await updateAlbum(album)
 
     
 }
 
-async function deleteAction(artist:Artist){
-    await deleteSongsByArtistId(artist.id)
-    await deleteSongsByArtistId(artist.id)
-    await deleteArtist(artist)
+async function deleteAction(album:Album){
+    await deleteSongsByAlbumId(album.id)
+    await deleteArtistsByAlbumId(album.id)
+    await deleteAlbum(album)
 }
-    
-    //Check si l'artist existe
-    //Si oui -> get by ID et ajouté sur la table S-Art
-    //Sinon -> Add et
 
-export default function artistSettings() {
+export default function albumSettings() {
     const params = useLocalSearchParams<{
         id: string;
     }>();
 
-    const [artist, setArtist] = useState<Artist>({
+    const [album, setAlbum] = useState<Album>({
         id: 0,
         name: "",
         cover: "",
@@ -96,7 +70,6 @@ export default function artistSettings() {
 
     const [name, setName] = useState<string>("");
     const [visibleModal, setVisibleModal] = useState<boolean>(false)
-    const [coverKey, setCoverKey] = useState<number>(Date.now());
     
     const [old_cover, setOldCover] = useState<File | null>(null);
     const [new_cover, setNewCover] = useState<File | null>(null);
@@ -110,25 +83,22 @@ export default function artistSettings() {
     }
     
     async function updateCover(newImage:File) {
-        let upArt = await getArtistById(artist.id);
-        if (upArt) {
-            upArt.cover = newImage.uri
-            setArtist(upArt);
+        let upAlb = await getAlbumById(album.id);
+        if (upAlb) {
+            upAlb.cover = newImage.uri
+            setAlbum(upAlb);
             setNewCover(newImage)
-            setCoverKey(Date.now());
         }
     }
     
     useEffect(() => {
-        getArtistById(Number(params.id)).then(result => {
+        getAlbumById(Number(params.id)).then(result => {
             if (result) {
-                setArtist(result);
+                setAlbum(result);
                 setOldCover(new File(result.cover))
                 setName(result.name)
             }
         });
-        //TODO update pour que l'image soit mise à jour
-        //Load current album if any
     }, []);
     
 
@@ -143,7 +113,7 @@ export default function artistSettings() {
                 <TouchableOpacity 
                     onPress={async () => {
                         //Save change
-                        saveChanges(artist, name, old_cover, new_cover)
+                        await saveChanges(album, name, old_cover, new_cover)
                         router.back()
                     }} style={styles.btn_sm}>
                     <Text style={styles.btn_text}>Save</Text>
@@ -151,7 +121,7 @@ export default function artistSettings() {
             </View>
             <ScrollView >
                 <View style={styles.main_scroll}>
-                    {getCoverSource(artist.cover, artist.name)}
+                    <Image source={getCoverSource(album.cover)} style={styles.cover}/>
                     <TouchableOpacity 
                         onPress={async () => {
                             openModal()
@@ -159,7 +129,7 @@ export default function artistSettings() {
                         <Text style={styles.btn_text}>Change cover</Text>
                     </TouchableOpacity>
                     
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='artist' id={artist.id} key={"song_setting:"+artist.id}/>
+                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='album' id={album.id} key={"song_setting:"+album.id}/>
                     <View style={styles.field_container}>
                         <Text style={styles.field_title}>Title</Text>
                         <TextInput
@@ -173,10 +143,10 @@ export default function artistSettings() {
                     </View>
                     <TouchableOpacity 
                         onPress={async () => {
-                            await deleteAction(artist)
+                            await deleteAction(album)
                             router.dismissAll()
                         }} style={styles.btn_delete}>
-                        <Text style={styles.btn_text}>Delete artist</Text>
+                        <Text style={styles.btn_text}>Delete album</Text>
                     </TouchableOpacity>
                 </View>
                 

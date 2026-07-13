@@ -6,6 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { Album, getAlbumById } from "@/db/AlbumsManager";
 import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { Directory, File, Paths } from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
@@ -40,6 +41,15 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         time_started: 0
     });
 
+    const [album, setAlbum] = useState<Album>({
+        id: 0,
+        name: "",
+        cover: "",
+        last_time_played: "",
+        time_listened: 0,
+        time_started: 0
+    });
+
     const [artists, setArtists] = useState<Artist[]>([]);
 
     const [visibleSearch, setVisibleSearch] = useState<boolean>(false)
@@ -59,6 +69,15 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
             getArtistById(id).then(result => {
                 if (result) {
                     setArtist(result)
+                    
+                }
+            });
+        }
+
+        if (target == "album"){
+            getAlbumById(id).then(result => {
+                if (result) {
+                    setAlbum(result)
                     
                 }
             });
@@ -174,7 +193,10 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
             }
         }
         if (target == "artist"){
-            return String(artist.name+"+profile+cover")
+            return String(artist.name+"+profile+picture+cover")
+        }
+        if (target == "album"){
+            return String(album.name+"+album+cover")
         }
     }
 

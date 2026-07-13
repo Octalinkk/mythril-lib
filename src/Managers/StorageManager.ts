@@ -57,8 +57,8 @@ export async function updateSongs() {
 
                 if (metadata) {
                     if(metadata.title) {newSong.name = metadata.title}
-                    if(metadata.artist && metadata.artist.replaceAll(" ", "") != "") {newArtist.name = metadata.artist}
-                    if(metadata.album) {newAlbum.name = metadata.album}
+                    if(metadata.artist && metadata.artist.replaceAll(" ", "").replaceAll("\n", "") != "") {newArtist.name = metadata.artist}
+                    if(metadata.album && metadata.album.replaceAll(" ", "").replaceAll("\n", "") != "") {newAlbum.name = metadata.album}
                 }
                 console.log(`Adding song : ${newSong.name}`)
                 const lastSongId = await addSong(newSong);
