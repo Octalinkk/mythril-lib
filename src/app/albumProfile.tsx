@@ -130,7 +130,9 @@ export default function AlbumProfil() {
                     <Text style={styles.name}>{album.name}</Text>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.context}>{countSong} songs</Text>
                     <Text style={styles.title}>Made by : </Text>
-                    {getArtistList(artists)}
+                    <View style={styles.items_container_md} >
+                        {getArtistList(artists)}
+                    </View>
                     <Text style={styles.title}>Songs</Text>
                     {getSongsList(songs)}
                 </View>

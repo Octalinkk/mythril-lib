@@ -112,7 +112,6 @@ export default function artistSettings() {
     async function updateCover(newImage:File) {
         let upArt = await getArtistById(artist.id);
         if (upArt) {
-            console.log("update:" , newImage)
             upArt.cover = newImage.uri
             setArtist(upArt);
             setNewCover(newImage)
@@ -125,7 +124,6 @@ export default function artistSettings() {
             if (result) {
                 setArtist(result);
                 setOldCover(new File(result.cover))
-                console.log(old_cover)
                 setName(result.name)
             }
         });

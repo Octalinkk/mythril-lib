@@ -68,7 +68,6 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         if (target == "artist"){
             getArtistById(id).then(result => {
                 if (result) {
-                    console.log(result)
                     setArtist(result)                 
                 }
             });
