@@ -13,7 +13,7 @@ import { colors, globalStyles } from '@/styles/global';
 import TrackPlayer, { PlayerCommand } from "@rntp/player";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 function getRecentSong(songs:Song[]){
@@ -55,8 +55,6 @@ function getRecentArtists(artists:Artist[]){
   }
   return recentArtist
 }
-export const curr_song = useRef<Song>(null);
-export const curr_artists = useRef<Artist[]>(null);
 
 export default function HomeScreen() {
 

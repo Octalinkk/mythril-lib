@@ -68,8 +68,8 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         if (target == "artist"){
             getArtistById(id).then(result => {
                 if (result) {
-                    setArtist(result)
-                    
+                    console.log(result)
+                    setArtist(result)                 
                 }
             });
         }
@@ -130,51 +130,57 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                 let destination
                 if (target == "song"){
                     dir = new Directory(Paths.document, 'songCover')
+                    if (!dir.exists){
+                        dir.create()                    
+                    }
                     destination = new File (dir.uri + `/${song.id}-temp.jpg`)
                 }
-                if (target == "artist"){
+                else if (target == "artist"){
                     dir = new Directory(Paths.document, 'artistProfil')
+                    if (!dir.exists){
+                        dir.create()                    
+                    }
                     destination = new File (dir.uri + `/${artist.id}-temp.jpg`)
                 }
-                if (target == "album"){
+                else if (target == "album"){
                     dir = new Directory(Paths.document, 'albumCover')
-                    destination = new File (dir.uri + `/${song.id}-temp.jpg`) //a changer 
+                    if (!dir.exists){
+                        dir.create()                    
+                    }
+                    destination = new File (dir.uri + `/${album.id}-temp.jpg`) //a changer 
                 }
-                if (target == "playlist"){
+                else if (target == "playlist"){
                     dir = new Directory(Paths.document, 'playlistCover')
+                    if (!dir.exists){
+                        dir.create()                    
+                    }
                     destination = new File (dir.uri + `/${song.id}-temp.jpg`) //a changer
                 }
-                else{
-                    //Le else est à garder sinon y'a des erreur jpp
-                    dir = new Directory(Paths.document, 'songCover')
-                    destination = new File (dir.uri + `/${song.id}-temp.jpg`)
-                }
                 
-                if (!dir.exists){
-                    dir.create()                    
-                }
-                if(destination.exists){
-                    await destination.delete()
-                }
-                try {                
-                    const output = await File.downloadFileAsync(imageUrl, destination)
-                    if (output.exists && output.uri != "" && output.uri){
-                        if (target == "song"){
-                            song.cover = output.uri
-                        }
-                        if (target == "artist"){
-                            artist.cover = output.uri
-                        }
-                        if (target == "album"){
-                        }
-                        if (target == "playlist"){
-                        }
-                        song.cover = output.uri
-                        //TODO Need to add a prop to define if it's song/album/artist
-                        await returnFileResult(output)
+                if(destination) {
+                    if(destination.exists){
+                        await destination.delete()
                     }
-                } catch (error) {
-                    
+                    try {                
+                        const output = await File.downloadFileAsync(imageUrl, destination)
+                        if (output.exists && output.uri != "" && output.uri){
+                            if (target == "song"){
+                                song.cover = output.uri
+                            }
+                            if (target == "artist"){
+                                artist.cover = output.uri
+                            }
+                            if (target == "album"){
+                                album.cover = output.uri
+                            }
+                            if (target == "playlist"){
+                            }
+                            //TODO Need to add a prop to define if it's song/album/artist
+                            await returnFileResult(output)
+                        }
+                    } catch (error) {
+                        
+                    }
                 }
             }
             closeSearch()

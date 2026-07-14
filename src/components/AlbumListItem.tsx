@@ -55,7 +55,7 @@ export default function AlbumListItem (id: Id) {
                     <Text style={styles.subtitle}>{countSong} songs</Text>
                 </View>
                     <Link href={{
-                        pathname: "/songSettings",
+                        pathname: "/albumSettings",
                         params: {id:[album.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity style={styles.icon}>
