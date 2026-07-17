@@ -21,7 +21,7 @@ export async function getPlaylistsBySongId(song_id:number) {
     return rows.map(row => row.playlist_id);
 }
 
-export async function getPlaylistCountById(playlist_id:number) {
+export async function getSongCountByPlstId(playlist_id:number) {
     const db = await getDb();
     const row = await db.getFirstAsync< {count: number} >(`SELECT COUNT(DISTINCT song_id) AS count FROM songs_playlists WHERE playlist_id = ?`, [playlist_id]);
     if (!row) return 0; else return row 

@@ -1,5 +1,5 @@
 import { getPlaylistById, Playlist } from "@/db/PlaylistsManager";
-import { getPlaylistCountById } from "@/db/SongsPlaylistsManager";
+import { getSongCountByPlstId } from "@/db/SongsPlaylistsManager";
 import { colors } from "@/styles/global";
 import { File } from "expo-file-system";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ export default function PlaylistItem (id: Id) {
     useEffect(() => {
         getPlaylistById(id.playlist_id).then(result => {
             if (result) setPlaylist(result);
-            getPlaylistCountById(id.playlist_id).then(result => {
+            getSongCountByPlstId(id.playlist_id).then(result => {
                 if (result) setCount(result.count);
 
             });
