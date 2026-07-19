@@ -20,7 +20,7 @@ function getRecentSong(songs:Song[]){
   let recentSong = []
   if (songs.length > 0){
     for (const item of songs) {
-        recentSong.push(<SongItem song_id={item.id} key={"song:"+item.id}/>)
+        recentSong.push(<SongItem song_id={item.id} play_ids={[]} key={"song:"+item.id}/>)
     }
   }
   else {

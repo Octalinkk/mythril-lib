@@ -140,6 +140,7 @@ export default function MusicPlayer() {
                 }));
 
 
+            console.log(all_songs)
             if (results[0]) {
                 setCurrDisplaySong(results[0]);  
             }

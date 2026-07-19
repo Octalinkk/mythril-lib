@@ -9,8 +9,10 @@ import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SongSettingsModal from "./songSettingsModal";
 
-type Id = {
-  song_id: number;
+type params = {
+    song_id: number;
+    play_ids: number[]
+    onLinkClick?: () => Promise<void>;
 };
 
 function getCoverSource(cover: string) {
@@ -38,11 +40,13 @@ async function getArtistsforSongId(songId:number){
         return artists.filter((artist): artist is Artist => artist !== null);
     }
 
-export default function SongListItem (id: Id) {
+export default function SongListItem (id: params) {
 
     const [song, setSong] = useState<Song | null>(null);
     const [artists, setArtists] = useState<Artist[]>([])
     const [visibleModal, setVisibleModal] = useState<boolean>(false)
+
+    const [toPlayIds, setToPlayIds] = useState<string[]>([])
     
     useFocusEffect(
         useCallback(() => {
@@ -50,6 +54,10 @@ export default function SongListItem (id: Id) {
                 const result = await getSongById(id.song_id)
                 if (result) {
                     setSong(result)
+                    if (id.play_ids.length == 0) {
+                        setToPlayIds([result.id.toString()])
+                    }
+                    else{setToPlayIds(id.play_ids.map(id => id.toString()))}
                     const artists = await getArtistsforSongId(result.id)
                     setArtists(artists)
                 };
@@ -72,12 +80,15 @@ export default function SongListItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString()]},
+            params: {ids:toPlayIds},
             }}
             onPress={async () => {
                 song.time_started += 1
                 song.last_time_played = new Date().toISOString()
                 await updateSong(song)
+                if (id.onLinkClick != undefined){
+                    await id.onLinkClick()
+                }
             }} push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>

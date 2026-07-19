@@ -3,8 +3,8 @@ import { colors } from "@/styles/global";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import TrackPlayer, { Event, useIsPlaying } from "@rntp/player";
 import { File } from "expo-file-system";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import TextTicker from "react-native-text-ticker";
 
@@ -31,18 +31,21 @@ export default function FloatingPlayer () {
     const playing = useIsPlaying();
 
 
-    useEffect(() => {
-        async function loadInfo(){
-            if (playing){
-                const result = await getSongById(Number(TrackPlayer.getActiveMediaItem()?.mediaId))
-                if (result) {
-                    setSong(result)
-                };
+    useFocusEffect(
+        useCallback(() => {
+            console.log(TrackPlayer.getActiveMediaItem())
+            async function loadInfo(){
+                if (playing){
+                    const result = await getSongById(Number(TrackPlayer.getActiveMediaItem()?.mediaId))
+                    if (result) {
+                        setSong(result)
+                    };
+                }
+                
             }
-            
-        }
-        loadInfo()
-    }, []);
+            loadInfo()
+        }, [])
+    );
 
     useEffect(() => {
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {

@@ -25,7 +25,7 @@ function getCoverSource(cover: string) {
 
 function getSongsList(songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} key={"listed_song:"+song.id}/>)
+        return songs.map(song => <SongListItem song_id={song.id} play_ids={(songs.slice(songs.indexOf(song), songs.length)).map(song => song.id)} key={"listed_song:"+song.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>Playlist empty</Text>
@@ -97,9 +97,17 @@ export default function PlaylistProfile() {
                     </View>        
                     <Text style={styles.name}>{playlist.name}</Text>
                     <View style={styles.play_header}>
-                        <TouchableOpacity style={styles.btn_play}>
-                            <Text style={styles.btn_text}>Play</Text>
-                        </TouchableOpacity>
+                        <Link href={{
+                        pathname: "/musicPlayer",
+                        params: {ids:songs.map(song => song.id.toString())},
+                        }}
+                        onPress={async () => {
+                            
+                        }} push asChild>
+                            <TouchableOpacity style={styles.btn_play}>
+                                <Text style={styles.btn_text}>Play</Text>
+                            </TouchableOpacity>
+                        </Link>
                         <TouchableOpacity style={{
                         justifyContent: 'center',
                         alignItems: 'center',}} 

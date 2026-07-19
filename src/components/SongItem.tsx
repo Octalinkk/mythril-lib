@@ -8,8 +8,10 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SongSettingsModal from "./songSettingsModal";
 
 
-type Id = {
-  song_id: number;
+type params = {
+    song_id: number;
+    play_ids: number[]
+    onLinkClick?: () => Promise<void>;
 };
 
 function getCoverSource(cover: string) {
@@ -20,15 +22,21 @@ function getCoverSource(cover: string) {
     return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-export default function SongItem (id: Id) {
+export default function SongItem (id: params) {
 
     const [song, setSong] = useState<Song | null>(null);
     const [visibleModal, setVisibleModal] = useState<boolean>(false)
 
+    const [toPlayIds, setToPlayIds] = useState<string[]>([])
+
     useFocusEffect(
         useCallback(() => {
             getSongById(id.song_id).then(result => {
-                if (result) setSong(result);
+                if (result) {setSong(result);
+                    if (id.play_ids.length == 0) {
+                        setToPlayIds([result.id.toString()])
+                    }
+                }
             });
         }, [id.song_id])
     );
@@ -49,12 +57,16 @@ export default function SongItem (id: Id) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString()]},
+            params: {ids:toPlayIds},
             }}
             onPress={async () => {
                 song.time_started += 1
                 song.last_time_played = new Date().toISOString()
                 await updateSong(song)
+                if (id.onLinkClick != undefined){
+                    await id.onLinkClick()
+                }
+                
             }} push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>

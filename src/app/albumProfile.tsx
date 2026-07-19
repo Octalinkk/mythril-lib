@@ -26,7 +26,7 @@ function getCoverSource(cover: string) {
 
 function getSongsList(songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} key={"listed_song:"+song.id}/>)
+        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} key={"listed_song:"+song.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>None located for this album</Text>

@@ -13,8 +13,8 @@ import { colors } from '@/styles/global';
 function getFilteredSongList(songs: Song[], filter:string){
     const filteredSongs = songs.filter((song) => song.name.toLowerCase().includes(filter.toLowerCase()))
     if (filteredSongs.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
-    if (filteredSongs.length > 100){return filteredSongs.slice(0, 100).map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)}
-    else{return filteredSongs.map(song => <SongListItem song_id={song.id} key={"searched_song:"+song.id}/>)}
+    if (filteredSongs.length > 100){return filteredSongs.slice(0, 100).map(song => <SongListItem song_id={song.id} play_ids={[]} key={"searched_song:"+song.id}/>)}
+    else{return filteredSongs.map(song => <SongListItem song_id={song.id} play_ids={[]} key={"searched_song:"+song.id}/>)}
     
 }
 
