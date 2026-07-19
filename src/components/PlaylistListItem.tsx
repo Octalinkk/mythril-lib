@@ -3,8 +3,8 @@ import { getSongCountByPlstId } from "@/db/SongsPlaylistsManager";
 import { colors } from "@/styles/global";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { File } from "expo-file-system";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
@@ -32,18 +32,20 @@ export default function PlaylistListItem (id: Id) {
         time_started: 0
     });
     const [count, setCount] = useState<number>(0)
-    useEffect(() => {
-        getPlaylistById(id.id).then(result => {
-            if (result) setPlaylist(result);
-            getSongCountByPlstId(id.id).then(result => {
-                if (result) setCount(result.count);
+    useFocusEffect(
+        useCallback(() => {
+            getPlaylistById(id.id).then(result => {
+                if (result) setPlaylist(result);
+                getSongCountByPlstId(id.id).then(result => {
+                    if (result) setCount(result.count);
+                });
             });
-        });
-    }, []);
+        }, [id.id])
+    );
 
     return (
         <Link href={{
-            pathname: "/albumProfile",
+            pathname: "/playlistProfile",
             params: {id:[playlist.id.toString()]},
             }}
             push asChild>

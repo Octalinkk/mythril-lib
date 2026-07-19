@@ -1,12 +1,12 @@
 
 import ArtistItem from '@/components/ArtistItem';
 import Header from '@/components/Header';
-import PlaylistItem from '@/components/PlaylistItem';
 import SongItem from '@/components/SongItem';
 import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
 import { useCallback } from 'react';
 
 import FloatingPlayer from '@/components/floatingPlayer';
+import PlaylistListItem from '@/components/PlaylistListItem';
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
@@ -33,7 +33,7 @@ function getRecentPlaylists(playlists:Playlist[]){
   let recentPlst = []
   if (playlists.length > 0){
     for (const item of playlists) {
-        recentPlst.push(<PlaylistItem playlist_id={item.id} key={"playlist:"+item.id}/>)
+        recentPlst.push(<PlaylistListItem id={item.id} key={"playlist:"+item.id}/>)
     }
   }
   else {
@@ -63,26 +63,7 @@ export default function HomeScreen() {
   const [recArtists, setArtist] = useState<Artist[]>([]);
 
   
-  
-    
 
-  useEffect(() => {
-      getMostRecentSongs().then(result => {
-          if (result) setSong(result);
-      });
-  }, []);
-
-  useEffect(() => {
-      getMostRecentPlst().then(result => {
-          if (result) setPlaylist(result);
-      });
-  }, []);
-
-  useEffect(() => {
-      getMostRecentArtists().then(result => {
-          if (result) setArtist(result);
-      });
-  }, []);
 
   useFocusEffect(
     useCallback(() =>{
@@ -155,12 +136,11 @@ export default function HomeScreen() {
         
         
         <Text style={styles.title}>Recent Playlists</Text>
-        <View  style={styles.items_container_md}>
+        <View style={styles.items_container_lst}>
           <Suspense fallback={<Text>Loading...</Text>}>
             {getRecentPlaylists(recPlaylists)}
           </Suspense>
         </View>
-
         <Text style={styles.title}>Recent Artists</Text>
         <View  style={styles.items_container_md}>
           <Suspense fallback={<Text>Loading...</Text>}>
@@ -198,6 +178,11 @@ const styles = StyleSheet.create({
     marginVertical: 30, 
     justifyContent: 'space-between', 
     gap: 20,
+  },
+  items_container_lst: {
+    flex: 1,
+    gap: 10,
+    marginVertical: 20
   },
   filler_text: {
     flex: 1,

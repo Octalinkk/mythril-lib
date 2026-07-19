@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
         flex:1,
         flexDirection: 'row',
         minHeight: 70,
+        maxHeight: 70,
         backgroundColor: '#b8b8b81b',
         borderRadius: 20,
         padding: 10,

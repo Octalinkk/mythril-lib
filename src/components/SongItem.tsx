@@ -5,6 +5,7 @@ import { File } from "expo-file-system";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import SongSettingsModal from "./songSettingsModal";
 
 
 type Id = {
@@ -22,6 +23,7 @@ function getCoverSource(cover: string) {
 export default function SongItem (id: Id) {
 
     const [song, setSong] = useState<Song | null>(null);
+    const [visibleModal, setVisibleModal] = useState<boolean>(false)
 
     useFocusEffect(
         useCallback(() => {
@@ -32,6 +34,17 @@ export default function SongItem (id: Id) {
     );
 
     if (!song) return null;
+
+    
+
+    
+    function openModal(){
+        setVisibleModal(true)
+    }
+
+    function closeModal(){
+        setVisibleModal(false)
+    }
 
     return (
         <Link href={{
@@ -47,14 +60,10 @@ export default function SongItem (id: Id) {
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>
                 <View style={styles.title_container}>
                     <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
-                    <Link href={{
-                        pathname: "/songSettings",
-                        params: {id:[song.id.toString()]},
-                        }} push asChild>
-                            <TouchableOpacity style={styles.icon}>
-                                <SimpleLineIcons name="options-vertical" size={12} color={colors.primary} />
-                            </TouchableOpacity>
-                    </Link>
+                    <TouchableOpacity style={styles.icon} onPress={openModal}>
+                        <SimpleLineIcons name="options-vertical" size={12} color={colors.primary} />
+                    </TouchableOpacity>
+                    <SongSettingsModal visible={visibleModal} onClose={closeModal} id={song.id}/>
                 </View>
             </TouchableOpacity>
         </Link>

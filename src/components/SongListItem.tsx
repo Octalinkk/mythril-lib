@@ -7,6 +7,7 @@ import { File } from "expo-file-system";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import SongSettingsModal from "./songSettingsModal";
 
 type Id = {
   song_id: number;
@@ -41,6 +42,7 @@ export default function SongListItem (id: Id) {
 
     const [song, setSong] = useState<Song | null>(null);
     const [artists, setArtists] = useState<Artist[]>([])
+    const [visibleModal, setVisibleModal] = useState<boolean>(false)
     
     useFocusEffect(
         useCallback(() => {
@@ -56,6 +58,15 @@ export default function SongListItem (id: Id) {
         }, [id.song_id])
     );
     if (!song) return null;
+
+    
+    function openModal(){
+        setVisibleModal(true)
+    }
+
+    function closeModal(){
+        setVisibleModal(false)
+    }
 
 
     return (
@@ -73,15 +84,11 @@ export default function SongListItem (id: Id) {
                 <View style={styles.title_container}>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{song.name}</Text>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.subtitle}>{getArtistName(artists)}</Text>
-                </View>
-                    <Link href={{
-                        pathname: "/songSettings",
-                        params: {id:[song.id.toString()]},
-                        }} push asChild>
-                        <TouchableOpacity style={styles.icon}>
-                            <SimpleLineIcons name="options-vertical" size={15} color={colors.primary} />
-                        </TouchableOpacity>
-                    </Link>
+                </View>                    
+                    <TouchableOpacity style={styles.icon}  onPress={openModal}>
+                        <SimpleLineIcons name="options-vertical" size={15} color={colors.primary} />
+                    </TouchableOpacity>
+                    <SongSettingsModal visible={visibleModal} onClose={closeModal} id={song.id}/>
             </TouchableOpacity>
         </Link>
     );
