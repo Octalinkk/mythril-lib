@@ -90,10 +90,10 @@ export default function PlaylistProfile() {
               end={{x:1, y:1}}
             >
             <Header />
-            <ScrollView style={{marginBottom: 50}}>
+            <ScrollView>
                 <View style={styles.header}>
                     <Link href={{
-                        pathname: "/albumSettings",
+                        pathname: "/playlistSettings",
                         params: {id:[playlist.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity>
@@ -124,14 +124,16 @@ export default function PlaylistProfile() {
                         onPress={() => {
                             TrackPlayer.setShuffleEnabled(!shuffle);
                             setShuffle(!shuffle);
+                            console.log(TrackPlayer.isShuffleEnabled())
                         }}>
-                            <RandomIcon isShuffled={shuffle} />
+                        <RandomIcon isShuffled={shuffle} />
                         </TouchableOpacity>
                     </View>
                     {getSongsList(songs)}
                 </View>
             </ScrollView>
             <FloatingPlayer />
+            <View style={{marginBottom:50}}></View>
         </LinearGradient>
     )
 }

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Album, getAlbumById } from "@/db/AlbumsManager";
+import { getPlaylistById, Playlist } from "@/db/PlaylistsManager";
 import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { Directory, File, Paths } from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
@@ -50,6 +51,16 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         time_started: 0
     });
 
+    const [playlist, setPlaylist] = useState<Playlist>({
+        id: 0,
+        name: "",
+        cover: "",
+        last_time_played: "",
+        time_listened: 0,
+        time_started: 0
+    });
+
+
     const [artists, setArtists] = useState<Artist[]>([]);
 
     const [visibleSearch, setVisibleSearch] = useState<boolean>(false)
@@ -78,6 +89,14 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                 if (result) {
                     setAlbum(result)
                     
+                }
+            });
+        }
+
+        if (target == "playlist"){
+            getPlaylistById(id).then(result => {
+                if (result) {
+                    setPlaylist(result)                    
                 }
             });
         }
@@ -153,7 +172,7 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                     if (!dir.exists){
                         dir.create()                    
                     }
-                    destination = new File (dir.uri + `/${song.id}-temp.jpg`) //a changer
+                    destination = new File (dir.uri + `/${playlist.id}-temp.jpg`) //a changer
                 }
                 
                 if(destination) {
@@ -173,8 +192,8 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                                 album.cover = output.uri
                             }
                             if (target == "playlist"){
+                                playlist.cover = output.uri
                             }
-                            //TODO Need to add a prop to define if it's song/album/artist
                             await returnFileResult(output)
                         }
                     } catch (error) {
@@ -202,6 +221,9 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         }
         if (target == "album"){
             return String(album.name+"+album+cover")
+        }
+        if (target == "playlist"){
+            return String(playlist.name+"+playlist+cover")
         }
     }
 

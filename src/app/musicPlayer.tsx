@@ -40,15 +40,6 @@ function getArtistName(artists: Artist[]):string {
     else return "unknown"
 }
 
-function getRandomIcon(){
-    if (TrackPlayer.isShuffleEnabled()) {
-        return <FontAwesome name="random" size={30} color={colors.primary} />
-    }
-    else{
-        return <FontAwesome name="random" size={30} color={"#b0b0b02e"} />
-    }
-}
-
 
 function getSongDuration(dur:number): string{
     const minutes = Math.floor(dur / 60).toString()

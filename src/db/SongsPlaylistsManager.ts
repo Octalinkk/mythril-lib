@@ -58,7 +58,7 @@ export async function deletePlaylistsBySongId(id:number) {
 export async function deleteSongsByPlaylistId(id:number) {
     const db = await getDb();
     try {
-        await db.runAsync(`DELETE FROM songs_playlists WHERE song_id = ?`, [id])
+        await db.runAsync(`DELETE FROM songs_playlists WHERE playlist_id = ?`, [id])
     }
     catch (err) {
         console.error(err)
