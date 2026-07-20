@@ -48,7 +48,7 @@ export default function FloatingPlayer () {
 
     useEffect(() => {
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-            if(item?.mediaId != undefined){
+            if(item?.mediaId != undefined && item?.mediaId != "0"){
                 const result = await getSongById(Number(item?.mediaId))
                 if (result){
                     setSong(result)
@@ -58,13 +58,14 @@ export default function FloatingPlayer () {
     }, []);
 
     //condition pour cacher
-    if (TrackPlayer.getActiveMediaItem() == null) return <View></View>;
+    if (TrackPlayer.getActiveMediaItem() == null || song.id === 0) return <View></View>;
 
     return (
         <Link href={{
             pathname: "/musicPlayer",
             params: {ids:[song.id.toString()], softOpen:"true"},
             }}
+            onPress={() =>{console.log(song.id)}}
             push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>

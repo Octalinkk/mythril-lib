@@ -23,6 +23,20 @@ export async function getAllArtists() {
     return artists;
 }
 
+export async function getAllArtistsOrdered() {
+    const db = await getDb();
+    const rows = await db.getAllAsync<Artist>('SELECT * FROM artists ORDER BY name ASC');
+    const artists: Artist[] = rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played: row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }));
+    return artists;
+}
+
 export async function getArtistById(id:number) {
     let artist:Artist
     const db = await getDb();

@@ -1,6 +1,7 @@
-import { colors } from '@/styles/global';
+import { colors, globalStyles } from '@/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
@@ -16,6 +17,12 @@ export default function TabLayout() {
           paddingTop: 4,
           marginBottom: 48
         },
+        tabBarBackground: () => <LinearGradient 
+          style={globalStyles.main_container}
+          colors={[colors.grad_prim, colors.grad_sec]}
+          start={{x:0, y:0}}
+          end={{x:1, y:1}}
+        />,
         tabBarLabelStyle: {
             flex: 1,
             fontFamily: 'SpaceGrotesk_400Regular',
@@ -63,6 +70,5 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
-    
   );
 }

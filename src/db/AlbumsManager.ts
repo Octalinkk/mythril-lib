@@ -23,6 +23,20 @@ export async function getAllAlbums() {
     return albums;
 }
 
+export async function getAllAlbumsOrdered() {
+    const db = await getDb();
+    const rows = await db.getAllAsync<Album>('SELECT * FROM albums ORDER BY name ASC');
+    const albums: Album[] = rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        cover: row.cover,
+        last_time_played: row.last_time_played,
+        time_listened: row.time_listened,
+        time_started: row.time_started
+    }));
+    return albums;
+}
+
 export async function getAlbumById(id:number) {
     let album:Album
     const db = await getDb();

@@ -115,7 +115,7 @@ export async function updateSongs() {
                         album_id:lastAlbumId
                     })    
                 }
-                if (artist != null && album != null) {
+                if (artist != null && album != null && lastAlbumId != 0 && lastArtistId != 0) {
                     const newAlbArt = {
                         album_id:lastAlbumId,
                         artist_id:lastArtistId

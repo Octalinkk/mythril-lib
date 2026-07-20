@@ -103,7 +103,7 @@ export default function playlistSettings() {
 
     function loadItemsList(){
         if (songs.length === 0) {
-            return <Text>None found</Text>;
+            return <View></View>;
         }
         
         return songs.map(song => (
