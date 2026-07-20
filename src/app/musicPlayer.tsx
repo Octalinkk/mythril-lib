@@ -243,13 +243,8 @@ export default function MusicPlayer() {
                         <TextTicker scrollSpeed={50} loop bounce numberOfLines={1} style={styles.title}>{curr_display_song.name}</TextTicker>
                         <Text style={styles.artists}>{getArtistName(curr_display_artists)}</Text>
                     </View>
-                    <View style={styles.random_container}>
-                        <TouchableOpacity onPress={() => {
-                            TrackPlayer.setShuffleEnabled(!shuffle);
-                            setShuffle(!shuffle);
-                        }}>
-                            <RandomIcon isShuffled={shuffle} />
-                        </TouchableOpacity>   
+                    <View style={styles.random_container}>                        
+                        <RandomIcon isShuffled={shuffle} />
                         <Text style={styles.dur}>{getSongDuration(duration)}</Text>
                     </View>                 
                 </View>

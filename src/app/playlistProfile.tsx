@@ -13,7 +13,6 @@ import { getSongById, Song } from '@/db/SongsManager';
 import { getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { SimpleLineIcons } from '@expo/vector-icons';
-import TrackPlayer from '@rntp/player';
 
 
 function getCoverSource(cover: string) {
@@ -118,16 +117,8 @@ export default function PlaylistProfile() {
                                 <Text style={styles.btn_text}>Play</Text>
                             </TouchableOpacity>
                         </Link>
-                        <TouchableOpacity style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',}} 
-                        onPress={() => {
-                            TrackPlayer.setShuffleEnabled(!shuffle);
-                            setShuffle(!shuffle);
-                            console.log(TrackPlayer.isShuffleEnabled())
-                        }}>
+                        
                         <RandomIcon isShuffled={shuffle} />
-                        </TouchableOpacity>
                     </View>
                     {getSongsList(songs)}
                 </View>
