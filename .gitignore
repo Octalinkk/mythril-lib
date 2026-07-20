@@ -3,6 +3,8 @@
 # dependencies
 node_modules/
 
+MakeARelease.md
+
 # Expo
 .expo/
 dist/
@@ -43,6 +45,7 @@ example
 /android
 modules/*/android/build/
 modules/*/android/.cxx/
+modules/*/android/*/*.keystore
 modules/*/ios/build/
 modules/*/.gradle/
 
