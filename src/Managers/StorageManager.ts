@@ -74,7 +74,7 @@ export async function updateSongs() {
                             id: 0,
                             name: newArtist.name,
                             cover: "",
-                            last_time_played: "",
+                            last_time_played: new Date().toISOString(),
                             time_listened: 0,
                             time_started: 0
                         }
@@ -88,11 +88,11 @@ export async function updateSongs() {
                 if (newAlbum.name != ""){
                     album = await getAlbumByName(newAlbum.name)
                     if (album == null){
-                        newArtist = {
+                        newAlbum = {
                             id: 0,
                             name: newAlbum.name,
                             cover: "",
-                            last_time_played: "",
+                            last_time_played: new Date().toISOString(),
                             time_listened: 0,
                             time_started: 0
                         }
@@ -115,7 +115,7 @@ export async function updateSongs() {
                         album_id:lastAlbumId
                     })    
                 }
-                if (artist != null && album != null && lastAlbumId != 0 && lastArtistId != 0) {
+                if (lastAlbumId != 0 && lastArtistId != 0) {
                     const newAlbArt = {
                         album_id:lastAlbumId,
                         artist_id:lastArtistId
@@ -132,5 +132,4 @@ export async function updateSongs() {
     };
     
     console.log("Done checking songs")
-    //TODO check deletedSongs from folder still in DB?
 }

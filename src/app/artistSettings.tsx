@@ -127,8 +127,6 @@ export default function artistSettings() {
                 setName(result.name)
             }
         });
-        //TODO update pour que l'image soit mise à jour
-        //Load current album if any
     }, []);
     
 

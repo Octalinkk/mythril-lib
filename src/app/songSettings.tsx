@@ -8,7 +8,7 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { addAlbum, getAlbumById, getAlbumByName } from '@/db/AlbumsManager';
 import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
 import { addArtist, getArtistById, getArtistByName } from '@/db/ArtistsManager';
-import { addSongAlbum, deleteAlbumsBySongId } from '@/db/SongsAlbumsManager';
+import { addSongAlbum, deleteAlbumsBySongId, getAlbumsBySongId } from '@/db/SongsAlbumsManager';
 import { addSongArtist, deleteArtistsBySongId, getArtistsBySongId } from '@/db/SongsArtistsManager';
 import { getSongById, Song, updateSong } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';
@@ -116,14 +116,13 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
 
     for (const [index, artist] of allArt.entries()){
         for (const [index, album] of allAlb.entries()){
-            
             if (artist && album) {
                 const entry = {
                     album_id:album.id,
                     artist_id:artist.id
                 }
                 const has_already = await getAlbumArtistById(entry)
-                if(has_already != null){
+                if(has_already == null){
                     await addAlbumArtist({
                         album_id:album.id,
                         artist_id:artist.id
@@ -196,10 +195,19 @@ export default function songSettings() {
                         setArtist("Nada")
                     }
                 });
+                getAlbumsBySongId(Number(result.id)).then(albIds => {
+                    if (albIds) {
+                        const albumsProm = albIds.map(id => getAlbumById(id))
+                        Promise.all(albumsProm).then(albums => {
+                           setAlbum(albums.map(alb => alb?.name ?? "").join(", "))
+                        })
+                    }
+                    else{
+                        setAlbum("Nada")
+                    }
+                });
             }
         });
-        //TODO update pour que l'image soit mise à jour
-        //Load current album if any
     }, []);
     
 
