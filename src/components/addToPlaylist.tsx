@@ -60,15 +60,12 @@ export default function AddToPlaylistModal ({ visible, onClose, id }: addToPlayl
                     setPlaylists(resPlst)
                     getPlaylistsBySongId(id).then(result => {
                         if (result) {
-                            if (resPlst.length == 0) {console.log("rigged")}
                             resPlst.forEach(playlist => {
                                 if (result.length != 0 && result.includes(playlist.id)){
                                     setState(playlist.id, true)
                                 }
                                 else{setState(playlist.id, false)}
                             })
-                            
-                            if (resPlst.length == 0) {console.log("rigged")}
                         }
                     });
                 }

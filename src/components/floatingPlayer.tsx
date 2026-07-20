@@ -33,11 +33,10 @@ export default function FloatingPlayer () {
 
     useFocusEffect(
         useCallback(() => {
-            console.log(TrackPlayer.getActiveMediaItem())
             async function loadInfo(){
                 if (playing){
                     const result = await getSongById(Number(TrackPlayer.getActiveMediaItem()?.mediaId))
-                    if (result) {
+                    if (result) {  
                         setSong(result)
                     };
                 }
@@ -64,7 +63,7 @@ export default function FloatingPlayer () {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString()]},
+            params: {ids:[song.id.toString()], softOpen:"true"},
             }}
             push asChild>
             <TouchableOpacity style={styles.container}>

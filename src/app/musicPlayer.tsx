@@ -61,7 +61,8 @@ function getSongDuration(dur:number): string{
 
 export default function MusicPlayer() {
     const params = useLocalSearchParams<{
-        ids: string;
+        ids: string,
+        softOpen: "true" | "false"
     }>();
     const playing = useIsPlaying();
     const { position, duration } = useProgress();
@@ -122,7 +123,10 @@ export default function MusicPlayer() {
                 
             }
 
+            
+
             let ids:number[] = params.ids.split(",").map((i) => Number(i))
+            
             
             let results = await Promise.all(
                 ids.map(id => getSongById(+id))
@@ -139,8 +143,6 @@ export default function MusicPlayer() {
                     artworkUrl: result!.cover,
                 }));
 
-
-            console.log(all_songs)
             if (results[0]) {
                 setCurrDisplaySong(results[0]);  
             }
@@ -152,13 +154,30 @@ export default function MusicPlayer() {
                 getArtistDisplay(results[0]?.id ?? curr_display_song.id)            
             }
 
-            if(Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)){
+            
+
+            const areSame = Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)
+            // Ici que ça fait la détection de si la même musique ou pas
+            //Switch from Song -> Playlist
+            if (TrackPlayer.getQueue().length == 1 && all_songs.length > 1 && areSame){
                 TrackPlayer.addMediaItems(all_songs.slice(1))
             }
-            else {
-                TrackPlayer.setMediaItems(all_songs);
+            //Switch from Playlist -> Song
+            else if (TrackPlayer.getQueue().length > 1 && all_songs.length == 1 && areSame && params.softOpen == "false"){
+                console.log("c'est icic mdr")
+                const idx = TrackPlayer.getActiveMediaItemIndex() ?? 0;
+                TrackPlayer.removeMediaItems(0, idx)
+                TrackPlayer.removeMediaItems(idx, TrackPlayer.getQueue().length-1)
+                
             }
-            
+            else if (TrackPlayer.getQueue().length == 1 && all_songs.length == 1 && areSame){
+                
+            }
+            else {
+                if(params.softOpen == "false"){
+                    TrackPlayer.setMediaItems(all_songs);
+                }
+            }
         }
 
         loadSongs().catch(console.error);

@@ -5,6 +5,7 @@ import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import FloatingPlayer from '@/components/floatingPlayer';
 import RandomIcon from '@/components/RandomIcon';
 import SongListItem from '@/components/SongListItem';
 import { getPlaylistById, Playlist } from '@/db/PlaylistsManager';
@@ -25,7 +26,16 @@ function getCoverSource(cover: string) {
 
 function getSongsList(songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} play_ids={(songs.slice(songs.indexOf(song), songs.length)).map(song => song.id)} key={"listed_song:"+song.id}/>)
+        return songs.map(song => {
+            let all = songs
+            const index = all.findIndex(item => item === song);
+
+            if (index !== -1) {
+                const [item] = all.splice(index, 1);
+                all.unshift(item); // L'ajoute au début
+            }
+            return <SongListItem song_id={song.id} play_ids={all.map(song => song.id)} key={"listed_song:"+song.id}/>
+        })
     }
     else{
         return <Text style={styles.filler_text}>Playlist empty</Text>
@@ -99,7 +109,7 @@ export default function PlaylistProfile() {
                     <View style={styles.play_header}>
                         <Link href={{
                         pathname: "/musicPlayer",
-                        params: {ids:songs.map(song => song.id.toString())},
+                        params: {ids:songs.map(song => song.id.toString()), softOpen:"false"},
                         }}
                         onPress={async () => {
                             
@@ -121,7 +131,7 @@ export default function PlaylistProfile() {
                     {getSongsList(songs)}
                 </View>
             </ScrollView>
-            
+            <FloatingPlayer />
         </LinearGradient>
     )
 }
