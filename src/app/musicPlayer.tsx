@@ -155,7 +155,6 @@ export default function MusicPlayer() {
             }
             //Switch from Playlist -> Song
             else if (TrackPlayer.getQueue().length > 1 && all_songs.length == 1 && areSame && params.softOpen == "false"){
-                console.log("c'est icic mdr")
                 const idx = TrackPlayer.getActiveMediaItemIndex() ?? 0;
                 TrackPlayer.removeMediaItems(0, idx)
                 TrackPlayer.removeMediaItems(idx, TrackPlayer.getQueue().length-1)

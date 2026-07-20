@@ -15,7 +15,7 @@ export default function RandomIcon({ isShuffled }: { isShuffled: boolean }) {
             TrackPlayer.setShuffleEnabled(!TrackPlayer.isShuffleEnabled());
             setShuffle(TrackPlayer.isShuffleEnabled());
         }}>
-            <FontAwesome name="random" size={30} color={shuffle ? colors.primary : "#b0b0b02e"} />
+            <FontAwesome name="random" size={30} color={shuffle == true ? colors.primary : "#b0b0b02e"} />
         </TouchableOpacity>
         
     );
