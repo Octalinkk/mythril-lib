@@ -9,7 +9,7 @@ This is just a BETA for now. There is more to come in the futur.
 - Play all your locally available songs and musics and manage your library
 
 ## Installation
-1. Download the ZIP and extract it
+1. Download the [ZIP](https://github.com/Octalinkk/mythril-lib/releases/tag/v0.1.0-beta) and extract it 
 2. Install the .apk
 
 ## What's Next?
