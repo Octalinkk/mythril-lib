@@ -1,10 +1,10 @@
 import { getAlbumCountById } from "@/db/ArtistsAlbumsManager";
-import { Artist, getArtistById } from "@/db/ArtistsManager";
+import { Artist, deleteArtist, getArtistById } from "@/db/ArtistsManager";
 import { getSongCountByArtistId } from "@/db/SongsArtistsManager";
 import { colors } from "@/styles/global";
 import { File } from "expo-file-system";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Id = {
@@ -47,30 +47,37 @@ function getCoverSource(cover: string, name:string) {
 
 export default function ArtistItem (id: Id) {
 
-    const [artist, setArtist] = useState<Artist>({
-        id: 0,
-        name: "",
-        cover: "",
-        last_time_played: "",
-        time_listened: 0,
-        time_started: 0
-    });
+    const [artist, setArtist] = useState<Artist | null>(null);
     const [countSong, setCountSong] = useState<number>(0)
     const [countAlbum, setCountAlbum] = useState<number>(0)
 
-    useEffect(() => {
-        getArtistById(id.artist_id).then(result => {
-            if (result) setArtist(result);
-            getSongCountByArtistId(id.artist_id).then(cntSong => {
-                if (cntSong) setCountSong(cntSong.count);
-
-            });
-            getAlbumCountById(id.artist_id).then(cntAlb => {
-                if (cntAlb) setCountAlbum(cntAlb.count);
-
-            });
-        });
-    }, [id]);
+    useFocusEffect(
+        useCallback(() => {
+            async function loadInfo(){
+                const result = await getArtistById(id.artist_id)
+                if (result) {
+                    setArtist(result)
+                    const cntSongs = await getSongCountByArtistId(result.id)
+                    if(cntSongs && cntSongs.count > 0) {
+                        setCountSong(cntSongs.count)
+                        const cntAlbums = await getAlbumCountById(result.id)
+                        if(cntAlbums) {
+                            setCountAlbum(cntSongs.count)
+                        }
+                    }
+                    else{
+                        //Automaticly delete if nothing                        
+                        await deleteArtist(result)
+                        setArtist(null)
+                    }
+                };
+            }
+            loadInfo()
+        }, [id.artist_id])
+    );
+    if (!artist){
+        return null
+    };
 
         return (
             <Link href={{

@@ -1,4 +1,4 @@
-import { Album, getAlbumById } from "@/db/AlbumsManager";
+import { Album, deleteAlbum, getAlbumById } from "@/db/AlbumsManager";
 import { getSongCountByAlbumId } from "@/db/SongsAlbumsManager";
 import { colors } from "@/styles/global";
 import { SimpleLineIcons } from "@expo/vector-icons";
@@ -34,13 +34,22 @@ export default function AlbumListItem (id: Id) {
                 if (result) {
                     setAlbum(result)
                     const cntSongs = await getSongCountByAlbumId(result.id)
-                    if(cntSongs) {setCountSong(cntSongs.count)}
+                    if(cntSongs && cntSongs.count > 0) {
+                        setCountSong(cntSongs.count)
+                    }
+                    else{
+                        //Automaticly delete if nothing                        
+                        await deleteAlbum(result)
+                        setAlbum(null)
+                    }
                 };
             }
             loadInfo()
         }, [id.id])
     );
-    if (!album) return null;
+    if (!album){
+        return null
+    };
 
     return (
         <Link href={{

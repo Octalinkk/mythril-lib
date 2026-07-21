@@ -1,5 +1,5 @@
 import { getAlbumCountById } from "@/db/ArtistsAlbumsManager";
-import { Artist, getArtistById } from "@/db/ArtistsManager";
+import { Artist, deleteArtist, getArtistById } from "@/db/ArtistsManager";
 import { getSongCountByArtistId } from "@/db/SongsArtistsManager";
 import { colors } from "@/styles/global";
 import { SimpleLineIcons } from "@expo/vector-icons";
@@ -59,15 +59,26 @@ export default function ArtistListItem (id: Id) {
                 if (result) {
                     setArtist(result)
                     const cntSongs = await getSongCountByArtistId(result.id)
-                    const cntAlbms = await getAlbumCountById(result.id)
-                    if(cntSongs) {setCountSong(cntSongs.count)}
-                    if(cntAlbms) {setCountAlbum(cntAlbms.count)}
+                    if(cntSongs && cntSongs.count > 0) {
+                        setCountSong(cntSongs.count)
+                        const cntAlbums = await getAlbumCountById(result.id)
+                        if(cntAlbums) {
+                            setCountAlbum(cntSongs.count)
+                        }
+                    }
+                    else{
+                        //Automaticly delete if nothing                        
+                        await deleteArtist(result)
+                        setArtist(null)
+                    }
                 };
             }
             loadInfo()
         }, [id.artist_id])
     );
-    if (!artist) return null;
+    if (!artist){
+        return null
+    };
 
     return (
         <Link href={{

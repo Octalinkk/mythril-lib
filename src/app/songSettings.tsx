@@ -58,29 +58,31 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     catch{
         console.log("Couldn't delete link for song")
     }
-    const artistLst = artist.split(",").map(art => art.trimStart());
-    for (const [index, artName] of artistLst.entries()){
-        const artist = await getArtistByName(artName)
-        let artId = 0
-        if (!artist){
-            const newArtist = {
-                id: 0,
-                name: artName,
-                cover: "",
-                last_time_played: "",
-                time_listened: 0,
-                time_started: 0
+    if(artist !=""){
+        const artistLst = artist.split(",").map(art => art.trimStart());
+        for (const [index, artName] of artistLst.entries()){
+            const artist = await getArtistByName(artName)
+            let artId = 0
+            if (!artist){
+                const newArtist = {
+                    id: 0,
+                    name: artName,
+                    cover: "",
+                    last_time_played: "",
+                    time_listened: 0,
+                    time_started: 0
+                }
+                artId = await addArtist(newArtist)    
             }
-            artId = await addArtist(newArtist)    
-        }
-        else {artId = artist.id}        
+            else {artId = artist.id}        
 
-        allArt.push(await getArtistById(artId))
-        
-        await addSongArtist({
-            song_id:song.id,
-            artist_id:artId
-        })
+            allArt.push(await getArtistById(artId))
+            
+            await addSongArtist({
+                song_id:song.id,
+                artist_id:artId
+            })
+        }
     }
 
     try{
@@ -89,48 +91,52 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
     catch{
         console.log("Couldn't delete link for song")
     }
-    const albumLst = album.split(",").map(alb => alb.trimStart());
-    for (const [index, albName] of albumLst.entries()){
-        const album = await getAlbumByName(albName)
-        let id = 0
-        if (!album){
-            const newAlbum = {
-                id: 0,
-                name: albName,
-                cover: "",
-                last_time_played: "",
-                time_listened: 0,
-                time_started: 0
+    if (album != ""){
+        const albumLst = album.split(",").map(alb => alb.trimStart());
+        for (const [index, albName] of albumLst.entries()){
+            const album = await getAlbumByName(albName)
+            let id = 0
+            if (!album){
+                const newAlbum = {
+                    id: 0,
+                    name: albName,
+                    cover: "",
+                    last_time_played: "",
+                    time_listened: 0,
+                    time_started: 0
+                }
+                id = await addAlbum(newAlbum)    
             }
-            id = await addAlbum(newAlbum)    
+            else {id = album.id}        
+            
+            allAlb.push(await getAlbumById(id))
+            
+            await addSongAlbum({
+                song_id:song.id,
+                album_id:id
+            }) 
         }
-        else {id = album.id}        
-        
-        allAlb.push(await getAlbumById(id))
-        
-        await addSongAlbum({
-            song_id:song.id,
-            album_id:id
-        }) 
     }
 
-    for (const [index, artist] of allArt.entries()){
-        for (const [index, album] of allAlb.entries()){
-            if (artist && album) {
-                const entry = {
-                    album_id:album.id,
-                    artist_id:artist.id
-                }
-                const has_already = await getAlbumArtistById(entry)
-                if(has_already == null){
-                    await addAlbumArtist({
+    if (allArt != null && allArt.length !== 0 && allAlb != null && allAlb.length !== 0){
+        for (const [index, artist] of allArt.entries()){
+            for (const [index, album] of allAlb.entries()){
+                if (artist && album) {
+                    const entry = {
                         album_id:album.id,
                         artist_id:artist.id
-                    })
+                    }
+                    const has_already = await getAlbumArtistById(entry)
+                    if(has_already == null){
+                        await addAlbumArtist({
+                            album_id:album.id,
+                            artist_id:artist.id
+                        })
+                    }
+                    
                 }
                 
             }
-            
         }
     }
     

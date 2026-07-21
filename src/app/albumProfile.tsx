@@ -7,7 +7,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 
 import ArtistItem from '@/components/ArtistItem';
 import SongListItem from '@/components/SongListItem';
-import { getAlbumById } from '@/db/AlbumsManager';
+import { Album, getAlbumById, updateAlbum } from '@/db/AlbumsManager';
 import { getArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
 import { Artist, getArtistById } from '@/db/ArtistsManager';
 import { getSongCountByAlbumId, getSongsByAlbumId } from '@/db/SongsAlbumsManager';
@@ -24,9 +24,15 @@ function getCoverSource(cover: string) {
     return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-function getSongsList(songs:Song[]){
+async function updateAlbumStats(album:Album){
+    album.time_started += 1
+    album.last_time_played = new Date().toISOString()
+    await updateAlbum(album) 
+}
+
+function getSongsList(album:Album, songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} key={"listed_song:"+song.id}/>)
+        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} onLinkClick={() => updateAlbumStats(album)} key={"listed_song:"+song.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>None located for this album</Text>
@@ -134,7 +140,7 @@ export default function AlbumProfil() {
                         {getArtistList(artists)}
                     </View>
                     <Text style={styles.title}>Songs</Text>
-                    {getSongsList(songs)}
+                    {getSongsList(album, songs)}
                 </View>
             </ScrollView>
             
