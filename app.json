@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "mythril-lib",
+    "name": "Mythril Library",
     "slug": "mythril-lib",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./src/res/Mithril.png",
     "scheme": "mythrillib",
