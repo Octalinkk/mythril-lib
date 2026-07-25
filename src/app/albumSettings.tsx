@@ -1,5 +1,5 @@
 import SearchCoverModal from '@/components/SearchCoverModal';
-import { File } from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
@@ -26,18 +26,22 @@ async function saveChanges(album:Album, title: string, old_cover:File | null, ne
     if(old_cover && new_cover){
         let uri = ""
         try{
+            //image -> image
             const oldCovValue = old_cover.bytesSync()
             if (oldCovValue != new_cover.bytesSync()){
                 //nouvelle image
-                uri = old_cover.uri
-                new_cover.moveSync(old_cover, { overwrite: true })
+                old_cover.delete()
+                const dir = new Directory(Paths.document, 'playlistCover');
+                const finalFile = new File(dir.uri + `/${album.id}_${Date.now()}.jpg`);
+                new_cover.moveSync(finalFile, { overwrite: true })
+                uri = new_cover.uri
             }
             else{
                 new_cover.delete()
             }
         }
         catch{
-            new_cover.moveSync(new File(new_cover.uri.replace("-temp", "")), { overwrite: true })
+            new_cover.moveSync(new File(new_cover.uri.replace("-temp", `_${Date.now()}`)), { overwrite: true })
             uri = new_cover.uri
         }
         

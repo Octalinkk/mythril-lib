@@ -32,14 +32,19 @@ export default function PlaylistListItem (id: Id) {
         time_started: 0
     });
     const [count, setCount] = useState<number>(0)
+    
     useFocusEffect(
         useCallback(() => {
-            getPlaylistById(id.id).then(result => {
-                if (result) setPlaylist(result);
-                getSongCountByPlstId(id.id).then(result => {
-                    if (result) setCount(result.count);
-                });
-            });
+            async function loadInfo(){
+                const result = await getPlaylistById(id.id)
+                if (result) {
+                    setPlaylist(result)
+                    getSongCountByPlstId(id.id).then(result => {
+                        if (result) setCount(result.count);
+                    });
+                };
+            }
+            loadInfo()
         }, [id.id])
     );
 

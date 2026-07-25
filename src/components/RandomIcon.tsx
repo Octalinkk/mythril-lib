@@ -1,12 +1,20 @@
 import { colors } from "@/styles/global";
 import { FontAwesome } from "@expo/vector-icons";
 import TrackPlayer from "@rntp/player";
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
 export default function RandomIcon({ isShuffled }: { isShuffled: boolean }) {
     
     const [shuffle, setShuffle] = useState<boolean>(TrackPlayer.isShuffleEnabled())
+
+    useFocusEffect(
+      useCallback(() =>{
+        setShuffle(TrackPlayer.isShuffleEnabled())
+      }, [shuffle]) 
+    )
+
     return (
         <TouchableOpacity style={{
         justifyContent: 'center',

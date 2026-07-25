@@ -13,7 +13,12 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 function getPlaylistLST(playlists: Playlist[]){  
-  return playlists.map(playlist => <PlaylistListItem id={playlist.id} key={"playlist_item:"+playlist.id}/>)
+  if (playlists.length !== 0){
+    return playlists.map(playlist => <PlaylistListItem id={playlist.id} key={"playlist_item:"+playlist.id}/>)
+  }
+  else{
+    return (<Text>Press + to add a new playlist</Text>)
+  }
 }
 
 export default function PlaylistScreen() {
@@ -23,9 +28,13 @@ export default function PlaylistScreen() {
 
   useFocusEffect(
     useCallback(() =>{
-      getAllPlaylists().then(result => {
-          if (result) setPlaylists(result);
-      });
+      async function loadInfo(){
+          const result = await getAllPlaylists()
+          if (result) {
+              setPlaylists(result)              
+          };
+      }
+      loadInfo()
     }, [playlists]) 
   )
 
@@ -101,7 +110,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     flex:1,
     gap:10,
-  }
+  },
+  filler_text: {
+      flex: 1,
+      fontSize: 15,
+      textAlign: 'center',
+      color: colors.secondary,
+      fontFamily: 'SpaceGrotesk_400Regular',
+  },
   
   
 });

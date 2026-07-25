@@ -274,6 +274,7 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
 
 const styles = StyleSheet.create({
     main_container: {
+        marginTop:40,
         flex:1
     },
     container: {

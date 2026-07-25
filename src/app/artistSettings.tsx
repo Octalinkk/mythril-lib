@@ -1,8 +1,8 @@
 import SearchCoverModal from '@/components/SearchCoverModal';
-import { File } from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { Artist, deleteArtist, getArtistById, updateArtist } from '@/db/ArtistsManager';
@@ -48,11 +48,15 @@ async function saveChanges(artist:Artist, title: string, old_cover:File | null, 
     if(old_cover && new_cover){
         let uri = ""
         try{
+            //image -> image
             const oldCovValue = old_cover.bytesSync()
             if (oldCovValue != new_cover.bytesSync()){
                 //nouvelle image
-                uri = old_cover.uri
-                new_cover.moveSync(old_cover, { overwrite: true })
+                old_cover.delete()
+                const dir = new Directory(Paths.document, 'playlistCover');
+                const finalFile = new File(dir.uri + `/${artist.id}_${Date.now()}.jpg`);
+                new_cover.moveSync(finalFile, { overwrite: true })
+                uri = new_cover.uri
             }
             else{
                 new_cover.delete()
@@ -118,16 +122,23 @@ export default function artistSettings() {
             setCoverKey(Date.now());
         }
     }
-    
-    useEffect(() => {
-        getArtistById(Number(params.id)).then(result => {
-            if (result) {
-                setArtist(result);
-                setOldCover(new File(result.cover))
-                setName(result.name)
+
+    useFocusEffect(
+        useCallback(() => {
+            async function loadInfo(){
+                const result = await getArtistById(Number(params.id))
+                if (result) {
+                    setArtist(result)
+                    setOldCover(new File(result.cover))
+                    setName(result.name)
+                };
             }
-        });
-    }, []);
+            loadInfo()
+        }, [Number(params.id)])
+    );
+    if (!artist){
+        return null
+    };
     
 
     return (

@@ -1,6 +1,6 @@
 import SearchCoverModal from '@/components/SearchCoverModal';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import { File } from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
@@ -30,17 +30,22 @@ async function saveChanges(playlist:Playlist, songs:Song[], title: string, old_c
     if(old_cover && new_cover){
         let uri = ""
         try{
+            //image -> image
             const oldCovValue = old_cover.bytesSync()
             if (oldCovValue != new_cover.bytesSync()){
                 //nouvelle image
-                uri = old_cover.uri
-                new_cover.moveSync(old_cover, { overwrite: true })
+                old_cover.delete()
+                const dir = new Directory(Paths.document, 'playlistCover');
+                const finalFile = new File(dir.uri + `/${playlist.id}_${Date.now()}.jpg`);
+                new_cover.moveSync(finalFile, { overwrite: true })
+                uri = new_cover.uri
             }
             else{
                 new_cover.delete()
             }
         }
         catch{
+            //Nothing -> new image
             new_cover.moveSync(new File(new_cover.uri.replace("-temp", "")), { overwrite: true })
             uri = new_cover.uri
         }
@@ -216,7 +221,8 @@ const styles = StyleSheet.create({
     header: {
         flex: 1,
         flexDirection: 'row-reverse',
-        maxHeight: 40,
+        maxHeight: 45,
+        minHeight: 45,
         alignItems: 'center',
     },
     btn_sm: {
