@@ -2,8 +2,11 @@ import { colors } from "@/styles/global";
 import { LinearGradient } from "expo-linear-gradient";
 import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { addPlaylist, Playlist } from "@/db/PlaylistsManager";
+import { getLastPlaylistId } from "@/db/DBManager";
+import { addPlaylist, Playlist, reserved } from "@/db/PlaylistsManager";
 import { useState } from "react";
+
+const limit = reserved + 1
 
 type SongOptionsModalProps = {
     visible: boolean;
@@ -11,16 +14,19 @@ type SongOptionsModalProps = {
 };
 
 async function addNewPlst(name:string){
-    const newPlaylist:Playlist = {
-        id: 0,
-        name: name,
-        cover: "",
-        last_time_played: new Date().toISOString(),
-        time_listened: 0,
-        time_started: 0
+    if (name != ""){
+        const lastPlstId = await getLastPlaylistId() ?? -limit    
+        const newPlaylist:Playlist = {
+            id: limit + Number(lastPlstId),
+            name: name,
+            cover: "",
+            last_time_played: new Date().toISOString(),
+            time_listened: 0,
+            time_started: 0
+        }
+        await addPlaylist(newPlaylist)
+        console.log("Adding new Playlist : ", name)
     }
-    await addPlaylist(newPlaylist)
-    console.log("Adding new Playlist : ", name)
 }
 
 
@@ -60,6 +66,7 @@ export default function CreatPlaylistModal ({ visible, onClose }: SongOptionsMod
                   </View>
                   <TouchableOpacity style={styles.btn} onPress={async () => {
                                               await addNewPlst(name)
+                                              setName("")
                                               onClose()
                                           }}>                            
                       <Text style={styles.btn_text}>Create playlist</Text>

@@ -1,9 +1,11 @@
 import { addAlbum, Album, getAlbumByName } from '@/db/AlbumsManager';
 import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
 import { addArtist, Artist, getArtistByName } from '@/db/ArtistsManager';
+import { addPlaylist, deletePlaylist, getPlaylistById } from '@/db/PlaylistsManager';
 import { addSongAlbum } from '@/db/SongsAlbumsManager';
 import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
+import { addSongPlaylist, getSongPlaylistById, SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { Directory, File } from 'expo-file-system';
 import { getAudioMetaData } from '../../modules/audio-metadata';
 
@@ -25,6 +27,19 @@ export async function updateSongs() {
     console.log("Checking for missing songs..")
     const localSongs: File[] = await getMp3Files() 
     //Check if a song isn't saved in the DB
+    const allSongsPlaylist = await getPlaylistById(1)
+    if (allSongsPlaylist != null){
+        deletePlaylist(allSongsPlaylist)
+    }
+    const firstPlaylistId = await addPlaylist({
+        id:1,
+        cover: "",
+        name: "All songs",
+        last_time_played: new Date().toISOString(),
+        time_listened: 0,
+        time_started: 0
+    })
+
     for (const song of localSongs) {
         if (song.exists && song.extension == ".mp3"){
             if(!await getSongByFilePath(song.uri)) {
@@ -121,12 +136,24 @@ export async function updateSongs() {
                         artist_id:lastArtistId
                     }
                     const has_already = await getAlbumArtistById(newAlbArt)
-                    console.warn(has_already)
                     if(has_already == null){
                         await addAlbumArtist(newAlbArt)
                     }       
                 }
-                
+                if (firstPlaylistId != null){
+                    const newSongPlst:SongPlaylist = {
+                        song_id:lastSongId,
+                        playlist_id:firstPlaylistId
+                    }
+                    const songInAllPlst = await getSongPlaylistById(newSongPlst)
+                    console.warn(songInAllPlst)
+                    if(songInAllPlst == null){
+                        await addSongPlaylist(newSongPlst)
+                    }
+                }
+                else {
+                    console.log("skip")
+                }
             }
         }
     };

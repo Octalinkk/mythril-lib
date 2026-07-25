@@ -22,6 +22,13 @@ export async function initDatabase(): Promise<void> {
 
     console.log('DB builded');
 }
+
+export async function getLastPlaylistId(){
+    const db = await getDb();
+    const row = db.getFirstAsync<number>(`SELECT seq FROM sqlite_sequence WHERE name = 'playlists'`)
+    if (!row) return null; else return row
+}
+
 async function createSongsTable(db: SQLiteDatabase) {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS songs (
@@ -114,3 +121,4 @@ async function createSongsPlaylistsTable(db: SQLiteDatabase) {
         );
     `);
 }
+

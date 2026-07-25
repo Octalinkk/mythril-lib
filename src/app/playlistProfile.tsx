@@ -15,8 +15,12 @@ import { colors, globalStyles } from '@/styles/global';
 import { SimpleLineIcons } from '@expo/vector-icons';
 
 
-function getCoverSource(cover: string) {
+function getCoverSource(playlist: Playlist) {
+    const cover = playlist.cover
     const file = new File(cover)
+    if(playlist.id == 1){
+        return require('../res/all_songs_cover.png');
+    }
     if (!cover || cover =="") {
         return require('../res/def_cover.png');
     }
@@ -61,6 +65,7 @@ async function updateStatForPlaylist(playlist:Playlist) {
 export default function PlaylistProfile() {
     const params = useLocalSearchParams<{
         id: string;
+        isLocked: "false" | "true"
     }>();
 
     const [playlist, setPlaylist] = useState<Playlist>({
@@ -88,15 +93,35 @@ export default function PlaylistProfile() {
         }, [params.id])
     );
 
-    return (
-        <LinearGradient 
-              style={globalStyles.main_container}
-              colors={[colors.grad_prim, colors.grad_sec, colors.grad_tri]}
-              start={{x:0, y:0}}
-              end={{x:1, y:1}}
-            >
-            <Header />
-            <ScrollView>
+    function getPlayButton() {
+        const mapped_songs = songs.map(song => song.id.toString())
+        if (mapped_songs.length > 0){
+            return (
+                <Link href={{
+                pathname: "/musicPlayer",
+                params: {ids:mapped_songs, softOpen:"false"},
+                }}
+                onPress={async () => {
+                    await updateStatForPlaylist(playlist)                            
+                }} push asChild>
+                    <TouchableOpacity style={styles.btn_play}>
+                        <Text style={styles.btn_text}>Play</Text>
+                    </TouchableOpacity>
+                </Link>
+            )
+        }
+        else {
+            return (
+                <TouchableOpacity style={styles.btn_play}>
+                    <Text style={styles.btn_text}>Play</Text>
+                </TouchableOpacity>
+            )
+        }   
+    }
+
+    function getHeader(){
+        if (!params.isLocked) {
+            return (
                 <View style={styles.header}>
                     <Link href={{
                         pathname: "/playlistSettings",
@@ -107,24 +132,29 @@ export default function PlaylistProfile() {
                         </TouchableOpacity>
                     </Link>
                 </View>
+            )
+        }
+        else{return <View></View>}
+        
+    }
+
+    return (
+        <LinearGradient 
+              style={globalStyles.main_container}
+              colors={[colors.grad_prim, colors.grad_sec, colors.grad_tri]}
+              start={{x:0, y:0}}
+              end={{x:1, y:1}}
+            >
+            <Header />
+            <ScrollView>
+                
                 <View style={styles.main_scroll}>
                     <View style={styles.pfp_container}>
-                        <Image source={getCoverSource(playlist.cover)} style={styles.cover}/>
+                        <Image source={getCoverSource(playlist)} style={styles.cover}/>
                     </View>        
                     <Text style={styles.name}>{playlist.name}</Text>
-                    <View style={styles.play_header}>
-                        <Link href={{
-                        pathname: "/musicPlayer",
-                        params: {ids:songs.map(song => song.id.toString()), softOpen:"false"},
-                        }}
-                        onPress={async () => {
-                            await updateStatForPlaylist(playlist)                            
-                        }} push asChild>
-                            <TouchableOpacity style={styles.btn_play}>
-                                <Text style={styles.btn_text}>Play</Text>
-                            </TouchableOpacity>
-                        </Link>
-                        
+                    <View style={styles.play_header}>                        
+                        {getPlayButton()}
                         <RandomIcon/>
                     </View>
                     {getSongsList(songs, playlist)}

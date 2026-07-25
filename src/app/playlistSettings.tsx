@@ -20,9 +20,6 @@ function getCoverSource(cover: string) {
     return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-
-
-
 async function saveChanges(playlist:Playlist, songs:Song[], title: string, old_cover:File | null, new_cover:File | null){
 
     //update title

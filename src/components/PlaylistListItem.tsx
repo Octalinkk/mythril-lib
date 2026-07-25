@@ -7,13 +7,19 @@ import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type Id = {
+type params = {
   id: number;
+  isLocked?: boolean;
+  displayOnly?: boolean;
 };
 
 
-function getCoverSource(cover: string) {
+function getCoverSource(playlist: Playlist) {
+    const cover = playlist.cover
     const file = new File(cover)
+    if(playlist.id == 1){
+        return require('../res/all_songs_cover.png');
+    }
     if (!cover || cover =="") {
         return require('../res/def_cover.png');
     }
@@ -21,7 +27,7 @@ function getCoverSource(cover: string) {
 }
 
 
-export default function PlaylistListItem (id: Id) {
+export default function PlaylistListItem ({ id, isLocked = false, displayOnly = false }: params) {
 
     const [playlist, setPlaylist] = useState<Playlist>({
         id: 0,
@@ -36,41 +42,67 @@ export default function PlaylistListItem (id: Id) {
     useFocusEffect(
         useCallback(() => {
             async function loadInfo(){
-                const result = await getPlaylistById(id.id)
+                const result = await getPlaylistById(id)
                 if (result) {
                     setPlaylist(result)
-                    getSongCountByPlstId(id.id).then(result => {
+                    getSongCountByPlstId(id).then(result => {
                         if (result) setCount(result.count);
                     });
                 };
             }
             loadInfo()
-        }, [id.id])
+        }, [id])
     );
 
-    return (
-        <Link href={{
-            pathname: "/playlistProfile",
-            params: {id:[playlist.id.toString()]},
-            }}
-            push asChild>
-            <TouchableOpacity style={styles.container}>
-                <Image source={getCoverSource(playlist.cover)} style={styles.image}/>
+    function getContent(){
+        return (
+            <View style={styles.container}>
+                <Image source={getCoverSource(playlist)} style={styles.image}/>
                 <View style={styles.title_container}>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{playlist.name}</Text>
                     <Text style={styles.subtitle}>{count} songs</Text>
                 </View>
-                    <Link href={{
-                        pathname: "/playlistSettings",
-                        params: {id:[playlist.id.toString()]},
-                        }} push asChild>
-                        <TouchableOpacity style={styles.icon}>
-                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                        </TouchableOpacity>
-                    </Link>
-            </TouchableOpacity>
-        </Link>
-    );
+                {displayOptions()}
+            </View>
+        )
+    }
+
+    function displayOptions(){
+        if (!isLocked){
+            return (
+                <Link href={{
+                    pathname: "/playlistSettings",
+                    params: {id:[playlist.id.toString()]},
+                    }} push asChild>
+                    <TouchableOpacity style={styles.icon}>
+                        <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                    </TouchableOpacity>
+                </Link>
+            )
+        }
+        else {return <View style={styles.icon}></View>}
+    }
+
+    if (!displayOnly){
+        return (
+            <Link href={{
+                pathname: "/playlistProfile",
+                params: {id:[playlist.id.toString()]},
+                }}
+                push asChild>
+                <TouchableOpacity>
+                    {getContent()}
+                </TouchableOpacity>
+            </Link>
+        );
+    }
+    else {
+        return (
+            <View>
+                {getContent()}
+            </View>
+        )
+    }
 
 };
 
@@ -92,7 +124,6 @@ const styles = StyleSheet.create({
     },
     title_container: {
         flex:1,
-        flexDirection: 'column'
     },
     title:{
         flex: 0.6,

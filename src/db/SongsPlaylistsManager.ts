@@ -15,6 +15,12 @@ export async function getAllSongsPlaylists() {
     return songsPlaylists;
 }
 
+export async function getSongPlaylistById(song_playlist:SongPlaylist) {
+    const db = await getDb();
+    const rows = await db.getAllAsync<{song_playlist:SongPlaylist}>(`SELECT song_id FROM songs_playlists WHERE song_id = ? AND playlist_id = ?`, [song_playlist.song_id, song_playlist.playlist_id]);
+    if (rows.length > 0) return rows; else return null
+}
+
 export async function getPlaylistsBySongId(song_id:number) {
     const db = await getDb();
     const rows = await db.getAllAsync<{ playlist_id: number }>(`SELECT playlist_id FROM songs_playlists WHERE song_id = ?`, [song_id]);

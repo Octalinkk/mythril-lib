@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import CreatPlaylistModal from '@/components/addPlaylist';
 import FloatingPlayer from '@/components/floatingPlayer';
 import PlaylistListItem from '@/components/PlaylistListItem';
-import { getAllPlaylists, Playlist } from '@/db/PlaylistsManager';
+import { getAllCustomPlaylists, getAllSystemPlaylists, Playlist } from '@/db/PlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
@@ -17,23 +17,35 @@ function getPlaylistLST(playlists: Playlist[]){
     return playlists.map(playlist => <PlaylistListItem id={playlist.id} key={"playlist_item:"+playlist.id}/>)
   }
   else{
-    return (<Text>Press + to add a new playlist</Text>)
+    return (<Text style={styles.filler_text}>Press + to add a new playlist</Text>)
+  }
+}
+
+function getSystemPlaylistLST(playlists: Playlist[]){  
+  if (playlists.length !== 0){
+    return playlists.map(playlist => <PlaylistListItem id={playlist.id} isLocked={true} key={"sys_playlist_item:"+playlist.id}/>)
   }
 }
 
 export default function PlaylistScreen() {
 
   const [playlists, setPlaylists] = useState<Playlist[]>([])
+  const [sysPlaylists, setSysPlaylists] = useState<Playlist[]>([])
   const [visible, setVisible] = useState<boolean>(false)
 
   //TODO quand tu ajoute une playliste, ouvre
 
   useFocusEffect(
     useCallback(() =>{
-      async function loadInfo(){
-          const result = await getAllPlaylists()
-          if (result) {
-              setPlaylists(result)              
+      async function loadInfo(){        
+          const plSys = await getAllSystemPlaylists()
+          if (plSys) {
+              setSysPlaylists(plSys)              
+          };
+
+          const plCustom = await getAllCustomPlaylists()
+          if (plCustom) {
+              setPlaylists(plCustom)              
           };
       }
       loadInfo()
@@ -59,6 +71,10 @@ export default function PlaylistScreen() {
       <Header />
 
       <ScrollView style={styles.main_scroll}>
+
+        <View style={styles.container}>
+          {getSystemPlaylistLST(sysPlaylists)}
+        </View>
 
         <View style={styles.header}>          
           <Text style={styles.title}>Your playlist</Text>
