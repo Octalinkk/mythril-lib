@@ -14,6 +14,8 @@ Free, no ads, no subscription, no nothing. It's a pation project I do on the sid
 1. Download the [ZIP](https://github.com/Octalinkk/mythril-lib/releases/tag/v0.1.1-beta) and extract it 
 2. Install the .apk
 
+If you have any trouble installing th enewer version, you might need to delete and re-install the app. For now, it's not a big deal but it taken care of (i hope) for the first release.
+
 ## What's Next?
 
 - UI customisation
