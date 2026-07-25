@@ -32,7 +32,7 @@ async function updateAlbumStats(album:Album){
 
 function getSongsList(album:Album, songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} onLinkClick={() => updateAlbumStats(album)} key={"listed_song:"+song.id}/>)
+        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} onLinkClick={async () => await updateAlbumStats(album)} key={"listed_song:"+song.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>None located for this album</Text>

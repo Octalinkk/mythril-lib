@@ -209,7 +209,7 @@ export default function MusicPlayer() {
                     if (curr_song.current != null){
                         curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
                         curr_song.current.time_started += 1
-                        curr_song.current.last_time_played += new Date().toISOString()
+                        curr_song.current.last_time_played = new Date().toISOString()
                         curr_artists.current.map(artist => artist.time_started += 1)
                         curr_artists.current.map(artist => artist.last_time_played = new Date().toISOString())
                         setCurrDisplaySong(curr_song.current)
@@ -243,7 +243,7 @@ export default function MusicPlayer() {
                         <Text style={styles.artists}>{getArtistName(curr_display_artists)}</Text>
                     </View>
                     <View style={styles.random_container}>                        
-                        <RandomIcon isShuffled={shuffle} />
+                        <RandomIcon/>
                         <Text style={styles.dur}>{getSongDuration(duration)}</Text>
                     </View>                 
                 </View>

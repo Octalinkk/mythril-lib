@@ -5,7 +5,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
-export default function RandomIcon({ isShuffled }: { isShuffled: boolean }) {
+export default function RandomIcon() {
     
     const [shuffle, setShuffle] = useState<boolean>(TrackPlayer.isShuffleEnabled())
 

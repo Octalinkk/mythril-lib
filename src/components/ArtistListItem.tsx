@@ -63,7 +63,7 @@ export default function ArtistListItem (id: Id) {
                         setCountSong(cntSongs.count)
                         const cntAlbums = await getAlbumCountById(result.id)
                         if(cntAlbums) {
-                            setCountAlbum(cntSongs.count)
+                            setCountAlbum(cntAlbums.count)
                         }
                     }
                     else{

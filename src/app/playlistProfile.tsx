@@ -8,7 +8,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import FloatingPlayer from '@/components/floatingPlayer';
 import RandomIcon from '@/components/RandomIcon';
 import SongListItem from '@/components/SongListItem';
-import { getPlaylistById, Playlist } from '@/db/PlaylistsManager';
+import { getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager';
 import { getSongById, Song } from '@/db/SongsManager';
 import { getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
@@ -23,7 +23,7 @@ function getCoverSource(cover: string) {
     return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-function getSongsList(songs:Song[]){
+function getSongsList(songs:Song[], playlist:Playlist){
     if (songs.length > 0){
         return songs.map(song => {
             let all = songs
@@ -33,7 +33,7 @@ function getSongsList(songs:Song[]){
                 const [item] = all.splice(index, 1);
                 all.unshift(item); // L'ajoute au début
             }
-            return <SongListItem song_id={song.id} play_ids={all.map(song => song.id)} key={"listed_song:"+song.id}/>
+            return <SongListItem song_id={song.id} play_ids={all.map(song => song.id)} onLinkClick={async () => await updateStatForPlaylist(playlist)} key={"listed_song:"+song.id}/>
         })
     }
     else{
@@ -49,6 +49,13 @@ async function getSongsforPlaylist(id:number){
         songsId.map(id => getSongById(+id))
     );
     return songs.filter((songs): songs is Song => songs !== null);
+}
+
+async function updateStatForPlaylist(playlist:Playlist) {
+    playlist.last_time_played = new Date().toISOString()
+    playlist.time_started += 1
+    await updatePlaylist(playlist)
+    console.log(playlist)
 }
 
 export default function PlaylistProfile() {
@@ -111,16 +118,16 @@ export default function PlaylistProfile() {
                         params: {ids:songs.map(song => song.id.toString()), softOpen:"false"},
                         }}
                         onPress={async () => {
-                            
+                            await updateStatForPlaylist(playlist)                            
                         }} push asChild>
                             <TouchableOpacity style={styles.btn_play}>
                                 <Text style={styles.btn_text}>Play</Text>
                             </TouchableOpacity>
                         </Link>
                         
-                        <RandomIcon isShuffled={shuffle} />
+                        <RandomIcon/>
                     </View>
-                    {getSongsList(songs)}
+                    {getSongsList(songs, playlist)}
                 </View>
             </ScrollView>
             <FloatingPlayer />

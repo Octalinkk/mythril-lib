@@ -25,7 +25,7 @@ export async function getAllPlaylists() {
 
 export async function getMostRecentPlst() {
     const db = await getDb();
-    const rows = await db.getAllAsync<Playlist>('SELECT * FROM playlists ORDER BY last_time_played DESC LIMIT 6');
+    const rows = await db.getAllAsync<Playlist>('SELECT * FROM playlists ORDER BY last_time_played DESC LIMIT 5');
     const playlists: Playlist[] = rows.map(row => ({
         id: row.id,
         name: row.name,
