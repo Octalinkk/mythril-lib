@@ -26,6 +26,8 @@ export default function PlaylistScreen() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [visible, setVisible] = useState<boolean>(false)
 
+  //TODO quand tu ajoute une playliste, ouvre
+
   useFocusEffect(
     useCallback(() =>{
       async function loadInfo(){

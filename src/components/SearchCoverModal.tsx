@@ -1,6 +1,7 @@
 import { Artist, getArtistById } from "@/db/ArtistsManager";
 import { getSongById, Song } from "@/db/SongsManager";
 import { colors } from "@/styles/global";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import { Album, getAlbumById } from "@/db/AlbumsManager";
 import { getPlaylistById, Playlist } from "@/db/PlaylistsManager";
 import { getArtistsBySongId } from "@/db/SongsArtistsManager";
 import { Directory, File, Paths } from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 type SongOptionsModalProps = {
@@ -139,42 +141,90 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
         }, true);
     `;
 
+    function getDestination():File{
+        let dir
+        let destination = new File
+        if (target == "song"){
+            dir = new Directory(Paths.document, 'songCover')
+            if (!dir.exists){
+                dir.create()                    
+            }
+            destination = new File (dir.uri + `/${song.id}-temp.jpg`)
+        }
+        else if (target == "artist"){
+            dir = new Directory(Paths.document, 'artistProfil')
+            if (!dir.exists){
+                dir.create()                    
+            }
+            destination = new File (dir.uri + `/${artist.id}-temp.jpg`)
+        }
+        else if (target == "album"){
+            dir = new Directory(Paths.document, 'albumCover')
+            if (!dir.exists){
+                dir.create()                    
+            }
+            destination = new File (dir.uri + `/${album.id}-temp.jpg`)
+        }
+        else if (target == "playlist"){
+            dir = new Directory(Paths.document, 'playlistCover')
+            if (!dir.exists){
+                dir.create()                    
+            }
+            destination = new File (dir.uri + `/${playlist.id}-temp.jpg`)
+        }
+        return destination
+    }
+
+    async function getLocalImage(){
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsMultipleSelection: false,
+            allowsEditing: true,
+            quality: 1,
+            defaultTab: "albums",
+        })
+
+        if (result != null && result.assets?.length !== 0 && !result.canceled) {
+            
+            const destination = getDestination()
+            if(destination) {
+                if(destination.exists){
+                    await destination.delete()
+                }
+                try {                
+                    let output = new File(result.assets[0].uri)
+                    output.moveSync(destination)
+                    if (output.exists && output.uri != "" && output.uri){
+                        if (target == "song"){
+                            song.cover = output.uri
+                        }
+                        if (target == "artist"){
+                            artist.cover = output.uri
+                        }
+                        if (target == "album"){
+                            album.cover = output.uri
+                        }
+                        if (target == "playlist"){
+                            playlist.cover = output.uri
+                        }
+                        await returnFileResult(output)
+                    }
+                } catch (error) {
+                    
+                }
+            }
+        }
+        closeSearch()
+        onClose()
+    }
+
     async function onMessage(event: WebViewMessageEvent) {
         if(!used_event.current){
             used_event.current = true
             const imageUrl = event.nativeEvent.data
             if (imageUrl && imageUrl != ""){
-                let dir
-                let destination
-                if (target == "song"){
-                    dir = new Directory(Paths.document, 'songCover')
-                    if (!dir.exists){
-                        dir.create()                    
-                    }
-                    destination = new File (dir.uri + `/${song.id}-temp.jpg`)
-                }
-                else if (target == "artist"){
-                    dir = new Directory(Paths.document, 'artistProfil')
-                    if (!dir.exists){
-                        dir.create()                    
-                    }
-                    destination = new File (dir.uri + `/${artist.id}-temp.jpg`)
-                }
-                else if (target == "album"){
-                    dir = new Directory(Paths.document, 'albumCover')
-                    if (!dir.exists){
-                        dir.create()                    
-                    }
-                    destination = new File (dir.uri + `/${album.id}-temp.jpg`) //a changer 
-                }
-                else if (target == "playlist"){
-                    dir = new Directory(Paths.document, 'playlistCover')
-                    if (!dir.exists){
-                        dir.create()                    
-                    }
-                    destination = new File (dir.uri + `/${playlist.id}-temp.jpg`) //a changer
-                }
                 
+                const destination = getDestination()
                 if(destination) {
                     if(destination.exists){
                         await destination.delete()
@@ -251,6 +301,12 @@ export default function SearchCoverModal ({ visible, onClose, id, returnFileResu
                             
                             <View  style={styles.btn_text}><Text   style={styles.text}>Search Online</Text></View>
                         </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.btn} onPress={getLocalImage}>
+                            <View  style={styles.btn_icon}><FontAwesome5 name="folder" size={24} color="black" /></View>
+                            
+                            <View  style={styles.btn_text}><Text   style={styles.text}>Search on Device</Text></View>
+                        </TouchableOpacity>
                 </LinearGradient>
             </View>
             </Modal>
@@ -282,7 +338,8 @@ const styles = StyleSheet.create({
         backgroundColor: "red",
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
-        padding: 40
+        padding: 40,
+        gap:20
     },
     btn: {
         flex:1,
