@@ -1,6 +1,6 @@
 import { getDb } from "./DBManager"
 
-export const reserved = 5
+export let reserved = 1
 
 export interface Playlist {
     id:number
@@ -9,6 +9,17 @@ export interface Playlist {
     last_time_played:string 
     time_listened: number
     time_started: number
+}
+
+export function setReservedPlaylistLimit(num:number|null){
+    if (num){
+        reserved = num
+    }
+    
+}
+
+export function sgetReservedPlaylistLimit():number{
+    return reserved
 }
 
 export async function getAllPlaylists() {
@@ -95,7 +106,7 @@ export async function addPlaylist(playlist:Playlist) {
             [playlist.name, playlist.cover, playlist.last_time_played, playlist.time_listened, playlist.time_started])
             if (!result) return null; else return result.lastInsertRowId
         }
-        else {
+        else{
             const result = await db.runAsync(`INSERT INTO playlists (id, name, cover, last_time_played, time_listened, time_started) VALUES (?, ?, ?, ?, ?, ?)`, 
             [playlist.id, playlist.name, playlist.cover, playlist.last_time_played, playlist.time_listened, playlist.time_started])
             if (!result) return null; else return result.lastInsertRowId

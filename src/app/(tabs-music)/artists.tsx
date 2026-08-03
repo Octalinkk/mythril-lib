@@ -2,7 +2,6 @@
 import Header from '@/components/Header';
 import { useCallback } from 'react';
 
-import CreatPlaylistModal from '@/components/addPlaylist';
 import ArtistItem from '@/components/ArtistItem';
 import FloatingPlayer from '@/components/floatingPlayer';
 import { Artist, getAllArtistsOrdered } from '@/db/ArtistsManager';
@@ -10,21 +9,9 @@ import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-function getRecentArtists(artists:Artist[]){
-  let artist = []
 
-  if (artists.length > 0){
-    for (const item of artists) {
-        artist.push(<ArtistItem artist_id={item.id} key={"artist:"+item.id}/>)
-    }
-  }
-  else {
-    artist.push(<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>)
-  }
-  return artist
-}
 export default function ArtistsScreen() {
 
   const [artists, setArtist] = useState<Artist[]>([]);
@@ -55,18 +42,24 @@ export default function ArtistsScreen() {
       end={{x:1, y:1}}
     >
       <Header />
-
-      <ScrollView style={styles.main_scroll}>
-
-        <View style={styles.header}>          
-          <Text style={styles.title}>Artists</Text>
-          <CreatPlaylistModal visible={visible} onClose={closeCreate}/>
-        </View>
-        <View style={styles.items_container_md}>
-          {getRecentArtists(artists)}
-        </View>
-          
-      </ScrollView>
+      <FlatList 
+      style={styles.main_scroll}
+      data={artists}
+      // TODO joue toute les musique en commençant par 1 car play_ids. Refaire tout le systeme de lecture pour faire en sorte mettre ll'ID de la musique séléctionné en premier (pas déplacer mais ajuster l'ID)
+      renderItem={({item}) => <ArtistItem artist_id={item.id} />}
+      keyExtractor={item => "artist:"+item.id}
+      ListHeaderComponent={
+          <View>
+              <View style={styles.header}>          
+                <Text style={styles.title}>Artists</Text>
+              </View>
+          </View>
+      }      
+      numColumns={2}
+      ListEmptyComponent={<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>}     
+      ItemSeparatorComponent={<View style={{height:20}}></View>}     
+      columnWrapperStyle={{ gap: 20 }}
+      />
       <FloatingPlayer />
     </LinearGradient>
   );
@@ -78,6 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20
   },
   title: {
     flex: 0.9,

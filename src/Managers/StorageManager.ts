@@ -1,7 +1,8 @@
 import { addAlbum, Album, getAlbumByName } from '@/db/AlbumsManager';
 import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
 import { addArtist, Artist, getArtistByName } from '@/db/ArtistsManager';
-import { addPlaylist, deletePlaylist, getPlaylistById } from '@/db/PlaylistsManager';
+import { getLastPlaylistId } from '@/db/DBManager';
+import { addPlaylist, getPlaylistById, setReservedPlaylistLimit } from '@/db/PlaylistsManager';
 import { addSongAlbum } from '@/db/SongsAlbumsManager';
 import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
@@ -27,18 +28,24 @@ export async function updateSongs() {
     console.log("Checking for missing songs..")
     const localSongs: File[] = await getMp3Files() 
     //Check if a song isn't saved in the DB
+    let firstPlaylistId
     const allSongsPlaylist = await getPlaylistById(1)
-    if (allSongsPlaylist != null){
-        deletePlaylist(allSongsPlaylist)
+    if (allSongsPlaylist == null){
+        await addPlaylist({
+            id:1,
+            cover: "",
+            name: "All songs",
+            last_time_played: new Date().toISOString(),
+            time_listened: 0,
+            time_started: 0
+        })
+        firstPlaylistId = await getLastPlaylistId()
     }
-    const firstPlaylistId = await addPlaylist({
-        id:1,
-        cover: "",
-        name: "All songs",
-        last_time_played: new Date().toISOString(),
-        time_listened: 0,
-        time_started: 0
-    })
+    else {
+        firstPlaylistId = allSongsPlaylist.id
+    }
+    
+    setReservedPlaylistLimit(1)
 
     for (const song of localSongs) {
         if (song.exists && song.extension == ".mp3"){
@@ -71,7 +78,7 @@ export async function updateSongs() {
                 }
 
                 if (metadata) {
-                    if(metadata.title) {newSong.name = metadata.title}
+                    if(metadata.title && metadata.title.replaceAll(" ", "").replaceAll("\n", "") != "") {newSong.name = metadata.title} else {newSong.name = song.name.replace(".mp3", "")}
                     if(metadata.artist && metadata.artist.replaceAll(" ", "").replaceAll("\n", "") != "") {newArtist.name = metadata.artist}
                     if(metadata.album && metadata.album.replaceAll(" ", "").replaceAll("\n", "") != "") {newAlbum.name = metadata.album}
                 }

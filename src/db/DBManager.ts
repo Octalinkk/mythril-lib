@@ -25,8 +25,9 @@ export async function initDatabase(): Promise<void> {
 
 export async function getLastPlaylistId(){
     const db = await getDb();
-    const row = db.getFirstAsync<number>(`SELECT seq FROM sqlite_sequence WHERE name = 'playlists'`)
-    if (!row) return null; else return row
+    const row = await db.getFirstAsync<{ seq: number }>(`SELECT seq FROM sqlite_sequence WHERE name = 'playlists'`)
+    if (!row) return null 
+    return row.seq
 }
 
 async function createSongsTable(db: SQLiteDatabase) {

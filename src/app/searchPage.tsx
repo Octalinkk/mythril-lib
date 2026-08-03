@@ -8,12 +8,12 @@ import SongListItem from '@/components/SongListItem';
 import { Album, getAllAlbums } from '@/db/AlbumsManager';
 import { Artist, getAllArtists } from '@/db/ArtistsManager';
 import { getAllSongs, Song } from '@/db/SongsManager';
-import { colors } from '@/styles/global';
+import { colors, globalStyles } from '@/styles/global';
 
 function getFilteredSongList(songs: Song[], filter:string){
     const filteredSongs = songs.filter((song) => song.name.toLowerCase().includes(filter.toLowerCase()))
     if (filteredSongs.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
-    if (filteredSongs.length > 100){return filteredSongs.slice(0, 100).map(song => <SongListItem song_id={song.id} play_ids={[]} key={"searched_song:"+song.id}/>)}
+    if (filteredSongs.length > 10){return filteredSongs.slice(0, 10).map(song => <SongListItem song_id={song.id} play_ids={[]} key={"searched_song:"+song.id}/>)}
     else{return filteredSongs.map(song => <SongListItem song_id={song.id} play_ids={[]} key={"searched_song:"+song.id}/>)}
     
 }
@@ -21,7 +21,7 @@ function getFilteredSongList(songs: Song[], filter:string){
 function getFilteredArtistList(artists: Artist[], filter:string){
     const filteredArtists = artists.filter((artist) => artist.name.toLowerCase().includes(filter.toLowerCase()))
     if (filteredArtists.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
-    if (filteredArtists.length > 100){return filteredArtists.slice(0, 100).map(artist => <ArtistListItem artist_id={artist.id} key={"searched_artist:"+artist.id}/>)}
+    if (filteredArtists.length > 10){return filteredArtists.slice(0, 10).map(artist => <ArtistListItem artist_id={artist.id} key={"searched_artist:"+artist.id}/>)}
     else{return filteredArtists.map(artist => <ArtistListItem artist_id={artist.id} key={"searched_artist:"+artist.id}/>)}
     
 }
@@ -29,7 +29,7 @@ function getFilteredArtistList(artists: Artist[], filter:string){
 function getFilteredAlbumList(albums: Album[], filter:string){
     const filteredAlbums = albums.filter((album) => album.name.toLowerCase().includes(filter.toLowerCase()))
     if (filteredAlbums.length <= 0){return <Text style={styles.filler_text}>None found</Text>}
-    if (filteredAlbums.length > 100){return filteredAlbums.slice(0, 100).map(album => <AlbumListItem id={album.id} key={"searched_album:"+album.id}/>)}
+    if (filteredAlbums.length > 10){return filteredAlbums.slice(0, 10).map(album => <AlbumListItem id={album.id} key={"searched_album:"+album.id}/>)}
     else{return filteredAlbums.map(album => <AlbumListItem id={album.id} key={"searched_album:"+album.id}/>)}
     
 }
@@ -67,36 +67,39 @@ export default function SearchScreen() {
 
     return (
         <LinearGradient 
-              style={styles.main_container}
+        
+              style={globalStyles.main_container}
               colors={[colors.grad_prim, colors.grad_sec, colors.grad_tri]}
               start={{x:0, y:0}}
               end={{x:1, y:1}}
             >
-            <View style={styles.header}>
-                <TextInput
-                    style={styles.search_input}
-                    onChangeText={(text) => setName(text)}
-                    inputMode='text'
-                    placeholder="Search: Songs, Artists or Albums"
-                    placeholderTextColor ={colors.secondary}
-                />
-            </View>
-            <ScrollView >
-                <View style={styles.main_scroll}>
-                    <Text style={styles.title}>Songs</Text>
-                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
-                        {getFilteredSongList(songs, name)}
-                    </Suspense>
-                    <Text style={styles.title}>Artists</Text>
-                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
-                        {getFilteredArtistList(artists, name)}
-                    </Suspense>
-                    <Text style={styles.title}>Albums</Text>
-                    <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
-                        {getFilteredAlbumList(albums, name)}
-                    </Suspense>
+            <View style={styles.main_container}>
+                <View style={styles.header}>
+                    <TextInput
+                        style={styles.search_input}
+                        onChangeText={(text) => setName(text)}
+                        inputMode='text'
+                        placeholder="Search: Songs, Artists or Albums"
+                        placeholderTextColor ={colors.secondary}
+                    />
                 </View>
-            </ScrollView>
+                <ScrollView >
+                    <View style={styles.main_scroll}>
+                        <Text style={styles.title}>Songs</Text>
+                        <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                            {getFilteredSongList(songs, name)}
+                        </Suspense>
+                        <Text style={styles.title}>Artists</Text>
+                        <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                            {getFilteredArtistList(artists, name)}
+                        </Suspense>
+                        <Text style={styles.title}>Albums</Text>
+                        <Suspense fallback={<Text style={{backgroundColor: 'red'}}>Loading...</Text>}>
+                            {getFilteredAlbumList(albums, name)}
+                        </Suspense>
+                    </View>
+                </ScrollView>
+            </View>
         </LinearGradient>
     )
 }
@@ -104,8 +107,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({  
     main_container: {
         flex: 1,
-        paddingTop: 50,
-        marginBottom:50
+        marginBottom: 50
     },
     header: {
         flex: 1,

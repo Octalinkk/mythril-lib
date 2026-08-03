@@ -4,27 +4,14 @@ import { useCallback } from 'react';
 
 import AlbumListItem from '@/components/AlbumListItem';
 import FloatingPlayer from '@/components/floatingPlayer';
-import { Album, getAllAlbumsOrdered } from '@/db/AlbumsManager';
+import { getAllAlbumsOrdered } from '@/db/AlbumsManager';
 import { Artist } from '@/db/ArtistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-function getRecentAlbums(albums:Album[]){
-  let album = []
-
-  if (albums.length > 0){
-    for (const item of albums) {
-        album.push(<AlbumListItem id={item.id} key={"album:"+item.id}/>)
-    }
-  }
-  else {
-    album.push(<Text style={styles.filler_text}  key={"album:None"}>No Album found</Text>)
-  }
-  return album
-}
 export default function AlbumsScreen() {
 
   const [albums, setAlbums] = useState<Artist[]>([]);
@@ -46,17 +33,21 @@ export default function AlbumsScreen() {
       end={{x:1, y:1}}
     >
       <Header />
-
-      <ScrollView style={styles.main_scroll}>
-
-        <View style={styles.header}>          
-          <Text style={styles.title}>Albums</Text>
-        </View>
-        <View style={styles.items_container}>
-          {getRecentAlbums(albums)}
-        </View>
-          
-      </ScrollView>
+      <FlatList 
+            style={styles.items_container}
+            data={albums}
+            // TODO joue toute les musique en commençant par 1 car play_ids. Refaire tout le systeme de lecture pour faire en sorte mettre ll'ID de la musique séléctionné en premier (pas déplacer mais ajuster l'ID)
+            renderItem={({item}) => <AlbumListItem id={item.id}/>}
+            keyExtractor={item => "album:"+item.id}
+            ListHeaderComponent={
+                <View style={styles.header}>          
+                  <Text style={styles.title}>Albums</Text>
+                </View>
+            }      
+            ListEmptyComponent={<Text style={styles.filler_text}  key={"album:None"}>No Album found</Text>}     
+            ItemSeparatorComponent={<View style={{height:10}}></View>}     
+            />
+            <FloatingPlayer />
       <FloatingPlayer />
     </LinearGradient>
   );
@@ -68,6 +59,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20
   },
   title: {
     flex: 0.9,

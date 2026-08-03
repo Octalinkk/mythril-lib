@@ -3,7 +3,7 @@ import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import FloatingPlayer from '@/components/floatingPlayer';
 import RandomIcon from '@/components/RandomIcon';
@@ -27,23 +27,6 @@ function getCoverSource(playlist: Playlist) {
     return { uri: `${cover}?cache=${Date.now()}` };
 }
 
-function getSongsList(songs:Song[], playlist:Playlist){
-    if (songs.length > 0){
-        return songs.map(song => {
-            let all = songs
-            const index = all.findIndex(item => item === song);
-
-            if (index !== -1) {
-                const [item] = all.splice(index, 1);
-                all.unshift(item); // L'ajoute au début
-            }
-            return <SongListItem song_id={song.id} play_ids={all.map(song => song.id)} onLinkClick={async () => await updateStatForPlaylist(playlist)} key={"listed_song:"+song.id}/>
-        })
-    }
-    else{
-        return <Text style={styles.filler_text}>Playlist empty</Text>
-    }
-}
 
 async function getSongsforPlaylist(id:number){
     const songsId = await Promise.resolve(
@@ -146,9 +129,14 @@ export default function PlaylistProfile() {
               end={{x:1, y:1}}
             >
             <Header />
-            <ScrollView>
-                
-                <View style={styles.main_scroll}>
+            <FlatList 
+            style={styles.main_scroll}
+            data={songs}
+            // TODO joue toute les musique en commençant par 1 car play_ids. Refaire tout le systeme de lecture pour faire en sorte mettre ll'ID de la musique séléctionné en premier (pas déplacer mais ajuster l'ID)
+            renderItem={({item}) => <SongListItem song_id={item.id} play_ids={songs.map(item => item.id)} onLinkClick={async () => await updateStatForPlaylist(playlist)}/>}
+            keyExtractor={item => "listed_song:"+item.id}
+            ListHeaderComponent={
+                <View>
                     <View style={styles.pfp_container}>
                         <Image source={getCoverSource(playlist)} style={styles.cover}/>
                     </View>        
@@ -157,11 +145,14 @@ export default function PlaylistProfile() {
                         {getPlayButton()}
                         <RandomIcon/>
                     </View>
-                    {getSongsList(songs, playlist)}
                 </View>
-            </ScrollView>
+            }      
+            ListEmptyComponent={<Text style={styles.filler_text}>Playlist empty</Text>}     
+            ItemSeparatorComponent={<View style={{height:10}}></View>}     
+            initialNumToRender={5}
+            />
             <FloatingPlayer />
-            <View style={{marginBottom:50}}></View>
+            <View style={{height:50}}></View>
         </LinearGradient>
     )
 }

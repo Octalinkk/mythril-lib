@@ -73,7 +73,7 @@ export default function PlaylistScreen() {
       <ScrollView style={styles.main_scroll}>
 
         <View style={styles.container}>
-          {getSystemPlaylistLST(sysPlaylists)}
+          <PlaylistListItem id={1} isLocked={true} key={"sys_playlist_item:1"}/>
         </View>
 
         <View style={styles.header}>          
