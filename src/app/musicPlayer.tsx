@@ -157,11 +157,13 @@ export default function MusicPlayer() {
             // Ici que ça fait la détection de si la même musique ou pas
             //Switch from Song -> Playlist
             if (TrackPlayer.getQueue().length == 1 && all_songs.length > 1 && areSame){
-                TrackPlayer.addMediaItems(all_songs.slice(1))
+                const index = all_songs.findIndex(function(song) { return song.mediaId === TrackPlayer.getActiveMediaItem()?.mediaId})
+                console.log(index)
+                await TrackPlayer.addMediaItems(all_songs.slice(index+1))
+                console.log(TrackPlayer.getQueue())
             }
             //Switch from Playlist -> Song
             else if (TrackPlayer.getQueue().length > 1 && all_songs.length == 1 && areSame && params.softOpen == "false"){
-                console.warn("Plst -> song")
                 const idx = TrackPlayer.getActiveMediaItemIndex() ?? 0;
                 await TrackPlayer.removeMediaItems(idx+1, TrackPlayer.getQueue().length)   
                 await TrackPlayer.removeMediaItems(0, idx)     
@@ -190,16 +192,18 @@ export default function MusicPlayer() {
         loadSongs().catch(console.error);
 
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-            if (isInit.current) {
-                if (item?.mediaId === expectedInitMediaId.current) {
-                    isInit.current = false; // on est arrivé au bon morceau, on sort du mode "init"
-                    // on NE return PAS : on laisse ce event être traité normalement ci-dessous
-                } else {
-                    return; // event parasite du chargement initial, on l'ignore
-                }
-            }
+                console.log(isInit.current)
+            
             if(!used_event.current){
                 used_event.current = true
+
+                if (isInit.current) {                
+                    isInit.current = false
+                    if (item?.mediaId !== expectedInitMediaId.current) {
+                        return
+                    } 
+                }
+
                 if (!playing) {
                     TrackPlayer.play()
                 }

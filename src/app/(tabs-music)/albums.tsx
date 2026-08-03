@@ -47,7 +47,6 @@ export default function AlbumsScreen() {
             ListEmptyComponent={<Text style={styles.filler_text}  key={"album:None"}>No Album found</Text>}     
             ItemSeparatorComponent={<View style={{height:10}}></View>}     
             />
-            <FloatingPlayer />
       <FloatingPlayer />
     </LinearGradient>
   );
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
   items_container: {    
     flex: 1,
     gap: 10,
-    marginVertical: 20
+    marginTop: 20
   },
   filler_text: {
     flex: 1,
