@@ -158,9 +158,7 @@ export default function MusicPlayer() {
             //Switch from Song -> Playlist
             if (TrackPlayer.getQueue().length == 1 && all_songs.length > 1 && areSame){
                 const index = all_songs.findIndex(function(song) { return song.mediaId === TrackPlayer.getActiveMediaItem()?.mediaId})
-                console.log(index)
                 await TrackPlayer.addMediaItems(all_songs.slice(index+1))
-                console.log(TrackPlayer.getQueue())
             }
             //Switch from Playlist -> Song
             else if (TrackPlayer.getQueue().length > 1 && all_songs.length == 1 && areSame && params.softOpen == "false"){
@@ -192,8 +190,6 @@ export default function MusicPlayer() {
         loadSongs().catch(console.error);
 
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-                console.log(isInit.current)
-            
             if(!used_event.current){
                 used_event.current = true
 

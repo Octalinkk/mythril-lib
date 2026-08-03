@@ -158,9 +158,6 @@ export async function updateSongs() {
                         await addSongPlaylist(newSongPlst)
                     }
                 }
-                else {
-                    console.log("skip")
-                }
             }
         }
     };

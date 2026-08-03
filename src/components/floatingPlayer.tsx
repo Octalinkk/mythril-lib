@@ -65,7 +65,6 @@ export default function FloatingPlayer () {
             pathname: "/musicPlayer",
             params: {ids:[song.id.toString()], softOpen:"true", startIdx:"0"},
             }}
-            onPress={() =>{console.log(song.id)}}
             push asChild>
             <TouchableOpacity style={styles.container}>
                 <Image source={getCoverSource(song.cover)} style={styles.image}/>
