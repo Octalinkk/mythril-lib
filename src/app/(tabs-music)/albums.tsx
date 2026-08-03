@@ -45,8 +45,12 @@ export default function AlbumsScreen() {
                 </View>
             }      
             ListEmptyComponent={<Text style={styles.filler_text}  key={"album:None"}>No Album found</Text>}     
-            ItemSeparatorComponent={<View style={{height:10}}></View>}     
-            />
+            ItemSeparatorComponent={<View style={{height:10}}></View>}   
+            maxToRenderPerBatch={5}   
+            initialNumToRender={2}
+            windowSize={5}
+            ListFooterComponent={<View style={{height:50}}></View>}
+      />
       <FloatingPlayer />
     </LinearGradient>
   );

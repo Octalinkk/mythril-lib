@@ -59,6 +59,11 @@ export default function ArtistsScreen() {
       ListEmptyComponent={<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>}     
       ItemSeparatorComponent={<View style={{height:20}}></View>}     
       columnWrapperStyle={{ gap: 20 }}
+      
+      maxToRenderPerBatch={5}   
+      initialNumToRender={2}
+      windowSize={5}
+      ListFooterComponent={<View style={{height:50}}></View>}
       />
       <FloatingPlayer />
     </LinearGradient>

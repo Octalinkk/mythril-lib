@@ -145,10 +145,13 @@ export default function PlaylistProfile() {
                         <RandomIcon/>
                     </View>
                 </View>
-            }      
+            }    
+            maxToRenderPerBatch={5}
             ListEmptyComponent={<Text style={styles.filler_text}>Playlist empty</Text>}     
             ItemSeparatorComponent={<View style={{height:10}}></View>}     
-            initialNumToRender={5}
+            initialNumToRender={2}
+            windowSize={5}
+            ListFooterComponent={<View style={{height:50}}></View>}
             />
             <FloatingPlayer />
             <View style={{height:50}}></View>
