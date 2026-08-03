@@ -190,48 +190,48 @@ export default function MusicPlayer() {
         loadSongs().catch(console.error);
 
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-            if(!used_event.current){
-                used_event.current = true
 
-                if (isInit.current) {                
-                    isInit.current = false
-                    if (item?.mediaId !== expectedInitMediaId.current) {
-                        return
-                    } 
-                }
+    if (isInit.current) {
+        isInit.current = false
+        if (item?.mediaId !== expectedInitMediaId.current) {
+            return  // event parasite du chargement : ignoré, used_event n'est PAS touché
+        }
+    }
 
-                if (!playing) {
-                    TrackPlayer.play()
-                }
-                if(item?.mediaId != undefined){
-                    //null à chaque réouverture du player car remit le useRef par défaut (null) 
-                    if (curr_song.current != null && curr_artists.current != null){
-                        //for previous song
-                        curr_song.current.time_listened += last_position.current
-                        curr_artists.current.map(artist => artist.time_listened += last_position.current)
-                        updateSong(curr_song.current)
-                        await Promise.all(
-                            curr_artists.current.map(artist => updateArtist(artist))
-                        );
-                    }
-                    curr_song.current = await getSongById(Number(item?.mediaId))
-                    if (curr_song.current != null){
-                        curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
-                        curr_song.current.time_started += 1
-                        curr_song.current.last_time_played = new Date().toISOString()
-                        curr_artists.current.map(artist => artist.time_started += 1)
-                        curr_artists.current.map(artist => artist.last_time_played = new Date().toISOString())
-                        setCurrDisplaySong(curr_song.current)
-                        setCurrDisplayArtists(curr_artists.current)
-                        updateSong(curr_song.current)
-                        await Promise.all(
-                            curr_artists.current.map(artist => updateArtist(artist))
-                        );
-                    }
-                    else {curr_artists.current = []}
-                }
+    if(!used_event.current){
+        used_event.current = true
+
+        if (!playing) {
+            TrackPlayer.play()
+        }
+        if(item?.mediaId != undefined){
+            //null à chaque réouverture du player car remit le useRef par défaut (null) 
+            if (curr_song.current != null && curr_artists.current != null){
+                curr_song.current.time_listened += last_position.current
+                curr_artists.current.map(artist => artist.time_listened += last_position.current)
+                updateSong(curr_song.current)
+                await Promise.all(
+                    curr_artists.current.map(artist => updateArtist(artist))
+                );
             }
-        });
+            curr_song.current = await getSongById(Number(item?.mediaId))
+            if (curr_song.current != null){
+                curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
+                curr_song.current.time_started += 1
+                curr_song.current.last_time_played = new Date().toISOString()
+                curr_artists.current.map(artist => artist.time_started += 1)
+                curr_artists.current.map(artist => artist.last_time_played = new Date().toISOString())
+                setCurrDisplaySong(curr_song.current)
+                setCurrDisplayArtists(curr_artists.current)
+                updateSong(curr_song.current)
+                await Promise.all(
+                    curr_artists.current.map(artist => updateArtist(artist))
+                );
+            }
+            else {curr_artists.current = []}
+        }
+    }
+});
         
         
     }, []);
