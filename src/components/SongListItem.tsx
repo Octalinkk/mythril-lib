@@ -40,6 +40,8 @@ async function getArtistsforSongId(songId:number){
         return artists.filter((artist): artist is Artist => artist !== null);
     }
 
+
+
 export default function SongListItem (id: params) {
 
     const [song, setSong] = useState<Song | null>(null);
@@ -76,11 +78,17 @@ export default function SongListItem (id: params) {
         setVisibleModal(false)
     }
 
+    function getSongPos(){
+        if (song){
+            return toPlayIds.indexOf(song.id.toString()).toString()
+        }
+        
+    }
 
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:toPlayIds, softOpen:"false"},
+            params: {ids:toPlayIds, softOpen:"false", startIdx:getSongPos()},
             }}
             onPress={async () => {
                 song.time_started += 1

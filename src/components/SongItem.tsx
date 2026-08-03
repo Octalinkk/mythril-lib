@@ -57,7 +57,7 @@ export default function SongItem (id: params) {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:toPlayIds, softOpen:"false"}
+            params: {ids:toPlayIds, softOpen:"false", startIdx:"0"}
             }}
             onPress={async () => {
                 song.time_started += 1

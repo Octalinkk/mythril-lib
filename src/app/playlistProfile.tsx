@@ -42,7 +42,6 @@ async function updateStatForPlaylist(playlist:Playlist) {
     playlist.last_time_played = new Date().toISOString()
     playlist.time_started += 1
     await updatePlaylist(playlist)
-    console.log(playlist)
 }
 
 export default function PlaylistProfile() {
@@ -82,7 +81,7 @@ export default function PlaylistProfile() {
             return (
                 <Link href={{
                 pathname: "/musicPlayer",
-                params: {ids:mapped_songs, softOpen:"false"},
+                params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
                 }}
                 onPress={async () => {
                     await updateStatForPlaylist(playlist)                            

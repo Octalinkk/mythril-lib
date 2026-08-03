@@ -48,12 +48,22 @@ function getSongDuration(dur:number): string{
     return minutes + ':' + dispSec;
 }
 
+async function getArtistsforSongId(songId:number){
+    const artistsIds = await Promise.resolve(
+        getArtistsBySongId(songId)
+    );
+    const artists = await Promise.all(
+        artistsIds.map(id => getArtistById(+id))
+    );
+    return artists.filter((artist): artist is Artist => artist !== null);
+}
 
 
 export default function MusicPlayer() {
     const params = useLocalSearchParams<{
         ids: string,
         softOpen: "true" | "false"
+        startIdx: string
     }>();
     const playing = useIsPlaying();
     const { position, duration } = useProgress();
@@ -71,23 +81,16 @@ export default function MusicPlayer() {
     const [curr_display_artists, setCurrDisplayArtists] = useState<Artist[]>([]);
 
     const used_event = useRef<boolean>(false);
+    const isInit = useRef<boolean>(false);
+    const expectedInitMediaId = useRef<string | null>(null);
+
     const last_position = useRef<number>(0);
     const curr_song = useRef<Song>(null);
     const curr_artists = useRef<Artist[]>(null);
     
     useEffect(() => {
 
-        async function getArtistsforSongId(songId:number){
-            const artistsIds = await Promise.resolve(
-                getArtistsBySongId(songId)
-            );
-
-            const artists = await Promise.all(
-                artistsIds.map(id => getArtistById(+id))
-            );
-
-            return artists.filter((artist): artist is Artist => artist !== null);
-        }
+        
 
         async function getArtistDisplay(songId:number){
             const artists = await getArtistsforSongId(songId)
@@ -133,21 +136,24 @@ export default function MusicPlayer() {
                     artist: '',
                     artworkUrl: result!.cover,
                 }));
+            
+            expectedInitMediaId.current = all_songs[Number(params.startIdx)]?.mediaId ?? null;
 
-            if (results[0]) {
-                setCurrDisplaySong(results[0]);  
+            const dispSong = results[Number(params.startIdx)];
+            if (dispSong) {
+                setCurrDisplaySong(dispSong);
             }
 
             if( curr_display_song.id != 0 ) {            
                 getArtistDisplay(curr_display_song.id)
             }
             else{
-                getArtistDisplay(results[0]?.id ?? curr_display_song.id)            
+                getArtistDisplay(results[Number(params.startIdx)]?.id ?? curr_display_song.id)            
             }
 
             
 
-            const areSame = Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[0].mediaId)
+            const areSame = Number(TrackPlayer.getActiveMediaItem()?.mediaId) == Number(all_songs[Number(params.startIdx)].mediaId)
             // Ici que ça fait la détection de si la même musique ou pas
             //Switch from Song -> Playlist
             if (TrackPlayer.getQueue().length == 1 && all_songs.length > 1 && areSame){
@@ -155,40 +161,43 @@ export default function MusicPlayer() {
             }
             //Switch from Playlist -> Song
             else if (TrackPlayer.getQueue().length > 1 && all_songs.length == 1 && areSame && params.softOpen == "false"){
+                console.warn("Plst -> song")
                 const idx = TrackPlayer.getActiveMediaItemIndex() ?? 0;
-                TrackPlayer.removeMediaItems(0, idx)
-                TrackPlayer.removeMediaItems(idx, TrackPlayer.getQueue().length-1)
+                await TrackPlayer.removeMediaItems(idx+1, TrackPlayer.getQueue().length)   
+                await TrackPlayer.removeMediaItems(0, idx)     
                 
             }
-            else if (TrackPlayer.getQueue().length == 1 && all_songs.length == 1 && areSame){
-                
-            }
+            else if (TrackPlayer.getQueue().length == 1 && all_songs.length == 1 && areSame){}
             else {
-                if(params.softOpen == "false"){
-                    TrackPlayer.setMediaItems(all_songs);
+                if(params.softOpen == "false" && !areSame){
+                    TrackPlayer.setMediaItems(all_songs);     
                 }
             }
+
+               
+            if (Number(params.startIdx) != 0 && !areSame){
+                TrackPlayer.skipToIndex(Number(params.startIdx))
+            } 
+
+            if (!playing){
+                TrackPlayer.play()
+            }
+            
+            
+            isInit.current = true
         }
 
         loadSongs().catch(console.error);
-    }, []);
-
-   
-    useEffect(() => {
-
-        async function getArtistsforSongId(songId:number){
-            const artistsIds = await Promise.resolve(
-                getArtistsBySongId(songId)
-            );
-
-            const artists = await Promise.all(
-                artistsIds.map(id => getArtistById(+id))
-            );
-
-            return artists.filter((artist): artist is Artist => artist !== null);
-        }
 
         TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
+            if (isInit.current) {
+                if (item?.mediaId === expectedInitMediaId.current) {
+                    isInit.current = false; // on est arrivé au bon morceau, on sort du mode "init"
+                    // on NE return PAS : on laisse ce event être traité normalement ci-dessous
+                } else {
+                    return; // event parasite du chargement initial, on l'ignore
+                }
+            }
             if(!used_event.current){
                 used_event.current = true
                 if (!playing) {
@@ -223,8 +232,10 @@ export default function MusicPlayer() {
                 }
             }
         });
+        
+        
     }, []);
-    
+
 
     return (
         <LinearGradient 

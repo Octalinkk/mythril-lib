@@ -63,7 +63,7 @@ export default function FloatingPlayer () {
     return (
         <Link href={{
             pathname: "/musicPlayer",
-            params: {ids:[song.id.toString()], softOpen:"true"},
+            params: {ids:[song.id.toString()], softOpen:"true", startIdx:"0"},
             }}
             onPress={() =>{console.log(song.id)}}
             push asChild>
