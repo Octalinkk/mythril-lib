@@ -45,6 +45,7 @@ export default function PlaylistListItem ({ id, isLocked = false, displayOnly = 
                 const result = await getPlaylistById(id)
                 if (result) {
                     setPlaylist(result)
+                    console.log(result.name)
                     getSongCountByPlstId(id).then(result => {
                         if (result) setCount(result.count);
                     });

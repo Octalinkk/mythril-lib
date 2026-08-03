@@ -20,8 +20,9 @@ export default function RandomIcon() {
         justifyContent: 'center',
         alignItems: 'center',}} 
         onPress={() => {
-            TrackPlayer.setShuffleEnabled(!TrackPlayer.isShuffleEnabled());
-            setShuffle(TrackPlayer.isShuffleEnabled());
+            const updateState = !shuffle            
+            setShuffle(updateState);
+            TrackPlayer.setShuffleEnabled(updateState);
         }}>
             <FontAwesome name="random" size={30} color={shuffle == true ? colors.primary : "#b0b0b02e"} />
         </TouchableOpacity>

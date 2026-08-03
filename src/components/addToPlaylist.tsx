@@ -1,4 +1,4 @@
-import { getAllPlaylists, Playlist } from "@/db/PlaylistsManager";
+import { getAllCustomPlaylists, Playlist } from "@/db/PlaylistsManager";
 import { getSongById, Song } from "@/db/SongsManager";
 import { addSongPlaylist, deletePlaylistsBySongId, getPlaylistsBySongId } from "@/db/SongsPlaylistsManager";
 import { colors } from "@/styles/global";
@@ -55,7 +55,7 @@ export default function AddToPlaylistModal ({ visible, onClose, id }: addToPlayl
                 }
             });
 
-            getAllPlaylists().then(resPlst => {
+            getAllCustomPlaylists().then(resPlst => {
                 if (resPlst) {
                     setPlaylists(resPlst)
                     getPlaylistsBySongId(id).then(result => {
@@ -81,11 +81,10 @@ export default function AddToPlaylistModal ({ visible, onClose, id }: addToPlayl
             return <Text>None found</Text>;
         }
         
-        return playlists.map(playlist => (
-            
+        return playlists.map(playlist => (            
             <TouchableOpacity style={styles.check_item} onPress={() => switchState(playlist.id)} key={"checkbox_item:"+playlist.id}>
-                <CheckBox value={getStat(playlist.id)} />
-                <PlaylistListItem id={playlist.id} />
+                <View style={{flex:0.2}}><CheckBox value={getStat(playlist.id)}/></View>
+                <View style={{flex:0.9}}><PlaylistListItem id={playlist.id} displayOnly={true} isLocked={true}/></View>                
             </TouchableOpacity>
         ));
     }
@@ -231,15 +230,16 @@ const styles = StyleSheet.create({
     },
     check_item:{
         flex:1,
+        paddingHorizontal: 2,
         flexDirection: 'row',
-        maxHeight: 80,   
         marginVertical: 10,
         justifyContent: 'center',
         alignItems: 'center',
+        gap: 10,
     },
     main_scroll: {
         flex:1,
-        maxHeight: 300
+        maxHeight: 300,
     },
     close: {
         flex: 0.3,
