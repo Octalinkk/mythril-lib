@@ -5,9 +5,9 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { Album, deleteAlbum, getAlbumById, updateAlbum } from '@/db/AlbumsManager';
+import { Album, deleteAlbum, getAlbumById, getAlbumByName, updateAlbum } from '@/db/AlbumsManager';
 import { deleteArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
-import { deleteSongsByAlbumId } from '@/db/SongsAlbumsManager';
+import { addSongAlbum, deleteSongsByAlbumId, getSongsByAlbumId } from '@/db/SongsAlbumsManager';
 import { colors, globalStyles } from '@/styles/global';
 
 function getCoverSource(cover: string) {
@@ -23,32 +23,45 @@ async function saveChanges(album:Album, title: string, old_cover:File | null, ne
 
     //update title
     album.name = title
-    if(old_cover && new_cover){
-        let uri = ""
-        try{
-            //image -> image
-            const oldCovValue = old_cover.bytesSync()
-            if (oldCovValue != new_cover.bytesSync()){
-                //nouvelle image
-                old_cover.delete()
-                const dir = new Directory(Paths.document, 'playlistCover');
-                const finalFile = new File(dir.uri + `/${album.id}_${Date.now()}.jpg`);
-                new_cover.moveSync(finalFile, { overwrite: true })
+    const alreadyAlb = await getAlbumByName(title)
+    if (alreadyAlb != null){
+        //IF already exist one like this
+        const transfSongs = await getSongsByAlbumId(album.id)
+        await Promise.all(transfSongs.map(id => addSongAlbum({
+                song_id:id,
+                album_id:alreadyAlb.id
+            })));
+        
+        await deleteSongsByAlbumId(album.id)
+        await deleteAlbum(album)
+    }
+    else {
+        if(old_cover && new_cover){
+            let uri = ""
+            try{
+                //image -> image
+                const oldCovValue = old_cover.bytesSync()
+                if (oldCovValue != new_cover.bytesSync()){
+                    //nouvelle image
+                    old_cover.delete()
+                    const dir = new Directory(Paths.document, 'playlistCover');
+                    const finalFile = new File(dir.uri + `/${album.id}_${Date.now()}.jpg`);
+                    new_cover.moveSync(finalFile, { overwrite: true })
+                    uri = new_cover.uri
+                }
+                else{
+                    new_cover.delete()
+                }
+            }
+            catch{
+                new_cover.moveSync(new File(new_cover.uri.replace("-temp", `_${Date.now()}`)), { overwrite: true })
                 uri = new_cover.uri
             }
-            else{
-                new_cover.delete()
-            }
+            
+            album.cover = uri
         }
-        catch{
-            new_cover.moveSync(new File(new_cover.uri.replace("-temp", `_${Date.now()}`)), { overwrite: true })
-            uri = new_cover.uri
-        }
-        
-        album.cover = uri
+        await updateAlbum(album)
     }
-    await updateAlbum(album)
-
     
 }
 
