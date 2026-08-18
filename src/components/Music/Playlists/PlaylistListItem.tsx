@@ -18,10 +18,10 @@ function getCoverSource(playlist: Playlist) {
     const cover = playlist.cover
     const file = new File(cover)
     if(playlist.id == 1){
-        return require('../res/all_songs_cover.png');
+        return require('../../../res/all_songs_cover.png');
     }
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -71,7 +71,7 @@ export default function PlaylistListItem ({ id, isLocked = false, displayOnly = 
         if (!isLocked){
             return (
                 <Link href={{
-                    pathname: "/playlistSettings",
+                    pathname: "/Music/playlistSettings",
                     params: {id:[playlist.id.toString()]},
                     }} push asChild>
                     <TouchableOpacity style={styles.icon}>
@@ -86,7 +86,7 @@ export default function PlaylistListItem ({ id, isLocked = false, displayOnly = 
     if (!displayOnly){
         return (
             <Link href={{
-                pathname: "/playlistProfile",
+                pathname: "/Music/playlistProfile",
                 params: {id:[playlist.id.toString()]},
                 }}
                 push asChild>

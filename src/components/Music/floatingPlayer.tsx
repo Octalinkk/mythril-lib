@@ -11,7 +11,7 @@ import TextTicker from "react-native-text-ticker";
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -62,7 +62,7 @@ export default function FloatingPlayer () {
 
     return (
         <Link href={{
-            pathname: "/musicPlayer",
+            pathname: "/Music/musicPlayer",
             params: {ids:[song.id.toString()], softOpen:"true", startIdx:"0"},
             }}
             push asChild>

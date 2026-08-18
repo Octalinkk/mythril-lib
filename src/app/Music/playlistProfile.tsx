@@ -1,13 +1,13 @@
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import FloatingPlayer from '@/components/floatingPlayer';
-import RandomIcon from '@/components/RandomIcon';
-import SongListItem from '@/components/SongListItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
+import RandomIcon from '@/components/Music/RandomIcon';
+import SongListItem from '@/components/Music/Songs/SongListItem';
 import { getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager';
 import { getSongById, Song } from '@/db/SongsManager';
 import { getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
@@ -18,10 +18,10 @@ function getCoverSource(playlist: Playlist) {
     const cover = playlist.cover
     const file = new File(cover)
     if(playlist.id == 1){
-        return require('../res/all_songs_cover.png');
+        return require('../../res/all_songs_cover.png');
     }
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -79,7 +79,7 @@ export default function PlaylistProfile() {
         if (mapped_songs.length > 0){
             return (
                 <Link href={{
-                pathname: "/musicPlayer",
+                pathname: "/Music/musicPlayer",
                 params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
                 }}
                 onPress={async () => {

@@ -18,7 +18,7 @@ type params = {
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        return require('../res/def_cover.png');
+        return require('../../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -87,7 +87,7 @@ export default function SongListItem (id: params) {
 
     return (
         <Link href={{
-            pathname: "/musicPlayer",
+            pathname: "/Music/musicPlayer",
             params: {ids:toPlayIds, softOpen:"false", startIdx:getSongPos()},
             }}
             onPress={async () => {

@@ -2,9 +2,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
-import AlbumListItem from '@/components/AlbumListItem';
-import ArtistListItem from '@/components/ArtistListItem';
-import SongListItem from '@/components/SongListItem';
+import AlbumListItem from '@/components/Music/Albums/AlbumListItem';
+import ArtistListItem from '@/components/Music/Artists/ArtistListItem';
+import SongListItem from '@/components/Music/Songs/SongListItem';
 import { Album, getAllAlbums } from '@/db/AlbumsManager';
 import { Artist, getAllArtists } from '@/db/ArtistsManager';
 import { getAllSongs, Song } from '@/db/SongsManager';

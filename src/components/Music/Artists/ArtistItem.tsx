@@ -81,7 +81,7 @@ export default function ArtistItem (id: Id) {
 
         return (
             <Link href={{
-                pathname: "/artistProfile",
+                pathname: "/Music/artistProfile",
                 params: {id:[artist.id.toString()]},
                 }}
                 push asChild>

@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Animated, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Separator from "./Separator";
+import Separator from "../Separator";
 
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.7;
 
@@ -37,7 +37,7 @@ export default function Header() {
             </TouchableOpacity>
             <View style={{ flex: 1 }}/>
             <Link href={{
-              pathname: "/searchPage",
+              pathname: "/Music/searchPage",
             }} push asChild>
               <TouchableOpacity>
                   <Ionicons name="search" size={30} color={colors.primary} />
@@ -53,7 +53,7 @@ export default function Header() {
                 <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }]} ]}>
                   <View style={styles.title_container}>
                     <Text style={styles.title_text}>Mythril Library</Text>
-                    <Image source={require("../res/Mithril.png")} style={styles.title_img}/>
+                    <Image source={require("../../res/Mithril.png")} style={styles.title_img}/>
                   </View>    
                   <Separator />              
                 </Animated.View>
@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#3a0f86d6",
     maxWidth: SIDEBAR_WIDTH,
     paddingHorizontal: 20,
-    paddingVertical: 60
+    paddingVertical: 60,
+    marginBottom:50
   },
   close: {
     flex: 0.5,

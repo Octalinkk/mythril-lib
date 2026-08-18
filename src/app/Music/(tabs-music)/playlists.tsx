@@ -1,10 +1,10 @@
 
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { useCallback, useEffect } from 'react';
 
-import CreatPlaylistModal from '@/components/addPlaylist';
-import FloatingPlayer from '@/components/floatingPlayer';
-import PlaylistListItem from '@/components/PlaylistListItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
+import CreatPlaylistModal from '@/components/Music/Playlists/addPlaylist';
+import PlaylistListItem from '@/components/Music/Playlists/PlaylistListItem';
 import { getAllCustomPlaylists, getAllSystemPlaylists, Playlist } from '@/db/PlaylistsManager';
 import { checkAllSongPlaylistIntegrity } from '@/Managers/PlaylistManager';
 import { colors, globalStyles } from '@/styles/global';

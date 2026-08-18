@@ -7,9 +7,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import CheckBox from "../../checkbox";
 import PlaylistListItem from "./PlaylistListItem";
 import CreatPlaylistModal from "./addPlaylist";
-import CheckBox from "./checkbox";
 
 
 type addToPlaylistModalProps = {

@@ -1,13 +1,13 @@
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import AlbumListItem from '@/components/AlbumListItem';
-import FloatingPlayer from '@/components/floatingPlayer';
-import SongListItem from '@/components/SongListItem';
+import AlbumListItem from '@/components/Music/Albums/AlbumListItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
+import SongListItem from '@/components/Music/Songs/SongListItem';
 import { Album, getAlbumById } from '@/db/AlbumsManager';
 import { getAlbumCountById, getAlbumsByArtistId } from '@/db/ArtistsAlbumsManager';
 import { Artist, getArtistById, updateArtist } from '@/db/ArtistsManager';
@@ -147,7 +147,7 @@ export default function ArtistProfil() {
         if (mapped_songs.length > 0){
             return (
                 <Link href={{
-                pathname: "/musicPlayer",
+                pathname: "/Music/musicPlayer",
                 params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
                 }}
                 onPress={async () => {
@@ -179,7 +179,7 @@ export default function ArtistProfil() {
             <ScrollView>
                 <View style={styles.header}>
                     <Link href={{
-                        pathname: "/artistSettings",
+                        pathname: "/Music/artistSettings",
                         params: {id:[artist.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity>

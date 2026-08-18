@@ -6,7 +6,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import SongListItem from '@/components/SongListItem';
+import SongListItem from '@/components/Music/Songs/SongListItem';
 import { deletePlaylist, getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager';
 import { getSongById, Song } from '@/db/SongsManager';
 import { addSongPlaylist, deleteSongsByPlaylistId, getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
@@ -15,7 +15,7 @@ import { colors, globalStyles } from '@/styles/global';
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }

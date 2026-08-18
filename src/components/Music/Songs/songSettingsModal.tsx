@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import AddToPlaylistModal from "./addToPlaylist";
+import AddToPlaylistModal from "../Playlists/addToPlaylist";
 
 
 type SongOptionsModalProps = {

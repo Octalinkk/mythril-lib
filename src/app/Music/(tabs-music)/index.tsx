@@ -1,12 +1,12 @@
 
-import ArtistItem from '@/components/ArtistItem';
-import Header from '@/components/Header';
-import SongItem from '@/components/SongItem';
+import ArtistItem from '@/components/Music/Artists/ArtistItem';
+import Header from '@/components/Music/Header';
+import SongItem from '@/components/Music/Songs/SongItem';
 import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
 import { useCallback } from 'react';
 
-import FloatingPlayer from '@/components/floatingPlayer';
-import PlaylistListItem from '@/components/PlaylistListItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
+import PlaylistListItem from '@/components/Music/Playlists/PlaylistListItem';
 import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
 import { getMostRecentSongs, Song } from '@/db/SongsManager';
 import { colors, globalStyles } from '@/styles/global';

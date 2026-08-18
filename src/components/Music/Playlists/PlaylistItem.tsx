@@ -12,7 +12,7 @@ type Id = {
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        return require('../res/def_cover.png');
+        return require('../../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }

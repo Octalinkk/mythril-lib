@@ -1,13 +1,13 @@
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import ArtistItem from '@/components/ArtistItem';
-import FloatingPlayer from '@/components/floatingPlayer';
-import SongListItem from '@/components/SongListItem';
+import ArtistItem from '@/components/Music/Artists/ArtistItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
+import SongListItem from '@/components/Music/Songs/SongListItem';
 import { Album, getAlbumById, updateAlbum } from '@/db/AlbumsManager';
 import { getArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
 import { Artist, getArtistById } from '@/db/ArtistsManager';
@@ -20,7 +20,7 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -122,7 +122,7 @@ export default function AlbumProfil() {
         if (mapped_songs.length > 0){
             return (
                 <Link href={{
-                pathname: "/musicPlayer",
+                pathname: "/Music/musicPlayer",
                 params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
                 }}
                 onPress={async () => {
@@ -154,7 +154,7 @@ export default function AlbumProfil() {
             <ScrollView>
                 <View style={styles.header}>
                     <Link href={{
-                        pathname: "/albumSettings",
+                        pathname: "/Music/albumSettings",
                         params: {id:[album.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity>

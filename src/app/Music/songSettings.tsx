@@ -16,7 +16,7 @@ import { colors, globalStyles } from '@/styles/global';
 function getCoverSource(cover: string, key:number) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${key}` };
 }

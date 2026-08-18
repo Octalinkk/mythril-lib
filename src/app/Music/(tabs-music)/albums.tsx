@@ -1,9 +1,9 @@
 
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { useCallback } from 'react';
 
-import AlbumListItem from '@/components/AlbumListItem';
-import FloatingPlayer from '@/components/floatingPlayer';
+import AlbumListItem from '@/components/Music/Albums/AlbumListItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
 import { getAllAlbumsOrdered } from '@/db/AlbumsManager';
 import { Artist } from '@/db/ArtistsManager';
 import { colors, globalStyles } from '@/styles/global';

@@ -13,7 +13,7 @@ import { colors, globalStyles } from '@/styles/global';
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }

@@ -15,7 +15,7 @@ type Id = {
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="") {
-        return require('../res/def_cover.png');
+        return require('../../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
@@ -53,7 +53,7 @@ export default function AlbumListItem (id: Id) {
 
     return (
         <Link href={{
-            pathname: "/albumProfile",
+            pathname: "/Music/albumProfile",
             params: {id:[album.id.toString()]},
             }}
             push asChild>
@@ -64,7 +64,7 @@ export default function AlbumListItem (id: Id) {
                     <Text style={styles.subtitle}>{countSong} songs</Text>
                 </View>
                     <Link href={{
-                        pathname: "/albumSettings",
+                        pathname: "/Music/albumSettings",
                         params: {id:[album.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity style={styles.icon}>

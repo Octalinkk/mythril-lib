@@ -1,9 +1,9 @@
 
-import Header from '@/components/Header';
+import Header from '@/components/Music/Header';
 import { useCallback } from 'react';
 
-import ArtistItem from '@/components/ArtistItem';
-import FloatingPlayer from '@/components/floatingPlayer';
+import ArtistItem from '@/components/Music/Artists/ArtistItem';
+import FloatingPlayer from '@/components/Music/floatingPlayer';
 import { Artist, getAllArtistsOrdered } from '@/db/ArtistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';

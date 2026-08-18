@@ -1,5 +1,5 @@
-import Header from '@/components/Header';
-import RandomIcon from '@/components/RandomIcon';
+import Header from '@/components/Music/Header';
+import RandomIcon from '@/components/Music/RandomIcon';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
@@ -28,7 +28,7 @@ type MediaItem = {
 function getCoverSource(cover: string) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        return require('../res/def_cover.png');
+        return require('../../res/def_cover.png');
     }
     return { uri: `${cover}?cache=${Date.now()}` };
 }
