@@ -1,11 +1,12 @@
 
 import Header from '@/components/Header';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import CreatPlaylistModal from '@/components/addPlaylist';
 import FloatingPlayer from '@/components/floatingPlayer';
 import PlaylistListItem from '@/components/PlaylistListItem';
 import { getAllCustomPlaylists, getAllSystemPlaylists, Playlist } from '@/db/PlaylistsManager';
+import { checkAllSongPlaylistIntegrity } from '@/Managers/PlaylistManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
@@ -34,6 +35,10 @@ export default function PlaylistScreen() {
   const [visible, setVisible] = useState<boolean>(false)
 
   //TODO quand tu ajoute une playliste, ouvre
+
+  useEffect(() => {
+      checkAllSongPlaylistIntegrity()
+  }, []);
 
   useFocusEffect(
     useCallback(() =>{

@@ -46,7 +46,7 @@ async function saveChanges(artist:Artist, title: string, old_cover:File | null, 
     //update title
     artist.name = title
     const alreadyArt = await getArtistByName(title)
-    if (alreadyArt != null){
+    if (alreadyArt != null && alreadyArt.id != artist.id){
         //IF already exist one like this
         const transfSongs = await getSongsByArtistId(artist.id)
         await Promise.all(transfSongs.map(id => addSongArtist({

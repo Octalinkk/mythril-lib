@@ -12,7 +12,6 @@ import { getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager
 import { getSongById, Song } from '@/db/SongsManager';
 import { getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
-import { SimpleLineIcons } from '@expo/vector-icons';
 
 
 function getCoverSource(playlist: Playlist) {
@@ -101,24 +100,7 @@ export default function PlaylistProfile() {
         }   
     }
 
-    function getHeader(){
-        if (!params.isLocked) {
-            return (
-                <View style={styles.header}>
-                    <Link href={{
-                        pathname: "/playlistSettings",
-                        params: {id:[playlist.id.toString()]},
-                        }} push asChild>
-                        <TouchableOpacity>
-                            <SimpleLineIcons name="options-vertical" size={20} color={colors.primary} />
-                        </TouchableOpacity>
-                    </Link>
-                </View>
-            )
-        }
-        else{return <View></View>}
-        
-    }
+    
 
     return (
         <LinearGradient 

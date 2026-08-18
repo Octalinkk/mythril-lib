@@ -24,7 +24,7 @@ async function saveChanges(album:Album, title: string, old_cover:File | null, ne
     //update title
     album.name = title
     const alreadyAlb = await getAlbumByName(title)
-    if (alreadyAlb != null){
+    if (alreadyAlb != null && alreadyAlb.id != album.id){
         //IF already exist one like this
         const transfSongs = await getSongsByAlbumId(album.id)
         await Promise.all(transfSongs.map(id => addSongAlbum({

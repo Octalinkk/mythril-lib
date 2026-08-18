@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import ArtistItem from '@/components/ArtistItem';
+import FloatingPlayer from '@/components/floatingPlayer';
 import SongListItem from '@/components/SongListItem';
 import { Album, getAlbumById, updateAlbum } from '@/db/AlbumsManager';
 import { getArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
@@ -32,7 +33,7 @@ async function updateAlbumStats(album:Album){
 
 function getSongsList(album:Album, songs:Song[]){
     if (songs.length > 0){
-        return songs.map(song => <SongListItem song_id={song.id} play_ids={[]} onLinkClick={async () => await updateAlbumStats(album)} key={"listed_song:"+song.id}/>)
+        return songs.map(song => <SongListItem song_id={song.id} play_ids={songs.map(item => item.id)}  onLinkClick={async () => await updateAlbumStats(album)} key={"listed_song:"+song.id}/>)
     }
     else{
         return <Text style={styles.filler_text}>None located for this album</Text>
@@ -73,6 +74,12 @@ async function getArtistsforAlbumId(id:number){
     return artists.filter((artist): artist is Artist => artist !== null);
 }
 
+async function updateStatForAlbum(album:Album) {
+    album.last_time_played = new Date().toISOString()
+    album.time_started += 1
+    await updateAlbum(album)
+}
+
 export default function AlbumProfil() {
     const params = useLocalSearchParams<{
         id: string;
@@ -110,6 +117,32 @@ export default function AlbumProfil() {
         }, [params.id])
     );
 
+    function getPlayButton() {
+        const mapped_songs = songs.map(song => song.id.toString())
+        if (mapped_songs.length > 0){
+            return (
+                <Link href={{
+                pathname: "/musicPlayer",
+                params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
+                }}
+                onPress={async () => {
+                    await updateStatForAlbum(album)                            
+                }} push asChild>
+                    <TouchableOpacity style={styles.btn_play}>
+                        <Text style={styles.btn_text}>Play</Text>
+                    </TouchableOpacity>
+                </Link>
+            )
+        }
+        else {
+            return (
+                <TouchableOpacity style={styles.btn_play}>
+                    <Text style={styles.btn_text}>Play</Text>
+                </TouchableOpacity>
+            )
+        }   
+    }
+
     return (
         <LinearGradient 
               style={globalStyles.main_container}
@@ -118,7 +151,7 @@ export default function AlbumProfil() {
               end={{x:1, y:1}}
             >
             <Header />
-            <ScrollView style={{marginBottom: 50}}>
+            <ScrollView>
                 <View style={styles.header}>
                     <Link href={{
                         pathname: "/albumSettings",
@@ -134,6 +167,7 @@ export default function AlbumProfil() {
                         <Image source={getCoverSource(album.cover)} style={styles.cover}/>
                     </View>        
                     <Text style={styles.name}>{album.name}</Text>
+                    {getPlayButton()}
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.context}>{countSong} songs</Text>
                     <Text style={styles.title}>Made by : </Text>
                     <View style={styles.items_container_md} >
@@ -143,7 +177,8 @@ export default function AlbumProfil() {
                     {getSongsList(album, songs)}
                 </View>
             </ScrollView>
-            
+            <FloatingPlayer />
+            <View  style={{marginBottom: 50}}></View>
         </LinearGradient>
     )
 }
@@ -171,6 +206,20 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 30
+    },
+    
+    btn_play:{
+        flex:0.9,
+        height: 40,
+        backgroundColor: colors.primary,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    btn_text:{
+        fontSize: 20,
+        color: "#000000",        
+        fontFamily: 'SpaceGrotesk_400Regular'
     },
     items_container_md: {
         flex: 1,

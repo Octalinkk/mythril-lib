@@ -98,6 +98,8 @@ export default function AddToPlaylistModal ({ visible, onClose, id }: addToPlayl
                 playlist_id:id
             }))
         );
+        //Keep song in "All Songs" playlist
+        await addSongPlaylist({song_id:song.id,playlist_id:1})
         onClose()
     }
     

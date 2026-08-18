@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import AlbumListItem from '@/components/AlbumListItem';
+import FloatingPlayer from '@/components/floatingPlayer';
 import SongListItem from '@/components/SongListItem';
 import { Album, getAlbumById } from '@/db/AlbumsManager';
 import { getAlbumCountById, getAlbumsByArtistId } from '@/db/ArtistsAlbumsManager';
@@ -94,6 +95,12 @@ async function getAlbumsforArtistId(id:number){
     return albums.filter((album): album is Album => album !== null);
 }
 
+async function updateStatForArtist(artist:Artist) {
+    artist.last_time_played = new Date().toISOString()
+    artist.time_started += 1
+    await updateArtist(artist)
+}
+
 export default function ArtistProfil() {
     const params = useLocalSearchParams<{
         id: string;
@@ -135,6 +142,32 @@ export default function ArtistProfil() {
         }, [params.id])
     );
 
+    function getPlayButton() {
+        const mapped_songs = songs.map(song => song.id.toString())
+        if (mapped_songs.length > 0){
+            return (
+                <Link href={{
+                pathname: "/musicPlayer",
+                params: {ids:mapped_songs, softOpen:"false", startIdx:"0"},
+                }}
+                onPress={async () => {
+                    await updateStatForArtist(artist)                            
+                }} push asChild>
+                    <TouchableOpacity style={styles.btn_play}>
+                        <Text style={styles.btn_text}>Play</Text>
+                    </TouchableOpacity>
+                </Link>
+            )
+        }
+        else {
+            return (
+                <TouchableOpacity style={styles.btn_play}>
+                    <Text style={styles.btn_text}>Play</Text>
+                </TouchableOpacity>
+            )
+        }   
+    }
+
     return (
         <LinearGradient 
               style={globalStyles.main_container}
@@ -143,7 +176,7 @@ export default function ArtistProfil() {
               end={{x:1, y:1}}
             >
             <Header />
-            <ScrollView style={{marginBottom: 50}}>
+            <ScrollView>
                 <View style={styles.header}>
                     <Link href={{
                         pathname: "/artistSettings",
@@ -159,6 +192,8 @@ export default function ArtistProfil() {
                         {getCoverSource(artist.cover, artist.name)}
                     </View>        
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.name}>{artist.name}</Text>
+                    
+                    {getPlayButton()}
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.context}>{countSong} songs | {countAlbum} albums</Text>
                     <Text style={styles.title}>Songs</Text>
                     {getSongsList(artist, songs)}
@@ -166,7 +201,9 @@ export default function ArtistProfil() {
                     {getAlbumsList(albums)}
                 </View>
             </ScrollView>
-            
+        
+            <FloatingPlayer />
+            <View  style={{marginBottom: 50}}></View>
         </LinearGradient>
     )
 }
@@ -190,6 +227,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
+    
+    btn_play:{
+        flex:0.9,
+        height: 40,
+        backgroundColor: colors.primary,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    btn_text:{
+        fontSize: 20,
+        color: "#000000",        
+        fontFamily: 'SpaceGrotesk_400Regular'
+    },
     image:{
         width: 200,
         height: 200,
