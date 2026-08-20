@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { Animated, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Separator from "../Separator";
 
+
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.7;
 
 export default function Header() {
@@ -54,8 +55,17 @@ export default function Header() {
                   <View style={styles.title_container}>
                     <Text style={styles.title_text}>Mythril Library</Text>
                     <Image source={require("../../res/Mithril.png")} style={styles.title_img}/>
-                  </View>    
-                  <Separator />              
+                  </View>  
+                   
+                  <Separator />  
+                  <Link href={{
+                    pathname: "/appSettings",
+                  }} push asChild>
+                    <TouchableOpacity style={styles.button_container}>
+                      <Ionicons name="settings-outline" style={styles.button_icon} size={24} color={colors.primary} />
+                      <Text style={styles.button_text}>Settings</Text>
+                    </TouchableOpacity>  
+                  </Link>           
                 </Animated.View>
                 <TouchableOpacity onPress={closeSidebar} style={styles.close}>
                 </TouchableOpacity>
@@ -114,6 +124,28 @@ const styles = StyleSheet.create({
     flex:0.3,
     maxWidth: 70,
     height: 70,
+  },
+  button_container:{
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    maxHeight: 50,
+  },
+  button_icon:{
+    flex: 0.3,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  button_text:{
+    flex: 0.7,
+    flexDirection: 'row',
+    fontSize: 20,
+    color: colors.primary,    
+    justifyContent: 'center',
+    alignItems: 'center',
   }
   
 

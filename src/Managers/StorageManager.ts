@@ -7,8 +7,26 @@ import { addSongAlbum } from '@/db/SongsAlbumsManager';
 import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { addSongPlaylist, getSongPlaylistById, SongPlaylist } from '@/db/SongsPlaylistsManager';
-import { Directory, File } from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
+import {
+    zip
+} from 'react-native-zip-archive';
 import { getAudioMetaData } from '../../modules/audio-metadata';
+
+export async function exportDatas() {
+    console.log("Exporting...")
+    zip(Paths.document.uri, new Directory("file:///storage/emulated/0/Documents/").uri, 9)
+        .then((path) => console.log(`zip completed at ${path}`))
+        .catch((error) => console.error(error))
+}
+
+export async function importDatas() {
+    
+}
+
+export async function deleteAllDatas() {
+    console.log("Deleting all...")
+}
 
 export default async function getMp3Files(path = "file:///storage/emulated/0/Music/"): Promise<File[]> {
     const dir = new Directory(path);
