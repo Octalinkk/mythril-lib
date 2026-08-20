@@ -29,7 +29,7 @@ function getRandomColor(seed:string){
 function getCoverSource(cover: string, name:string) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        const split = name.split(" ")
+        const split = name.trimEnd().split(" ")
         let text = ""
         if(split.length > 1){
             text = split.map(name => name.charAt(0).toUpperCase()).join("").substring(0, 2)
@@ -82,7 +82,7 @@ export default function ArtistListItem (id: Id) {
 
     return (
         <Link href={{
-            pathname: "/artistProfile",
+            pathname: "/Music/artistProfile",
             params: {id:[artist.id.toString()]},
             }}
             push asChild>
@@ -93,7 +93,7 @@ export default function ArtistListItem (id: Id) {
                     <Text style={styles.subtitle}>{countSong} songs | {countAlbum} albums</Text>
                 </View>
                     <Link href={{
-                        pathname: "/artistSettings",
+                        pathname: "/Music/artistSettings",
                         params: {id:[artist.id.toString()]},
                         }} push asChild>
                         <TouchableOpacity style={styles.icon}>

@@ -8,20 +8,20 @@ import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { addSongPlaylist, getSongPlaylistById, SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { Directory, File, Paths } from 'expo-file-system';
-import {
-    zip
-} from 'react-native-zip-archive';
+import { unzip, zip } from 'react-native-zip-archive';
 import { getAudioMetaData } from '../../modules/audio-metadata';
 
 export async function exportDatas() {
     console.log("Exporting...")
-    zip(Paths.document.uri, new Directory("file:///storage/emulated/0/Documents/").uri, 9)
+    zip(Paths.document.uri, new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, 9)
         .then((path) => console.log(`zip completed at ${path}`))
         .catch((error) => console.error(error))
 }
 
 export async function importDatas() {
-    
+    unzip(new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, Paths.document.uri)
+        .then((path) => console.log(`unzip completed at ${path}`))
+        .catch((error) => console.error(error))
 }
 
 export async function deleteAllDatas() {

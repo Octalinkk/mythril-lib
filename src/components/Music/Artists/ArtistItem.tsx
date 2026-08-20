@@ -28,7 +28,7 @@ function getRandomColor(seed:string){
 function getCoverSource(cover: string, name:string) {
     const file = new File(cover)
     if (!cover || cover =="" || !file.exists) {
-        const split = name.split(" ")
+        const split = name.trimEnd().split(" ")
         let text = ""
         if(split.length > 1){
             text = split.map(name => name.charAt(0).toUpperCase()).join("").substring(0, 2)
@@ -36,7 +36,6 @@ function getCoverSource(cover: string, name:string) {
         else{
             text = split[0].substring(0, 2).toUpperCase()
         }
-
         return (<View style={[{backgroundColor: getRandomColor(text)}, styles.profile_container]}>
                     <Text style={styles.profile_title}>{text}</Text>
                 </View>)

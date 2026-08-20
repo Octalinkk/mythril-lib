@@ -7,7 +7,6 @@
     "icon": "./src/res/Mithril.png",
     "scheme": "mythrillib",
     "userInterfaceStyle": "automatic",
-    
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -43,8 +42,11 @@
           }
         }
       ],
-      
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

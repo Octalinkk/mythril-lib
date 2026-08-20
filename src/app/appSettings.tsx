@@ -1,118 +1,13 @@
 
-import ArtistItem from '@/components/Music/Artists/ArtistItem';
-import SongItem from '@/components/Music/Songs/SongItem';
-import { Artist, getMostRecentArtists } from '@/db/ArtistsManager';
-import { useCallback } from 'react';
 
-import PlaylistListItem from '@/components/Music/Playlists/PlaylistListItem';
-import { getMostRecentPlst, Playlist } from '@/db/PlaylistsManager';
-import { getMostRecentSongs, Song } from '@/db/SongsManager';
-import { deleteAllDatas, exportDatas } from '@/Managers/StorageManager';
+import { deleteAllDatas, exportDatas, importDatas } from '@/Managers/StorageManager';
 import { colors, globalStyles } from '@/styles/global';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import TrackPlayer, { PlayerCommand } from "@rntp/player";
+import Octicons from '@expo/vector-icons/Octicons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-function getRecentSong(songs:Song[]){
-  let recentSong = []
-  if (songs.length > 0){
-    for (const item of songs) {
-        recentSong.push(<SongItem song_id={item.id} play_ids={[]} key={"song:"+item.id}/>)
-    }
-  }
-  else {
-    recentSong.push(<Text style={styles.filler_text} key={"song:None"}>No Songs found</Text>)
-  }
-  return recentSong
-}
-
-function getRecentPlaylists(playlists:Playlist[]){
-  let recentPlst = []
-  if (playlists.length > 0){
-    for (const item of playlists) {
-        recentPlst.push(<PlaylistListItem id={item.id} key={"playlist:"+item.id}/>)
-    }
-  }
-  else {
-    recentPlst.push(<Text style={styles.filler_text}  key={"playlist:None"}>No Playlists found</Text>)
-  }
-  return recentPlst
-}
-
-function getRecentArtists(artists:Artist[]){
-  let recentArtist = []
-
-  if (artists.length > 0){
-    for (const item of artists) {
-        recentArtist.push(<ArtistItem artist_id={item.id} key={"artist:"+item.id}/>)
-    }
-  }
-  else {
-    recentArtist.push(<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>)
-  }
-  return recentArtist
-}
-
 export default function HomeScreen() {
-
-  const [recSongs, setSong] = useState<Song[]>([]);
-  const [recPlaylists, setPlaylist] = useState<Playlist[]>([]);
-  const [recArtists, setArtist] = useState<Artist[]>([]);
-
-  
-
-
-  useFocusEffect(
-    useCallback(() =>{
-      getMostRecentSongs().then(result => {
-          if (result) setSong(result);
-      });
-    }, [recSongs]) 
-  )
-
-  useFocusEffect(
-    useCallback(() =>{
-      getMostRecentPlst().then(result => {
-          if (result) setPlaylist(result);
-      });
-    }, [recPlaylists]) 
-  )
-
-  useFocusEffect(
-    useCallback(() =>{
-      getMostRecentArtists().then(result => {
-          if (result) setArtist(result);
-      });
-    }, [recArtists]) 
-  )
-
-  useEffect(() => {
-    try{
-      TrackPlayer.setupPlayer({
-          contentType: 'music',
-          android: {
-            wakeMode: 'local',
-            taskRemovedBehavior : 'continue',
-            notification: {
-              channelId: 'com.solizardstudio.mythrillib',
-              channelName: 'Mythril Library',
-              smallIcon: 'ic_notification',
-            },
-          },
-      });
-      TrackPlayer.setCommands({
-        capabilities: [
-            PlayerCommand.PlayPause,
-            PlayerCommand.Next,
-            PlayerCommand.SkipForward
-        ],
-      });
-    }
-    catch {}
-  }, []);
   
 
   return (
@@ -128,6 +23,10 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.button_container} onPress={async () => await exportDatas()}>
           <MaterialIcons name="save-alt" size={30} color={colors.primary} />
           <Text style={styles.button_text}>Save datas</Text>
+        </TouchableOpacity> 
+        <TouchableOpacity style={styles.button_container} onPress={async () => await importDatas()}>
+          <Octicons name="upload" size={24} color={colors.primary} />
+          <Text style={styles.button_text}>Import datas</Text>
         </TouchableOpacity> 
         <TouchableOpacity style={styles.button_container_danger} onPress={async () => await deleteAllDatas()}>
           <MaterialIcons name="delete-outline" size={30} color={colors.primary} />

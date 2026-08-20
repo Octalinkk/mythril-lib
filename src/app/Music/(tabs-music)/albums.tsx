@@ -91,7 +91,8 @@ const styles = StyleSheet.create({
   items_container: {    
     flex: 1,
     gap: 10,
-    marginTop: 20
+    marginTop: 20,
+    paddingHorizontal: 20
   },
   filler_text: {
     flex: 1,
