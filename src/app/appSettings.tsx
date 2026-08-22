@@ -1,20 +1,65 @@
 
 
+import ConfirmationModal from '@/components/ConfirmPopup';
+import InformationModal from '@/components/InformationPopup';
 import { updateDBToLatest } from '@/db/DBManager';
 import { deleteAllDatas, exportDatas, importDatas } from '@/Managers/StorageManager';
 import { colors, globalStyles } from '@/styles/global';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { killApp } from '../../modules/app-killer';
 
 export default function AppSettings() {
   
   const [loading, setLoading] = useState<boolean>(false)
+  const [visibleExportModal, setVisibleExportModal] = useState<boolean>(false)
+  const [visibleImportModal, setVisibleImportModal] = useState<boolean>(false)
+  const [visibleDeleteModal, setVisibleDeleteModal] = useState<boolean>(false)
+
+  useFocusEffect(
+    useCallback(() => {
+        const onBackPress = () => {
+            // Prevent going back when loading (if true -> block)
+            return loading; 
+            
+        };
+
+        const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        return () => subscription.remove();
+    }, [loading])
+);
+
+  function openExportModal(){
+      setVisibleExportModal(true)
+  }
+
+  function closeExportModal(){
+      setVisibleExportModal(false)
+  }
+  
+  function openImportModal(){
+      setVisibleImportModal(true)
+  }
+
+  function closeImportModal(){
+      setVisibleImportModal(false)
+  }
+  
+  function openDeleteModal(){
+      setVisibleDeleteModal(true)
+  }
+
+  function closeDeleteModal(){
+      setVisibleDeleteModal(false)
+  }
+    
 
   async function handleSave() {
+    closeExportModal()
     setLoading(true)
     await exportDatas().then(() => {
           setLoading(false)
@@ -22,6 +67,7 @@ export default function AppSettings() {
   }
 
   async function handleImport() {
+    closeImportModal()
     setLoading(true)
     await importDatas().then(async () => {
           setLoading(false)
@@ -31,6 +77,7 @@ export default function AppSettings() {
   }
 
   async function handleDelete() {
+    closeDeleteModal()
     setLoading(true)
     await deleteAllDatas().then(() => {
           setLoading(false)
@@ -51,21 +98,23 @@ export default function AppSettings() {
             <ActivityIndicator style={{margin: 20}} size="large" color={colors.primary} />
           ) : (
             <View>
-            <TouchableOpacity style={styles.button_container} onPress={handleSave} disabled={loading}>
+            <TouchableOpacity style={styles.button_container} onPress={openExportModal} disabled={loading}>
                 <MaterialIcons name="save-alt" size={30} color={colors.primary} />
                 <Text style={styles.button_text}>Save datas</Text>
             </TouchableOpacity> 
-            <TouchableOpacity style={styles.button_container} onPress={handleImport} disabled={loading}>
+            <TouchableOpacity style={styles.button_container} onPress={openImportModal} disabled={loading}>
               <Octicons name="upload" size={24} color={colors.primary} />
               <Text style={styles.button_text}>Import datas</Text>
             </TouchableOpacity> 
-            <TouchableOpacity style={styles.button_container_danger} onPress={handleDelete} disabled={loading}>
+            <TouchableOpacity style={styles.button_container_danger} onPress={openDeleteModal} disabled={loading}>
               <MaterialIcons name="delete-outline" size={30} color={colors.primary} />
               <Text style={styles.button_text}>Erase datas</Text>
             </TouchableOpacity>
             </View>
           )} 
-        
+        <InformationModal onClose={handleSave} visible={visibleExportModal} text='Your data is going to be backed up to a zip file. Please wait'/>
+        <ConfirmationModal onClose={closeImportModal} onConfirm={handleImport} visible={visibleImportModal} danger='warning' text='The application will close after importing data. Do you want to continue ?'/>
+        <ConfirmationModal onClose={closeDeleteModal} onConfirm={handleDelete} visible={visibleDeleteModal} danger='danger' text='The application will close after deleting data. Do you want to continue ?'/>
       </ScrollView>
     </LinearGradient>
   );
