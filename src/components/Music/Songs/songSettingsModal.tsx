@@ -71,7 +71,7 @@ export default function SongSettingsModal ({ visible, onClose, id }: SongOptions
                 
                 <View style={styles.items_container_sm}>
                     <Link href={{
-                    pathname: "/songSettings",
+                    pathname: "/Music/songSettings",
                     params: {id:[song.id.toString()]},
                     }}
                     onPress={onClose} push asChild>

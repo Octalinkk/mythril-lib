@@ -19,8 +19,13 @@ export async function initDatabase(): Promise<void> {
     await createSongsAlbumsTable(db)
     await createAlbumsArtistsTable(db)
     await createSongsPlaylistsTable(db)
-
+    updateDBToLatest()
     console.log('DB builded');
+}
+
+export async function updateDBToLatest() {
+    console.log("DB hasn't changed yet so more is coming")   
+    //Write changes to DB here for futur updates 
 }
 
 export async function getLastPlaylistId(){

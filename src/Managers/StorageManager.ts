@@ -13,19 +13,30 @@ import { getAudioMetaData } from '../../modules/audio-metadata';
 
 export async function exportDatas() {
     console.log("Exporting...")
-    zip(Paths.document.uri, new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, 9)
+    await zip(Paths.document.uri, new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, 9)
         .then((path) => console.log(`zip completed at ${path}`))
         .catch((error) => console.error(error))
 }
 
 export async function importDatas() {
-    unzip(new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, Paths.document.uri)
+    await deleteAllDatas()
+    await unzip(new File("file:///storage/emulated/0/Documents/MythrilLibData.zip").uri, Paths.document.uri)
         .then((path) => console.log(`unzip completed at ${path}`))
         .catch((error) => console.error(error))
 }
 
 export async function deleteAllDatas() {
-    console.log("Deleting all...")
+        if (new Directory(Paths.document, 'songCover').exists){
+            new Directory(Paths.document, 'songCover').delete()
+        }if (new Directory(Paths.document, 'artistProfil').exists){
+            new Directory(Paths.document, 'artistProfil').delete()
+        }if (new Directory(Paths.document, 'albumCover').exists){
+            new Directory(Paths.document, 'albumCover').delete()
+        }if (new Directory(Paths.document, 'playlistCover').exists){
+            new Directory(Paths.document, 'playlistCover').delete()
+        }if (new Directory(Paths.document, 'SQLite').exists){
+            new Directory(Paths.document, 'SQLite').delete()
+    }
 }
 
 export default async function getMp3Files(path = "file:///storage/emulated/0/Music/"): Promise<File[]> {

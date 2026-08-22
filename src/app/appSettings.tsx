@@ -1,14 +1,42 @@
 
 
+import { updateDBToLatest } from '@/db/DBManager';
 import { deleteAllDatas, exportDatas, importDatas } from '@/Managers/StorageManager';
 import { colors, globalStyles } from '@/styles/global';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { killApp } from '../../modules/app-killer';
 
-export default function HomeScreen() {
+export default function AppSettings() {
   
+  const [loading, setLoading] = useState<boolean>(false)
+
+  async function handleSave() {
+    setLoading(true)
+    await exportDatas().then(() => {
+          setLoading(false)
+    });
+  }
+
+  async function handleImport() {
+    setLoading(true)
+    await importDatas().then(async () => {
+          setLoading(false)
+          updateDBToLatest()
+          killApp()
+    });
+  }
+
+  async function handleDelete() {
+    setLoading(true)
+    await deleteAllDatas().then(() => {
+          setLoading(false)
+          killApp()
+    });
+  }
 
   return (
     <LinearGradient 
@@ -17,21 +45,26 @@ export default function HomeScreen() {
       start={{x:0, y:0}}
       end={{x:1, y:1}}
     >
-
       <ScrollView style={styles.main_scroll}>
         <Text style={styles.title}>Datas</Text>
-        <TouchableOpacity style={styles.button_container} onPress={async () => await exportDatas()}>
-          <MaterialIcons name="save-alt" size={30} color={colors.primary} />
-          <Text style={styles.button_text}>Save datas</Text>
-        </TouchableOpacity> 
-        <TouchableOpacity style={styles.button_container} onPress={async () => await importDatas()}>
-          <Octicons name="upload" size={24} color={colors.primary} />
-          <Text style={styles.button_text}>Import datas</Text>
-        </TouchableOpacity> 
-        <TouchableOpacity style={styles.button_container_danger} onPress={async () => await deleteAllDatas()}>
-          <MaterialIcons name="delete-outline" size={30} color={colors.primary} />
-          <Text style={styles.button_text}>Erase datas</Text>
-        </TouchableOpacity>
+        {loading ? (
+            <ActivityIndicator style={{margin: 20}} size="large" color={colors.primary} />
+          ) : (
+            <View>
+            <TouchableOpacity style={styles.button_container} onPress={handleSave} disabled={loading}>
+                <MaterialIcons name="save-alt" size={30} color={colors.primary} />
+                <Text style={styles.button_text}>Save datas</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={styles.button_container} onPress={handleImport} disabled={loading}>
+              <Octicons name="upload" size={24} color={colors.primary} />
+              <Text style={styles.button_text}>Import datas</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={styles.button_container_danger} onPress={handleDelete} disabled={loading}>
+              <MaterialIcons name="delete-outline" size={30} color={colors.primary} />
+              <Text style={styles.button_text}>Erase datas</Text>
+            </TouchableOpacity>
+            </View>
+          )} 
         
       </ScrollView>
     </LinearGradient>
@@ -57,6 +90,7 @@ const styles = StyleSheet.create({
     padding: 10,
     gap: 20,
     maxHeight: 50,
+    minHeight: 50,
     borderWidth: 2,
     borderRadius: 30,
     borderColor: colors.primary,

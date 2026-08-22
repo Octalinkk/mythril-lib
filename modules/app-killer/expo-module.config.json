@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "web"],
+  "apple": {
+    "modules": ["AppKillerModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.appkiller.AppKillerModule"]
+  }
+}
