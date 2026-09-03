@@ -1,4 +1,4 @@
-# Mythril Library - BETA 0.1.2
+# Mythril Library - BETA 0.1.3
 
 This app is a multifunctional library that allows you (only for now) to play all your songs.
 
