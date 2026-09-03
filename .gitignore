@@ -4,6 +4,7 @@
 node_modules/
 
 MakeARelease.md
+keys/*
 
 # Expo
 .expo/
