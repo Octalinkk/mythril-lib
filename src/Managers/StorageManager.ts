@@ -8,91 +8,23 @@ import { addSongArtist } from '@/db/SongsArtistsManager';
 import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
 import { addSongPlaylist, getSongPlaylistById, SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { Directory, File, Paths } from 'expo-file-system';
-import * as FS from 'react-native-fs';
+import { unzip, zip } from 'react-native-zip-archive';
 import { getAudioMetaData } from '../../modules/audio-metadata';
-import { meta } from './AppInfo';
+import { metaInfo } from './AppInfo';
 
-interface SerializedFile {
-    path: string;      // chemin relatif dans l'app
-    content: string;   // contenu en Base64
-}
-
-async function serializeDirectory(dir: Directory, basePath: string = ''): Promise<SerializedFile[]> {
-    const items = dir.list();
-    let files: SerializedFile[] = [];
-
-    for (const item of items) {
-        const relativePath = basePath ? `${basePath}/${item.name}` : item.name;
-
-        if (item instanceof File) {
-            const content = item.base64Sync(); // ← lit et encode en Base64
-            files.push({ path: relativePath, content });
-        } else if (item instanceof Directory) {
-            const subFiles = await serializeDirectory(item, relativePath);
-            files = files.concat(subFiles);
-        }
-    }
-
-    return files;
-}
 
 export async function exportDatas() {
-
-    
-
-    const files = await serializeDirectory(new Directory("file://"+FS.ExternalDirectoryPath+"Documents/MythrilLibData.json"))
-    
-    const backup = {
-        version: meta.version,
-        date: new Date().toISOString(),
-        files: files
-    };
-
-    console.log(FS.DownloadDirectoryPath)
-    const backupFile = new File("file://"+FS.DownloadDirectoryPath+"/MythrilLibData.json");
-    console.log(backupFile.uri)
-    if (backupFile.exists) backupFile.delete();
-    await FS.writeFile("file://"+FS.DownloadDirectoryPath+"/MythrilLibData.json", JSON.stringify(backup), "utf8")
-    
-    console.log(`Export terminé — ${files.length} fichiers`);
+    console.log("Exporting...")
+    await zip(Paths.document.uri, new File(metaInfo.DEFBACKUPPATH).uri, 9)
+        .then((path) => console.log(`zip completed at ${path}`))
+        .catch((error) => console.error(error))
 }
 
 export async function importDatas() {
-    //await deleteAllDatas()
-    const backupFile = new File("file://"+FS.DownloadDirectoryPath+"/MythrilLibData.json");
-    
-    if (!backupFile.exists) {
-        console.log('Aucune sauvegarde trouvée');
-        return;
-    }
-
-    const raw = await backupFile.text();
-    const backup = JSON.parse(raw);
-
-    for (const fileEntry of backup.files) {
-        const targetFile = new File(Paths.document, fileEntry.path);
-        
-        // Crée le dossier parent si besoin
-        const parentDir = new Directory(targetFile.uri.substring(0, targetFile.uri.lastIndexOf('/')));
-        if (!parentDir.exists) {
-            parentDir.create();
-        }
-
-        // Décode et écrit
-        const bytes = base64ToBytes(fileEntry.content);
-        targetFile.write(bytes);
-    }
-
-    console.log(`Import terminé — ${backup.files.length} fichiers restaurés`);
-}
-
-function base64ToBytes(base64: string): Uint8Array {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
+    deleteAllDatas()
+    await unzip(new File(metaInfo.DEFBACKUPPATH).uri, Paths.document.uri)
+        .then((path) => console.log(`unzip completed at ${path}`))
+        .catch((error) => console.error(error))
 }
 
 export async function deleteAllDatas() {

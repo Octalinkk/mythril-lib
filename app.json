@@ -12,6 +12,7 @@
     },
     "android": {
       "permissions": [
+        "android.permission.MANAGE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_MEDIA_VIDEO",
@@ -46,7 +47,8 @@
       "expo-font",
       "expo-image",
       "expo-status-bar",
-      "expo-web-browser"
+      "expo-web-browser",
+      "react-native-zip-archive"
     ],
     "experiments": {
       "typedRoutes": true,

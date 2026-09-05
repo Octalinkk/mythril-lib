@@ -12,26 +12,34 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { killApp } from '../../modules/app-killer';
+import { hasExternalStorageAccess, requestExternalStorageAccess } from '../../modules/storage-permission-manager';
 
 export default function AppSettings() {
   
   const [loading, setLoading] = useState<boolean>(false)
+  const [hasAccess, setAccess] = useState<boolean>(hasExternalStorageAccess())
   const [visibleExportModal, setVisibleExportModal] = useState<boolean>(false)
   const [visibleImportModal, setVisibleImportModal] = useState<boolean>(false)
   const [visibleDeleteModal, setVisibleDeleteModal] = useState<boolean>(false)
 
   useFocusEffect(
-    useCallback(() => {
-        const onBackPress = () => {
-            // Prevent going back when loading (if true -> block)
-            return loading; 
-            
-        };
+      useCallback(() => {
+          const onBackPress = () => {
+              // Prevent going back when loading (if true -> block)
+              return loading; 
+              
+          };
 
-        const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-        return () => subscription.remove();
-    }, [loading])
-);
+          const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+          return () => subscription.remove();
+      }, [loading])
+  );
+
+  useFocusEffect(
+      useCallback(() => {
+          setAccess(hasExternalStorageAccess())
+      }, [hasAccess])
+  );
 
   function openExportModal(){
       setVisibleExportModal(true)
@@ -85,6 +93,50 @@ export default function AppSettings() {
     });
   }
 
+  
+
+  function getBackupContent(){
+    if(hasAccess){
+      return (
+        <View>
+          <Text style={styles.title}>Backup datas</Text>
+            {loading ? (
+                <ActivityIndicator style={{margin: 20}} size="large" color={colors.primary} />
+              ) : (
+                <View>
+                <TouchableOpacity style={styles.button_container} onPress={openExportModal} disabled={loading}>
+                    <MaterialIcons name="save-alt" size={30} color={colors.primary} />
+                    <Text style={styles.button_text}>Save datas</Text>
+                </TouchableOpacity> 
+                <TouchableOpacity style={styles.button_container} onPress={openImportModal} disabled={loading}>
+                  <Octicons name="upload" size={24} color={colors.primary} />
+                  <Text style={styles.button_text}>Import datas</Text>
+                </TouchableOpacity> 
+                <TouchableOpacity style={styles.button_container_danger} onPress={openDeleteModal} disabled={loading}>
+                  <MaterialIcons name="delete-outline" size={30} color={colors.primary} />
+                  <Text style={styles.button_text}>Erase datas</Text>
+                </TouchableOpacity>
+                </View>
+              )} 
+            <InformationModal onClose={handleSave} visible={visibleExportModal} text='Your data is going to be backed up to a zip file. Please wait'/>
+            <ConfirmationModal onClose={closeImportModal} onConfirm={handleImport} visible={visibleImportModal} danger='warning' text='The application will close after importing data. Do you want to continue ?'/>
+            <ConfirmationModal onClose={closeDeleteModal} onConfirm={handleDelete} visible={visibleDeleteModal} danger='danger' text='The application will close after deleting data. Do you want to continue ?'/>
+        </View>
+      )
+    }
+    else {
+      return(
+        <View>
+          <Text style={styles.title}>Backup datas</Text>
+          <Text style={styles.button_text}>The app does not have access to your storage. Click below to grant authorisation.</Text>
+          <TouchableOpacity style={styles.button_container} onPress={requestExternalStorageAccess} disabled={loading}>
+            <Text style={styles.button_text}>Grant Authorisation</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
+  }
+
   return (
     <LinearGradient 
       style={globalStyles.main_container}
@@ -93,28 +145,7 @@ export default function AppSettings() {
       end={{x:1, y:1}}
     >
       <ScrollView style={styles.main_scroll}>
-        <Text style={styles.title}>Datas</Text>
-        {loading ? (
-            <ActivityIndicator style={{margin: 20}} size="large" color={colors.primary} />
-          ) : (
-            <View>
-            <TouchableOpacity style={styles.button_container} onPress={openExportModal} disabled={loading}>
-                <MaterialIcons name="save-alt" size={30} color={colors.primary} />
-                <Text style={styles.button_text}>Save datas</Text>
-            </TouchableOpacity> 
-            <TouchableOpacity style={styles.button_container} onPress={openImportModal} disabled={loading}>
-              <Octicons name="upload" size={24} color={colors.primary} />
-              <Text style={styles.button_text}>Import datas</Text>
-            </TouchableOpacity> 
-            <TouchableOpacity style={styles.button_container_danger} onPress={openDeleteModal} disabled={loading}>
-              <MaterialIcons name="delete-outline" size={30} color={colors.primary} />
-              <Text style={styles.button_text}>Erase datas</Text>
-            </TouchableOpacity>
-            </View>
-          )} 
-        <InformationModal onClose={handleSave} visible={visibleExportModal} text='Your data is going to be backed up to a zip file. Please wait'/>
-        <ConfirmationModal onClose={closeImportModal} onConfirm={handleImport} visible={visibleImportModal} danger='warning' text='The application will close after importing data. Do you want to continue ?'/>
-        <ConfirmationModal onClose={closeDeleteModal} onConfirm={handleDelete} visible={visibleDeleteModal} danger='danger' text='The application will close after deleting data. Do you want to continue ?'/>
+        {getBackupContent()}
       </ScrollView>
     </LinearGradient>
   );

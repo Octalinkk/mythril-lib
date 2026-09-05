@@ -5,6 +5,7 @@ import { initDatabase } from '@/db/DBManager';
 import { SpaceGrotesk_400Regular, SpaceGrotesk_700Bold, useFonts } from '@expo-google-fonts/space-grotesk';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
+import { hasExternalStorageAccess, requestExternalStorageAccess } from '../../../modules/storage-permission-manager';
 
 export default function RootLayout() {
 
@@ -24,8 +25,12 @@ export default function RootLayout() {
                 if (granted) {
                     // 3.update DB
                     updateSongs()
+                    if (hasExternalStorageAccess() != true){                        
+                        requestExternalStorageAccess()
+                    }
                 }
             })
+            
         .catch(err => console.error('Perms error:', err));
         }).catch(console.error);
     }, []);

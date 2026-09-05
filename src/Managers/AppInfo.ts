@@ -1,3 +1,4 @@
-export const meta = {
-    version: "0.1.4"
+export const metaInfo = {
+    VERSION: "0.1.4",
+    DEFBACKUPPATH : "file:///storage/emulated/0/Documents/MythrilLibData.zip"
 }
