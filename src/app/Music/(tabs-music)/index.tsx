@@ -107,7 +107,8 @@ export default function HomeScreen() {
         capabilities: [
             PlayerCommand.PlayPause,
             PlayerCommand.Next,
-            PlayerCommand.Previous
+            PlayerCommand.Previous,
+            PlayerCommand.Seek
         ],
       });
     }

@@ -8,7 +8,7 @@ import { File } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { AppState, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextTicker from 'react-native-text-ticker';
 
 import { Artist, getArtistById, updateArtist } from '@/db/ArtistsManager';
@@ -87,6 +87,34 @@ export default function MusicPlayer() {
     const last_position = useRef<number>(0);
     const curr_song = useRef<Song>(null);
     const curr_artists = useRef<Artist[]>(null);
+
+    async function applyTransition(mediaId: number) {
+        if (curr_song.current?.id === mediaId) return // déjà à jour, rien à faire
+
+        if (curr_song.current != null && curr_artists.current != null) {
+            curr_song.current.time_listened += last_position.current
+            curr_artists.current.forEach(artist => artist.time_listened += last_position.current)
+            updateSong(curr_song.current)
+            await Promise.all(curr_artists.current.map(artist => updateArtist(artist)))
+        }
+
+        curr_song.current = await getSongById(mediaId)
+        if (curr_song.current != null) {
+            curr_artists.current = await getArtistsforSongId(curr_song.current.id)
+            curr_song.current.time_started += 1
+            curr_song.current.last_time_played = new Date().toISOString()
+            curr_artists.current.forEach(artist => {
+                artist.time_started += 1
+                artist.last_time_played = new Date().toISOString()
+            })
+            setCurrDisplaySong(curr_song.current)
+            setCurrDisplayArtists(curr_artists.current)
+            updateSong(curr_song.current)
+            await Promise.all(curr_artists.current.map(artist => updateArtist(artist)))
+        } else {
+            curr_artists.current = []
+        }
+    }
     
     useEffect(() => {
 
@@ -189,51 +217,28 @@ export default function MusicPlayer() {
 
         loadSongs().catch(console.error);
 
-        TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-
-    if (isInit.current) {
-        isInit.current = false
-        if (item?.mediaId !== expectedInitMediaId.current) {
-            return  // event parasite du chargement : ignoré, used_event n'est PAS touché
-        }
-    }
-
-    if(!used_event.current){
-        used_event.current = true
-
-        if (!playing) {
-            TrackPlayer.play()
-        }
-        if(item?.mediaId != undefined){
-            //null à chaque réouverture du player car remit le useRef par défaut (null) 
-            if (curr_song.current != null && curr_artists.current != null){
-                curr_song.current.time_listened += last_position.current
-                curr_artists.current.map(artist => artist.time_listened += last_position.current)
-                updateSong(curr_song.current)
-                await Promise.all(
-                    curr_artists.current.map(artist => updateArtist(artist))
-                );
+        TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item }) => {
+            if (isInit.current) {
+                isInit.current = false
+                if (item?.mediaId !== expectedInitMediaId.current) return
             }
-            curr_song.current = await getSongById(Number(item?.mediaId))
-            if (curr_song.current != null){
-                curr_artists.current = await getArtistsforSongId(curr_song.current?.id)
-                curr_song.current.time_started += 1
-                curr_song.current.last_time_played = new Date().toISOString()
-                curr_artists.current.map(artist => artist.time_started += 1)
-                curr_artists.current.map(artist => artist.last_time_played = new Date().toISOString())
-                setCurrDisplaySong(curr_song.current)
-                setCurrDisplayArtists(curr_artists.current)
-                updateSong(curr_song.current)
-                await Promise.all(
-                    curr_artists.current.map(artist => updateArtist(artist))
-                );
-            }
-            else {curr_artists.current = []}
-        }
-    }
-});
+            if (item?.mediaId === undefined) return
+            await applyTransition(Number(item.mediaId))
+        })
         
         
+    }, []);
+
+    useEffect(() => {
+        const sub = AppState.addEventListener('change', (nextState) => {
+            if (nextState === 'active') {
+                const activeItem = TrackPlayer.getActiveMediaItem()
+                if (activeItem?.mediaId !== undefined) {
+                    applyTransition(Number(activeItem.mediaId))
+                }
+            }
+        });
+        return () => sub.remove();
     }, []);
 
 
@@ -267,7 +272,7 @@ export default function MusicPlayer() {
                     TrackPlayer.seekTo(value)
                 }}/>
                 <View style={styles.controls}>
-                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToPrevious(); used_event.current = false}}>
+                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToPrevious();}}>
                         <MaterialIcons name="skip-previous" size={30} color="black" />
                     </TouchableOpacity>
 
@@ -275,7 +280,7 @@ export default function MusicPlayer() {
                         {playing ? <FontAwesome6 name="pause" size={35} color={"#000000"} /> : <FontAwesome name="play" style={{marginLeft: 5}} size={30} color={"#000000"} />}
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext() ; used_event.current = false}}>
+                    <TouchableOpacity style={styles.skip_btn} onPress={() => {TrackPlayer.skipToNext()}}>
                         <MaterialIcons name="skip-next" size={30} color="black" />
                     </TouchableOpacity>
                 </View>

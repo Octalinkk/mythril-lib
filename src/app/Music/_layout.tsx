@@ -2,6 +2,7 @@ import { askAudioFilesPerms } from '@/Managers/PermsManager';
 import { updateSongs } from '@/Managers/StorageManager';
 import { initDatabase } from '@/db/DBManager';
 
+import { setupPlayerBehavior } from '@/Managers/MusicManager';
 import { SpaceGrotesk_400Regular, SpaceGrotesk_700Bold, useFonts } from '@expo-google-fonts/space-grotesk';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
@@ -33,6 +34,10 @@ export default function RootLayout() {
             
         .catch(err => console.error('Perms error:', err));
         }).catch(console.error);
+    }, []);
+
+    useEffect(() => {
+        setupPlayerBehavior()
     }, []);
 
     
