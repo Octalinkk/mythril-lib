@@ -35,10 +35,12 @@ export default function FloatingPlayer () {
         useCallback(() => {
             async function loadInfo(){
                 if (playing){
-                    const result = await getSongById(Number(TrackPlayer.getActiveMediaItem()?.mediaId))
-                    if (result) {  
-                        setSong(result)
-                    };
+                    if(TrackPlayer.getActiveMediaItem()?.mediaId != null){
+                        const curr = await getSongById(Number(TrackPlayer.getActiveMediaItem()?.mediaId))
+                        if (curr != null){
+                            setSong(curr)    
+                        }
+                    }
                 }
                 
             }
@@ -47,15 +49,15 @@ export default function FloatingPlayer () {
     );
 
     useEffect(() => {
-        TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item, index }) => {
-            if(item?.mediaId != undefined && item?.mediaId != "0"){
-                const result = await getSongById(Number(item?.mediaId))
-                if (result){
-                    setSong(result)
+        TrackPlayer.addEventListener(Event.MediaItemTransition, async ({ item }) => {
+            if(item?.mediaId != null){
+                const curr = await getSongById(Number(item.mediaId))
+                if (curr != null){
+                    setSong(curr)    
                 }
-            }
-        });
-    }, []);
+            }                         
+        })
+    }, [song]);
 
     //condition pour cacher
     if (TrackPlayer.getActiveMediaItem() == null || song.id === 0) return <View></View>;
