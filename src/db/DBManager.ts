@@ -1,4 +1,6 @@
+import { updateSongCreationDate } from '@/Managers/StorageManager';
 import { openDatabaseAsync, SQLiteDatabase } from 'expo-sqlite';
+import { getAllSongs } from './SongsManager';
 
 let dbPromise: Promise<SQLiteDatabase> | null = null;
 
@@ -24,8 +26,29 @@ export async function initDatabase(): Promise<void> {
 }
 
 export async function updateDBToLatest() {
-    console.log("DB hasn't changed yet so more is coming")   
-    //Write changes to DB here for futur updates 
+    console.log("DB has some change") 
+    await updateAddCreationDate()
+}
+
+export async function updateAddCreationDate() {
+    
+    const db = await getDb();
+    try{
+        await db.execAsync(`
+            ALTER TABLE songs
+            ADD COLUMN time_created TEXT DEFAULT "";
+        `);        
+    }
+    catch{
+        console.warn("Cant add 'time_created' to songs. It already exists ?")
+    }
+    const songs = await (await getAllSongs()).filter((song) => song.time_created == "")
+    if (songs.length > 0)
+    {
+        for (const song of songs) {
+        await updateSongCreationDate(song)
+    }
+}
 }
 
 export async function getLastPlaylistId(){
@@ -44,7 +67,8 @@ async function createSongsTable(db: SQLiteDatabase) {
             cover TEXT,
             last_time_played TEXT,
             time_listened INTEGER DEFAULT 0,
-            time_started INTEGER DEFAULT 0
+            time_started INTEGER DEFAULT 0,
+            time_created TEXT DEFAULT ""
         );
     `);
 }

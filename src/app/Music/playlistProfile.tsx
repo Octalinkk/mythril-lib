@@ -9,7 +9,7 @@ import FloatingPlayer from '@/components/Music/floatingPlayer';
 import RandomIcon from '@/components/Music/RandomIcon';
 import SongListItem from '@/components/Music/Songs/SongListItem';
 import { getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager';
-import { getSongById, Song } from '@/db/SongsManager';
+import { getAllSongsinAddOrder, getSongById, Song } from '@/db/SongsManager';
 import { getSongsByPlaylistId } from '@/db/SongsPlaylistsManager';
 import { colors, globalStyles } from '@/styles/global';
 
@@ -28,9 +28,19 @@ function getCoverSource(playlist: Playlist) {
 
 
 async function getSongsforPlaylist(id:number){
-    const songsId = await Promise.resolve(
-        getSongsByPlaylistId(id)
-    );
+    let songsId
+    
+    switch(id){
+        case 1:
+            const songs = await getAllSongsinAddOrder() 
+            songsId = songs.map((song) => song.id)
+            break
+        default:
+            songsId = await Promise.resolve(
+                getSongsByPlaylistId(id)    
+            );
+    }
+        
     const songs = await Promise.all(
         songsId.map(id => getSongById(+id))
     );

@@ -5,12 +5,13 @@ import { getLastPlaylistId } from '@/db/DBManager';
 import { addPlaylist, getPlaylistById, setReservedPlaylistLimit } from '@/db/PlaylistsManager';
 import { addSongAlbum } from '@/db/SongsAlbumsManager';
 import { addSongArtist } from '@/db/SongsArtistsManager';
-import { addSong, getSongByFilePath, Song } from '@/db/SongsManager';
+import { addSong, deleteSong, getAllSongs, getSongByFilePath, Song, updateSong } from '@/db/SongsManager';
 import { addSongPlaylist, getSongPlaylistById, SongPlaylist } from '@/db/SongsPlaylistsManager';
 import { Directory, File, Paths } from 'expo-file-system';
 import { unzip, zip } from 'react-native-zip-archive';
 import { getAudioMetaData } from '../../modules/audio-metadata';
 import { metaInfo } from './AppInfo';
+
 
 
 export async function exportDatas() {
@@ -41,11 +42,11 @@ export async function deleteAllDatas() {
     }
 }
 
-export default async function getMp3Files(path = "file:///storage/emulated/0/Music/"): Promise<File[]> {
-    const dir = new Directory(path);
+export default async function getMp3Files(): Promise<File[]> {
+    const dir = new Directory(metaInfo.MP3LOCATION);
     
     if (!dir.exists) {
-        console.log('Dossier introuvable:', path);
+        console.log('Dossier introuvable:', metaInfo.MP3LOCATION);
         return [];
     }
 
@@ -53,6 +54,23 @@ export default async function getMp3Files(path = "file:///storage/emulated/0/Mus
     return items.filter(item => 
         item instanceof File && item.name.endsWith('.mp3')
     ) as File[];
+}
+
+export async function updateSongCreationDate(song:Song) {
+    const file = new File(song.file_path)
+    
+    
+    if (file.creationTime != null) {
+        let date = new Date(file.creationTime)
+        song.time_created = date.toISOString()
+        console.log(song.time_created)
+        await updateSong(song)
+    }    
+    else {
+        song.time_created = new Date().toISOString()
+        console.log("pAs DATE")
+        await updateSong(song)
+    }
 }
 
 export async function updateSongs() {
@@ -75,8 +93,20 @@ export async function updateSongs() {
     else {
         firstPlaylistId = allSongsPlaylist.id
     }
+
+
     
     setReservedPlaylistLimit(1)
+
+    const dbSongs = await getAllSongs()
+
+    if (dbSongs.length != localSongs.length && dbSongs.length > 0){
+        for (const song of dbSongs) {
+            if (! new File(song.file_path).exists){
+                deleteSong(song)
+            }
+        }
+    }
 
     for (const song of localSongs) {
         if (song.exists && song.extension == ".mp3"){
@@ -89,7 +119,8 @@ export async function updateSongs() {
                     cover: "",
                     last_time_played: new Date().toISOString(),
                     time_listened: 0,
-                    time_started: 0
+                    time_started: 0,
+                    time_created: new Date().toISOString()
                 }
                 let newArtist: Artist = {
                     id: 0,
@@ -192,6 +223,8 @@ export async function updateSongs() {
             }
         }
     };
+
+    
     
     console.log("Done checking songs")
 }
