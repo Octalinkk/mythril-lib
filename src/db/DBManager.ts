@@ -28,6 +28,40 @@ export async function initDatabase(): Promise<void> {
 export async function updateDBToLatest() {
     console.log("DB has some change") 
     await updateAddCreationDate()
+    await updateAddPin()
+}
+
+export async function updateAddPin() {
+    
+    const db = await getDb();
+    try{
+        //BOOLEAN existent pas alors mettre INTEGER : 0 (false) 1 (true)
+        //Keyword SQL false et true marche
+        await db.execAsync(`
+            ALTER TABLE artists
+            ADD COLUMN pinned INTEGER DEFAULT 0;
+        `);        
+    }
+    catch{
+        console.warn("Cant add 'pinned' to artists. It already exists ?")
+    }
+
+    try{
+        await db.execAsync(`
+            ALTER TABLE albums
+            ADD COLUMN pinned INTEGER DEFAULT 0;
+        `);        
+    }
+    catch{
+        console.warn("Cant add 'pinned' to albums. It already exists ?")
+    }
+    const songs = await (await getAllSongs()).filter((song) => song.time_created == "")
+    if (songs.length > 0)
+    {
+        for (const song of songs) {
+            await updateSongCreationDate(song)
+        }
+    }
 }
 
 export async function updateAddCreationDate() {
@@ -46,9 +80,9 @@ export async function updateAddCreationDate() {
     if (songs.length > 0)
     {
         for (const song of songs) {
-        await updateSongCreationDate(song)
+            await updateSongCreationDate(song)
+        }
     }
-}
 }
 
 export async function getLastPlaylistId(){

@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 
 import ArtistItem from '@/components/Music/Artists/ArtistItem';
 import FloatingPlayer from '@/components/Music/floatingPlayer';
-import { Artist, getAllArtistsOrdered } from '@/db/ArtistsManager';
+import { Artist, getAllArtistsPinnedOrdered } from '@/db/ArtistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
@@ -19,20 +19,11 @@ export default function ArtistsScreen() {
 
   useFocusEffect(
       useCallback(() =>{
-        getAllArtistsOrdered().then(result => {
+        getAllArtistsPinnedOrdered().then(result => {
             if (result) setArtist(result);
         });
       }, [artists]) 
     )
-
-  function openCreate(){
-    setVisible(true)
-  }
-
-  function closeCreate(){
-    setVisible(false)
-  }
-  
 
   return (
     <LinearGradient 
@@ -56,7 +47,7 @@ export default function ArtistsScreen() {
           </View>
       }      
       numColumns={2}
-      ListEmptyComponent={<Text style={styles.filler_text}  key={"artist:None"}>No Artists found</Text>}     
+      ListEmptyComponent={<Text style={styles.filler_text}  key={"artist:None"}>No Artists pinned yet. You can pin in an artist's options</Text>}     
       ItemSeparatorComponent={<View style={{height:20}}></View>}     
       columnWrapperStyle={{ gap: 20 }}
       
@@ -81,7 +72,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 0.9,
     fontSize: 20,
-    fontFamily: 'SpaceGrotesk_400Regular',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',

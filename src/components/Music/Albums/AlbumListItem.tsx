@@ -6,6 +6,7 @@ import { File } from "expo-file-system";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AlbumSettingsModal from "./albumSettingsModal";
 
 type Id = {
   id: number;
@@ -25,6 +26,7 @@ export default function AlbumListItem (id: Id) {
 
     const [album, setAlbum] = useState<Album | null>(null);
     const [countSong, setCountSong] = useState<number>(0)
+    const [visibleModal, setVisibleModal] = useState<boolean>(false)
 
 
     useFocusEffect(
@@ -49,7 +51,17 @@ export default function AlbumListItem (id: Id) {
     );
     if (!album){
         return null
-    };
+    };    
+    
+    
+    function openModal(){
+        setVisibleModal(true)
+    }
+
+    function closeModal(){
+        setVisibleModal(false)
+    }
+
 
     return (
         <Link href={{
@@ -63,14 +75,10 @@ export default function AlbumListItem (id: Id) {
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{album.name}</Text>
                     <Text style={styles.subtitle}>{countSong} songs</Text>
                 </View>
-                    <Link href={{
-                        pathname: "/Music/albumSettings",
-                        params: {id:[album.id.toString()]},
-                        }} push asChild>
-                        <TouchableOpacity style={styles.icon}>
+                        <TouchableOpacity style={styles.icon} onPress={openModal}>
                             <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
                         </TouchableOpacity>
-                    </Link>
+                        <AlbumSettingsModal visible={visibleModal} onClose={closeModal} id={album.id}/>
             </TouchableOpacity>
         </Link>
     );

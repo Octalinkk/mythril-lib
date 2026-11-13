@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 
 import AlbumListItem from '@/components/Music/Albums/AlbumListItem';
 import FloatingPlayer from '@/components/Music/floatingPlayer';
-import { getAllAlbumsOrdered } from '@/db/AlbumsManager';
+import { getAllAlbumsPinnedOrdered } from '@/db/AlbumsManager';
 import { Artist } from '@/db/ArtistsManager';
 import { colors, globalStyles } from '@/styles/global';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,7 +18,7 @@ export default function AlbumsScreen() {
 
   useFocusEffect(
       useCallback(() =>{
-        getAllAlbumsOrdered().then(result => {
+        getAllAlbumsPinnedOrdered().then(result => {
             if (result) setAlbums(result);
         });
       }, [albums]) 
@@ -44,7 +44,7 @@ export default function AlbumsScreen() {
                   <Text style={styles.title}>Albums</Text>
                 </View>
             }      
-            ListEmptyComponent={<Text style={styles.filler_text}  key={"album:None"}>No Album found</Text>}     
+            ListEmptyComponent={<Text style={styles.filler_text}  key={"album:None"}>No Album pinned yet. You can pin in an album's options</Text>}     
             ItemSeparatorComponent={<View style={{height:10}}></View>}   
             maxToRenderPerBatch={5}   
             initialNumToRender={2}
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 0.9,
     fontSize: 20,
-    fontFamily: 'SpaceGrotesk_400Regular',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',

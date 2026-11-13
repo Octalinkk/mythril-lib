@@ -128,7 +128,8 @@ export async function updateSongs() {
                     cover: "",
                     last_time_played: new Date().toISOString(),
                     time_listened: 0,
-                    time_started: 0
+                    time_started: 0,
+                    pinned: 0
                 }
                 let newAlbum: Album = {
                     id: 0,
@@ -136,7 +137,8 @@ export async function updateSongs() {
                     cover: "",
                     last_time_played: new Date().toISOString(),
                     time_listened: 0,
-                    time_started: 0
+                    time_started: 0,
+                    pinned: 0
                 }
 
                 if (metadata) {
@@ -160,7 +162,8 @@ export async function updateSongs() {
                             cover: "",
                             last_time_played: new Date().toISOString(),
                             time_listened: 0,
-                            time_started: 0
+                            time_started: 0,
+                            pinned: 0
                         }
                         
                         console.log(`Adding artist : ${newArtist.name}`)
@@ -178,7 +181,8 @@ export async function updateSongs() {
                             cover: "",
                             last_time_played: new Date().toISOString(),
                             time_listened: 0,
-                            time_started: 0
+                            time_started: 0,
+                            pinned: 0
                         }
                         
                         console.log(`Adding album : ${newAlbum.name}`)

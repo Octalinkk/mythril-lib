@@ -7,6 +7,7 @@ import { File } from "expo-file-system";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import ArtistSettingsModal from "./artistSettingsModal";
 
 type Id = {
   artist_id: number;
@@ -50,6 +51,7 @@ export default function ArtistListItem (id: Id) {
     const [artist, setArtist] = useState<Artist | null>(null);
     const [countSong, setCountSong] = useState<number>(0)
     const [countAlbum, setCountAlbum] = useState<number>(0)
+    const [visibleModal, setVisibleModal] = useState<boolean>(false)
 
 
     useFocusEffect(
@@ -80,6 +82,16 @@ export default function ArtistListItem (id: Id) {
         return null
     };
 
+    
+    
+    function openModal(){
+        setVisibleModal(true)
+    }
+
+    function closeModal(){
+        setVisibleModal(false)
+    }
+
     return (
         <Link href={{
             pathname: "/Music/artistProfile",
@@ -92,14 +104,10 @@ export default function ArtistListItem (id: Id) {
                     <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{artist.name}</Text>
                     <Text style={styles.subtitle}>{countSong} songs | {countAlbum} albums</Text>
                 </View>
-                    <Link href={{
-                        pathname: "/Music/artistSettings",
-                        params: {id:[artist.id.toString()]},
-                        }} push asChild>
-                        <TouchableOpacity style={styles.icon}>
-                            <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
-                        </TouchableOpacity>
-                    </Link>
+                    <TouchableOpacity style={styles.icon} onPress={openModal}>
+                        <SimpleLineIcons name="options-vertical" size={10} color={colors.primary} />
+                    </TouchableOpacity>
+                    <ArtistSettingsModal visible={visibleModal} onClose={closeModal} id={artist.id}/>
             </TouchableOpacity>
         </Link>
     );

@@ -25,7 +25,8 @@ export default function SongSettingsModal ({ visible, onClose, id }: SongOptions
         cover: "",
         last_time_played: "",
         time_listened: 0,
-        time_started: 0
+        time_started: 0,
+        time_created: ""
     });
 
 
