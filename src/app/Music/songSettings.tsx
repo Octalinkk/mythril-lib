@@ -3,7 +3,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { addAlbum, getAlbumById, getAlbumByName } from '@/db/AlbumsManager';
 import { addAlbumArtist, getAlbumArtistById } from '@/db/ArtistsAlbumsManager';
@@ -74,7 +74,8 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
                     cover: "",
                     last_time_played: "",
                     time_listened: 0,
-                    time_started: 0
+                    time_started: 0,
+                    pinned: 0
                 }
                 artId = await addArtist(newArtist)    
             }
@@ -107,7 +108,8 @@ async function saveChanges(song:Song, title: string, artist: string, album: stri
                     cover: "",
                     last_time_played: "",
                     time_listened: 0,
-                    time_started: 0
+                    time_started: 0,
+                    pinned: 0
                 }
                 id = await addAlbum(newAlbum)    
             }
@@ -158,7 +160,8 @@ export default function songSettings() {
         cover: "",
         last_time_played: "",
         time_listened: 0,
-        time_started: 0
+        time_started: 0,
+        time_created: ""
     });
 
     const [name, setName] = useState<string>("");
@@ -238,56 +241,62 @@ export default function songSettings() {
                     <Text style={styles.btn_text}>Save</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView >
-                <View style={styles.main_scroll}>
-                    <Image source={getCoverSource(song.cover, coverKey)} style={styles.cover}/>
-                    <TouchableOpacity 
-                        onPress={async () => {
-                            openModal()
-                        }} style={styles.btn_md}>
-                        <Text style={styles.btn_text}>Change cover</Text>
-                    </TouchableOpacity>
+            <KeyboardAvoidingView behavior='height'>
+                <ScrollView keyboardShouldPersistTaps="always">
+                    <View style={styles.main_scroll}>
+                        <Image source={getCoverSource(song.cover, coverKey)} style={styles.cover}/>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                openModal()
+                            }} style={styles.btn_md}>
+                            <Text style={styles.btn_text}>Change cover</Text>
+                        </TouchableOpacity>
+                        
+                        <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='song' id={song.id} key={"song_setting:"+song.id}/>
+                        
+                                <View style={styles.field_container}>
+                                    <Text style={styles.field_title}>Title</Text>
+                                    <TextInput
+                                        style={styles.field_input}
+                                        onChangeText={(name) => setName(name)}
+                                        inputMode='text'
+                                        value={name}
+                                        placeholder="Song title"
+                                        placeholderTextColor ={colors.secondary}
+                                        autoFocus={true}
+                                    />
+                                </View>
+
+                                <View style={styles.field_container}>
+                                    <Text style={styles.field_title}>Artist</Text>
+                                    <TextInput
+                                        style={styles.field_input}
+                                        onChangeText={(artist) => setArtist(artist)}
+                                        inputMode='text'
+                                        value={artist}
+                                        placeholder="Artist name"
+                                        placeholderTextColor ={colors.secondary}
+                                        autoFocus={true}
+                                    />
+                                </View>
+
+                                <View style={styles.field_container}>
+                                    <Text style={styles.field_title}>Album</Text>
+                                    <TextInput
+                                        style={styles.field_input}
+                                        onChangeText={(album) => setAlbum(album)}
+                                        inputMode='text'
+                                        value={album}
+                                        placeholder="Album title"
+                                        placeholderTextColor ={colors.secondary}
+                                        autoFocus={true}
+                                    />
+                                </View>
+                    </View>
                     
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='song' id={song.id} key={"song_setting:"+song.id}/>
-                    <View style={styles.field_container}>
-                        <Text style={styles.field_title}>Title</Text>
-                        <TextInput
-                            style={styles.field_input}
-                            onChangeText={(name) => setName(name)}
-                            inputMode='text'
-                            value={name}
-                            placeholder="Song title"
-                            placeholderTextColor ={colors.secondary}
-                        />
-                    </View>
-
-                    <View style={styles.field_container}>
-                        <Text style={styles.field_title}>Artist</Text>
-                        <TextInput
-                            style={styles.field_input}
-                            onChangeText={(artist) => setArtist(artist)}
-                            inputMode='text'
-                            value={artist}
-                            placeholder="Artist name"
-                            placeholderTextColor ={colors.secondary}
-                        />
-                    </View>
-
-                    <View style={styles.field_container}>
-                        <Text style={styles.field_title}>Album</Text>
-                        <TextInput
-                            style={styles.field_input}
-                            onChangeText={(album) => setAlbum(album)}
-                            inputMode='text'
-                            value={album}
-                            placeholder="Album title"
-                            placeholderTextColor ={colors.secondary}
-                        />
-                    </View>
-                </View>
-                
-                
-            </ScrollView>
+                    
+                </ScrollView>
+            </KeyboardAvoidingView>
         </LinearGradient>
     )
 }
@@ -343,7 +352,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         fontFamily: 'SpaceGrotesk_400Regular',
         fontSize: 15,
-        color: colors.primary
+        color: colors.primary,
+        maxHeight: 20
     },
     field_input:{
         flex: 1,
@@ -351,7 +361,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         borderBottomWidth: 1,
         borderBottomColor: colors.primary,
-        color: colors.primary
+        color: colors.primary,
+        maxHeight: 50
     }
 
 });

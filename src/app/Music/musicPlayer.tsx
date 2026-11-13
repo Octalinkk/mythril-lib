@@ -77,7 +77,8 @@ export default function MusicPlayer() {
         cover: "",
         last_time_played: "",
         time_listened: 0,
-        time_started: 0
+        time_started: 0,
+        time_created: ""
     });
     const [curr_display_artists, setCurrDisplayArtists] = useState<Artist[]>([]);
 

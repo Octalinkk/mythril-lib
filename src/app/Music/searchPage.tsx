@@ -81,6 +81,7 @@ export default function SearchScreen() {
                         inputMode='text'
                         placeholder="Search: Songs, Artists or Albums"
                         placeholderTextColor ={colors.secondary}
+                        autoFocus={true}
                     />
                 </View>
                 <ScrollView >

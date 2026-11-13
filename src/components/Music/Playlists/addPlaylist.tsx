@@ -62,6 +62,7 @@ export default function CreatPlaylistModal ({ visible, onClose }: SongOptionsMod
                           value={name}
                           placeholder="playlist name"
                           placeholderTextColor ={colors.secondary}
+                            autoFocus={true}
                       />
                   </View>
                   <TouchableOpacity style={styles.btn} onPress={async () => {

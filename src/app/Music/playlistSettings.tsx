@@ -4,7 +4,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import SongListItem from '@/components/Music/Songs/SongListItem';
 import { deletePlaylist, getPlaylistById, Playlist, updatePlaylist } from '@/db/PlaylistsManager';
@@ -177,6 +177,8 @@ export default function playlistSettings() {
                     <Text style={styles.btn_text}>Save</Text>
                 </TouchableOpacity>
             </View>
+            
+            <KeyboardAvoidingView behavior='height'>
             <ScrollView style={{marginBottom: 50}}>
                 <View style={styles.main_scroll}>
                     <Image source={getCoverSource(playlist.cover)} style={styles.cover}/>
@@ -197,6 +199,7 @@ export default function playlistSettings() {
                             value={name}
                             placeholder="Playlist name"
                             placeholderTextColor ={colors.secondary}
+                            autoFocus={true}
                         />
                     </View>
                     <TouchableOpacity 
@@ -210,6 +213,7 @@ export default function playlistSettings() {
                 {loadItemsList()}
                 
             </ScrollView>
+            </KeyboardAvoidingView>
         </LinearGradient>
     )
 }

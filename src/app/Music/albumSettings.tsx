@@ -3,7 +3,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { Album, deleteAlbum, getAlbumById, getAlbumByName, updateAlbum } from '@/db/AlbumsManager';
 import { deleteArtistsByAlbumId } from '@/db/ArtistsAlbumsManager';
@@ -82,7 +82,8 @@ export default function albumSettings() {
         cover: "",
         last_time_played: "",
         time_listened: 0,
-        time_started: 0
+        time_started: 0,
+        pinned: 0
     });
 
     const [name, setName] = useState<string>("");
@@ -136,39 +137,43 @@ export default function albumSettings() {
                     <Text style={styles.btn_text}>Save</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView >
-                <View style={styles.main_scroll}>
-                    <Image source={getCoverSource(album.cover)} style={styles.cover}/>
-                    <TouchableOpacity 
-                        onPress={async () => {
-                            openModal()
-                        }} style={styles.btn_md}>
-                        <Text style={styles.btn_text}>Change cover</Text>
-                    </TouchableOpacity>
-                    
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='album' id={album.id} key={"song_setting:"+album.id}/>
-                    <View style={styles.field_container}>
-                        <Text style={styles.field_title}>Title</Text>
-                        <TextInput
-                            style={styles.field_input}
-                            onChangeText={(name) => setName(name)}
-                            inputMode='text'
-                            value={name}
-                            placeholder="Song title"
-                            placeholderTextColor ={colors.secondary}
-                        />
+            
+            <KeyboardAvoidingView behavior='height'>
+                <ScrollView >
+                    <View style={styles.main_scroll}>
+                        <Image source={getCoverSource(album.cover)} style={styles.cover}/>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                openModal()
+                            }} style={styles.btn_md}>
+                            <Text style={styles.btn_text}>Change cover</Text>
+                        </TouchableOpacity>
+                        
+                        <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='album' id={album.id} key={"song_setting:"+album.id}/>
+                        <View style={styles.field_container}>
+                            <Text style={styles.field_title}>Title</Text>
+                            <TextInput
+                                style={styles.field_input}
+                                onChangeText={(name) => setName(name)}
+                                inputMode='text'
+                                value={name}
+                                placeholder="Song title"
+                                placeholderTextColor ={colors.secondary}
+                                autoFocus={true}
+                            />
+                        </View>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                await deleteAction(album)
+                                router.dismissAll()
+                            }} style={styles.btn_delete}>
+                            <Text style={styles.btn_text}>Delete album</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity 
-                        onPress={async () => {
-                            await deleteAction(album)
-                            router.dismissAll()
-                        }} style={styles.btn_delete}>
-                        <Text style={styles.btn_text}>Delete album</Text>
-                    </TouchableOpacity>
-                </View>
-                
-                
-            </ScrollView>
+                    
+                    
+                </ScrollView>
+            </KeyboardAvoidingView>
         </LinearGradient>
     )
 }

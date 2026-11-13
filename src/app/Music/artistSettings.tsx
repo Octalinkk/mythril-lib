@@ -3,7 +3,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { Artist, deleteArtist, getArtistById, getArtistByName, updateArtist } from '@/db/ArtistsManager';
 import { addSongArtist, deleteSongsByArtistId, getSongsByArtistId } from '@/db/SongsArtistsManager';
@@ -108,7 +108,8 @@ export default function artistSettings() {
         cover: "",
         last_time_played: "",
         time_listened: 0,
-        time_started: 0
+        time_started: 0,
+        pinned: 0
     });
 
     const [name, setName] = useState<string>("");
@@ -171,39 +172,43 @@ export default function artistSettings() {
                     <Text style={styles.btn_text}>Save</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView >
-                <View style={styles.main_scroll}>
-                    {getCoverSource(artist.cover, artist.name)}
-                    <TouchableOpacity 
-                        onPress={async () => {
-                            openModal()
-                        }} style={styles.btn_md}>
-                        <Text style={styles.btn_text}>Change cover</Text>
-                    </TouchableOpacity>
-                    
-                    <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='artist' id={artist.id} key={"song_setting:"+artist.id}/>
-                    <View style={styles.field_container}>
-                        <Text style={styles.field_title}>Title</Text>
-                        <TextInput
-                            style={styles.field_input}
-                            onChangeText={(name) => setName(name)}
-                            inputMode='text'
-                            value={name}
-                            placeholder="Song title"
-                            placeholderTextColor ={colors.secondary}
-                        />
+            
+            <KeyboardAvoidingView behavior='height'>
+                <ScrollView >
+                    <View style={styles.main_scroll}>
+                        {getCoverSource(artist.cover, artist.name)}
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                openModal()
+                            }} style={styles.btn_md}>
+                            <Text style={styles.btn_text}>Change cover</Text>
+                        </TouchableOpacity>
+                        
+                        <SearchCoverModal visible={visibleModal} onClose={closeModal} returnFileResult={updateCover} target='artist' id={artist.id} key={"song_setting:"+artist.id}/>
+                        <View style={styles.field_container}>
+                            <Text style={styles.field_title}>Title</Text>
+                            <TextInput
+                                style={styles.field_input}
+                                onChangeText={(name) => setName(name)}
+                                inputMode='text'
+                                value={name}
+                                placeholder="Song title"
+                                placeholderTextColor ={colors.secondary}
+                                autoFocus={true}
+                            />
+                        </View>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                await deleteAction(artist)
+                                router.dismissAll()
+                            }} style={styles.btn_delete}>
+                            <Text style={styles.btn_text}>Delete artist</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity 
-                        onPress={async () => {
-                            await deleteAction(artist)
-                            router.dismissAll()
-                        }} style={styles.btn_delete}>
-                        <Text style={styles.btn_text}>Delete artist</Text>
-                    </TouchableOpacity>
-                </View>
-                
-                
-            </ScrollView>
+                    
+                    
+                </ScrollView>
+            </KeyboardAvoidingView>
         </LinearGradient>
     )
 }
